@@ -1,9 +1,12 @@
 module(..., package.seeall)
 
 local html_writer = require "lunamark.html_writer"
+local latex_writer = require "lunamark.latex_writer"
 local markdown_parser = require "lunamark.markdown_parser"
 
-writer = { html = html_writer.writer }
+writer = { html = html_writer.writer,
+           latex = latex_writer.writer,
+         }
 parser = { markdown = markdown_parser.parser }
 
 function converter(in_format, out_format, options)
