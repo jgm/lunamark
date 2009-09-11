@@ -22,6 +22,7 @@ build = {
       lunamark = "lunamark.lua",
       ["lunamark.util"] = "lunamark/util.lua",
       ["lunamark.html_writer"] = "lunamark/html_writer.lua",
+      ["lunamark.latex_writer"] = "lunamark/latex_writer.lua",
       ["lunamark.markdown_parser"] = "lunamark/markdown_parser.lua"
    }
 }
