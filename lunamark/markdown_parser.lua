@@ -78,7 +78,6 @@ function parser(writerfn, opts, refs)
     ( _"Blockquote"
     + _"Verbatim"
     + _"Reference" / {} 
-    -- + _"Note"
     + _"HorizontalRule"
     + _"Heading"
     + _"OrderedList"
@@ -137,7 +136,6 @@ function parser(writerfn, opts, refs)
 
     Verbatim = lpeg.Ct(_"VerbatimChunk"^1) * (blankline^1 + eof) / writer.verbatim,
 
-    -- TODO when notes are added, need to exclude label starting with ^
     Label = p"[" * lpeg.Cf(lpeg.Cc("") * #((c(_"Label" + _"Inline") - p"]")^1), strcat) * 
              lpeg.Ct((_"Label" / function(a) return {"[",a.inlines,"]"} end + _"Inline" - p"]")^1) * p"]" /
              function(a,b) return {raw = a, inlines = b} end,
@@ -165,13 +163,10 @@ function parser(writerfn, opts, refs)
     + _"Emph"
     + _"Image"
     + _"Link"
-    -- + _"NoteReference"
-    -- + _"InlineNote"
     + _"Code"
     + _"RawHtml"
     + _"Entity"
     + _"EscapedChar"
-    -- + _"Smart"
     + _"Symbol",
 
     RawHtml = c(htmlcomment + htmltag) / writer.rawhtml,
