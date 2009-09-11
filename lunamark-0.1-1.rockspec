@@ -6,11 +6,14 @@ source = {
 description = {
    summary = "General markup format converter using lpeg.",
    detailed = [[
-      Here we would put a detailed, typically
-      paragraph-long description.
+      lunamark is a lua library for converting between markup
+      formats.  Currently markdown is the only supported input format,
+      and HTML and LaTeX the only supported output formats, but lunamark's
+      modular structure makes it easy to add new parsers and writers.
+      Parsers are written using a PEG grammar.
    ]],
    homepage = "",
-   license = "GPL",
+   license = "MIT",
 }
 dependencies = {
    "lua >= 5.1",
