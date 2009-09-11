@@ -23,7 +23,6 @@ function writer(parser, options, references)
   local list = { tight = function(items) return util.map(listitem, items) end,
                  loose = function(items) return util.map(function(c) return listitem(c .. "\n\n") end, items) end }
   return {
-  null = function() return "" end,
   rawhtml = function(c) return c end,
   linebreak = function() return "<br />\n" end,
   str = escape,

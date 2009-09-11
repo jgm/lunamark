@@ -190,7 +190,7 @@ function parser(writerfn, opts, refs)
     + ( line * (p"==="^3 + p"---"^3) * newline )
     ) / writer.space,
 
-    TerminalEndline = sp * newline * eof / writer.null,
+    TerminalEndline = sp * newline * eof / "",
 
     LineBreak = p"  " * _"NormalEndline" / writer.linebreak,
 
