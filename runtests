@@ -1,0 +1,6 @@
+#!/usr/bin/env lua
+
+os.execute[[
+cd MarkdownTest_1.0.3
+./MarkdownTest.pl --script=../markdown --tidy
+]]
