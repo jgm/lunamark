@@ -19,7 +19,7 @@ function writer(parser, options, references)
                       return string.gsub(s, "(.)", function(c) return string.format(fmt(),string.byte(c)) end)
                     end
   local spliton1 = function(s) local t = {}; for m in string.gmatch(s, "([^\001]+)") do table.insert(t,m) end; return t end
-  local listitem = function(c) return {"<li>", util.map(parser(writer, options, references).parse, spliton1(c)), "</li>\n"} end
+  local listitem = function(c) return {"<li>", util.map(parser(writer, options, references), spliton1(c)), "</li>\n"} end
   local list = { tight = function(items) return util.map(listitem, items) end,
                  loose = function(items) return util.map(function(c) return listitem(c .. "\n\n") end, items) end }
   return {
@@ -38,7 +38,7 @@ function writer(parser, options, references)
                   loose = function(c) return {"<ol>\n", list.loose(c), "</ol>\n"} end },
   para = function(c) return {"<p>", c, "</p>\n"} end,
   plain = function(c) return c end,
-  blockquote = function(c) return {"<blockquote>", parser(writer, options, references).parse(table.concat(c,"\n")), "</blockquote>\n"} end,
+  blockquote = function(c) return {"<blockquote>", parser(writer, options, references)(table.concat(c,"\n")), "</blockquote>\n"} end,
   verbatim = function(c) return {"<pre><code>", escape(table.concat(c,"")), "</code></pre>\n"} end,
   hrule = function() return "<hr />\n" end,
   link = function(lab,src,tit)

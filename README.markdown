@@ -24,16 +24,13 @@ Using
     require "lunamark"
 
     -- read stdin
-    local inp = io.read("*a")
+    inp = io.read("*a")
 
     -- note: these are functions:
-    local markdown2html_string = lunamark.converter("markdown", "html").to_string
-    local write_markdown2latex = lunamark.converter("markdown", "latex").write
+    markdown2html = lunamark.converter("markdown", "html")
+    markdown2latex = lunamark.converter("markdown", "latex")
 
-    -- return a string:
-    output = markdown2html_string(inp)
-    print(output)
-
-    -- or, write directly to file:
-    write_markdown2latex(io.stdout, inp)
+    io.write("HTML:\n",markdown2html(inp))
+    io.write("-----\n")
+    io.write("LaTeX:\n",markdown2latex(inp))
 

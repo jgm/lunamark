@@ -244,14 +244,8 @@ function parser(writerfn, opts, refs)
     Symbol = c(specialchar) / writer.str
     }
 
-  local parse = function(inp) return lpeg.match(parser, inp) end
+  local parse = function(inp) return util.to_string(lpeg.match(parser, inp)) end
 
-  return {
-    writer = writer,
-    options = options,
-    parse = parse,
-    to_string = function(inp) return util.to_string(parse(inp)) end,
-    write = function(f, inp) return util.to_file(f, parse(inp)) end
-    }
+  return parse
 end
 

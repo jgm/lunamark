@@ -30,5 +30,7 @@ end
 
 inp = read_and_expand_tabs()
 
-lunamark.converter("markdown", "html").write(io.stdout, inp)
+local convert = lunamark.converter("markdown", "html")
+
+io.write(convert(inp))
 

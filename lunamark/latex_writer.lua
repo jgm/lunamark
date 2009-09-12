@@ -25,7 +25,7 @@ function writer(parser, options, references)
                             end
   local escape = function(s) return (string.gsub(s, "[{}$%&_#^\\~|<>]", escape_latex_char)) end
   local spliton1 = function(s) local t = {}; for m in string.gmatch(s, "([^\001]+)") do table.insert(t,m) end; return t end
-  local listitem = function(c) return {"\\item ", util.map(parser(writer, options, references).parse, spliton1(c)), "\n"} end
+  local listitem = function(c) return {"\\item ", util.map(parser(writer, options, references), spliton1(c)), "\n"} end
   local list = { tight = function(items) return util.map(listitem, items) end,
                  loose = function(items) return util.map(function(c) return listitem(c .. "\n\n") end, items) end }
   local symbolnotin = function(s)
@@ -51,7 +51,7 @@ function writer(parser, options, references)
                   loose = function(c) return {"\\end{enumerate}\n", list.loose(c), "\\end{enumerate}\n"} end },
   para = function(c) return {c, "\n"} end,
   plain = function(c) return c end,
-  blockquote = function(c) return {"\\begin{quote}\n", parser(writer, options, references).parse(table.concat(c,"\n")), "\\end{quote}\n"} end,
+  blockquote = function(c) return {"\\begin{quote}\n", parser(writer, options, references)(table.concat(c,"\n")), "\\end{quote}\n"} end,
   verbatim = function(c) return {"\\begin{verbatim}\n", escape(table.concat(c,"")), "\\end{verbatim}\n"} end,
   hrule = function() return "\\begin{center}\\rule{3in}{0.4pt}\\end{center}\n" end,
   link = function(lab,src,tit)
