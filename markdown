@@ -4,7 +4,7 @@ require "luarocks.require"
 require "lunamark"
 
 local function detab(s, tabstop)
-  return s:gsub("([^\n\r]-)\t", function(m) local l = string.len(m) % tabstop; return m .. string.rep(" ",4 - l)  end)
+  return s:gsub("([^\n\r]-)\t", function(m) local l = string.len(m) % tabstop; return m .. string.rep(" ",tabstop - l)  end)
 end
 
 numargs = table.getn(arg)
