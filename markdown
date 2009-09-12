@@ -15,13 +15,20 @@ local function expandTabs(s, tab)
   return s
 end
 
+local function read_and_expand_tabs()
+  buffer = {}
+  for line in io.lines() do
+    table.insert(buffer, expandTabs(line,4).."\n")
+  end
+  return table.concat(buffer).."\n"
+end
+
 numargs = table.getn(arg)
 if numargs > 0 then
   io.input(arg[1])
 end
 
-local inp = io.read("*a") .. "\n\n"  -- added because markdown test suite demands it
-inp = expandTabs(inp,4)                   -- again, because test suite demands it
+inp = read_and_expand_tabs()
 
 lunamark.converter("markdown", "html").write(io.stdout, inp)
 
