@@ -1,33 +1,31 @@
 module(..., package.seeall)
 
-function to_string(t)
-  local result = ""
-  for k, v in pairs(t) do
-    if type(v) == "string" then
-      result = result .. v
-    else
-      result = result .. to_string(v)
-    end
-  end
-  return result
-end
-
-function to_file(f, t)
-  for k,v in pairs(t) do
-    if type(v) == "string" then
-      f:write(v)
-    else
-      to_file(f, v)
-    end
-  end
-end
-
 function map(func, t)
   local new_t = {}
   for i,v in ipairs(t) do
     new_t[i] = func(v)
   end
   return new_t
+end
+
+function traverse_tree(f, t)
+  for k,v in pairs(t) do
+    if type(v) == "string" then
+      f(v)
+    else
+      traverse_tree(f, v)
+    end
+  end
+end
+
+function to_string(t)
+  local buffer = {}
+  traverse_tree(function(x) table.insert(buffer,x) end, t)
+  return table.concat(buffer)
+end
+
+function to_file(file, t)
+  return traverse_tree(function(x) file:write(x) end, t)
 end
 
 function normalize_label(a)
