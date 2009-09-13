@@ -1,0 +1,8 @@
+- make it possible to insert custom parsers and callbacks
+  for them w/o modifying module code?
+
+- better documentation, also on extending
+
+- release, on luaforge, as rock?
+
+
