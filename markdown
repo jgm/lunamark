@@ -5,14 +5,13 @@ require "lunamark"
 
 -- from Programming Lua
 local function expandTabs(s, tab)
-  tabstop = tabstop or 4
+  local tab = tab or 4
   local corr = 0
-  s = string.gsub(s, "()\t", function(p)
+  return string.gsub(s, "()\t", function(p)
           local sp = tab - (p - 1 + corr)%tab
           corr = corr - 1 + sp
           return string.rep(" ",sp)
         end)
-  return s
 end
 
 local function read_and_expand_tabs()
