@@ -245,5 +245,3 @@ function parser(writerfn, opts, refs)
 
   return function(inp) return util.to_string(lpeg.match(syntax, inp)) end
 end
-
-return parser

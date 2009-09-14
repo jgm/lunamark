@@ -1,1 +1,3 @@
-return { markdown = require "lunamark.parser.markdown" }
+module(..., package.seeall)
+
+markdown = (require "lunamark.parser.markdown").parser
