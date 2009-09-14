@@ -1,17 +1,11 @@
 module(..., package.seeall)
 
-local html_writer = require "lunamark.html_writer"
-local latex_writer = require "lunamark.latex_writer"
-local markdown_parser = require "lunamark.markdown_parser"
-
-writer = { html = html_writer.writer,
-           latex = latex_writer.writer,
-         }
-parser = { markdown = markdown_parser.parser }
+local writer = require "lunamark.writer"
+local parser = require "lunamark.parser"
 
 function converter(in_format, out_format, options)
-  assert(parser[in_format], "input format " .. in_format .. " not defined")
-  assert(writer[out_format], "output format " .. out_format .. " not defined")
+  assert(parser[in_format], string.format("input format `%s' not defined", in_format))
+  assert(writer[out_format], string.format("output format `%s' not defined", out_format))
   return parser[in_format](writer[out_format], options)
 end
 

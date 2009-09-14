@@ -1,4 +1,4 @@
-module(..., package.seeall)
+module (..., package.seeall)
 
 local lpeg = require "lpeg"
 local util = require "lunamark.util"
@@ -62,7 +62,7 @@ function parser(writerfn, opts, refs)
   local references = refs or {}
   local writer = writerfn(parser, options, references)
 
-  local parser = p{
+  local syntax = p{
     "Doc"; -- initial
 
     Doc = #(lpeg.Cmt(_"References", function(s,i,a) writer = writerfn(parser, options, references); return i end)) * 
@@ -243,8 +243,7 @@ function parser(writerfn, opts, refs)
     Symbol = c(specialchar) / writer.str
     }
 
-  local parse = function(inp) return util.to_string(lpeg.match(parser, inp)) end
-
-  return parse
+  return function(inp) return util.to_string(lpeg.match(syntax, inp)) end
 end
 
+return parser

@@ -24,9 +24,11 @@ build = {
    modules = {
       lunamark = "lunamark.lua",
       ["lunamark.util"] = "lunamark/util.lua",
-      ["lunamark.html_writer"] = "lunamark/html_writer.lua",
-      ["lunamark.latex_writer"] = "lunamark/latex_writer.lua",
-      ["lunamark.markdown_parser"] = "lunamark/markdown_parser.lua"
+      ["lunamark.writer"] = "lunamark/writer.lua",
+      ["lunamark.writer.html"] = "lunamark/writer/html.lua",
+      ["lunamark.writer.latex"] = "lunamark/writer/latex.lua",
+      ["lunamark.parser"] = "lunamark/parser.lua",
+      ["lunamark.parser.markdown"] = "lunamark/parser/markdown.lua",
    }
 }
 

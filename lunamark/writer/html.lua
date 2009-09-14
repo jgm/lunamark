@@ -1,8 +1,6 @@
-module(..., package.seeall)
-
 local util = require "lunamark.util"
 
-function writer(parser, options, references)
+local function writer(parser, options, references)
   local escape_html_char = function(c)
                              if c == "\"" then
                                 return "&quot;"
@@ -63,3 +61,4 @@ function writer(parser, options, references)
   }
 end
 
+return writer

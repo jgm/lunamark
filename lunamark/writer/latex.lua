@@ -1,8 +1,6 @@
-module(..., package.seeall)
-
 local util = require "lunamark.util"
 
-function writer(parser, options, references)
+local function writer(parser, options, references)
   local escape_latex_char = function(c)
                               if c == "{" or c == "}" or c == "$" or c == "%" or
                                  c == "&" or c == "_" or c == "#" then
@@ -67,3 +65,4 @@ function writer(parser, options, references)
   }
 end
 
+return writer
