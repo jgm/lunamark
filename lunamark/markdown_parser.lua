@@ -51,7 +51,6 @@ local blocktag = lpeg.Cmt(c(alphanumeric^1), function(s,i,a) return blocktags[st
 local openblocktag = p"<" * spnl * lpeg.Cg(blocktag, "opentag") * spnl * htmlattribute^0 * p">"
 local closeblocktag = p"<" * spnl * p"/" * lpeg.Cmt(c(alphanumeric^1) * lpeg.Cb("opentag"), function(s,i,a,b) return string.lower(a) == string.lower(b) and i end) * spnl * p">"
 local selfclosingblocktag = p"<" * spnl * p"/"^-1 * blocktag * spnl * htmlattribute^0 * p"/" * spnl * p">"
-local inblocktags = openblocktag * (_"HtmlBlock" + (p(1) - closeblocktag))^0 * closeblocktag
 
 local choice = function(parsers) local res = lpeg.S""; for k,p in pairs(parsers) do res = res + p end; return res end
 
@@ -123,7 +122,9 @@ function parser(writerfn, opts, refs)
 
     ListBlockLine = -blankline * -(indent^-1 * (bullet + enumerator)) * optionallyindentedline,
 
-    HtmlBlock = c(inblocktags + selfclosingblocktag + htmlcomment) * blankline^1 / function(a) return writer.rawhtml(a .. "\n") end,
+    InBlockTags = openblocktag * (_"HtmlBlock" + (p(1) - closeblocktag))^0 * closeblocktag,
+
+    HtmlBlock = c(_"InBlockTags" + selfclosingblocktag + htmlcomment) * blankline^1 / function(a) return writer.rawhtml(a .. "\n") end,
 
     BlockquoteLine = ( (nonindentspace * p(">") * p(" ")^-1 * c(linechar^0) * newline)^1
     * ((c(linechar^1) - blankline) * newline)^0 
