@@ -58,8 +58,6 @@ local choice = function(parsers) local res = lpeg.S""; for k,p in pairs(parsers)
 -- yields a blank line unless we're at the beginning of the document
 local interblockspace = lpeg.Cmt(blankline^0, function(s,i) if i == 1 then return i, "" else return i, "\n" end end)
 
-local strcat = function(accum,s) return (accum .. s) end 
-
 function parser(writerfn, opts, refs)
   local options = opts or {}
   local references = refs or {}
@@ -136,7 +134,7 @@ function parser(writerfn, opts, refs)
 
     Verbatim = lpeg.Ct(_"VerbatimChunk"^1) * (blankline^1 + eof) / writer.verbatim,
 
-    Label = p"[" * lpeg.Cf(lpeg.Cc("") * #((c(_"Label" + _"Inline") - p"]")^1), strcat) * 
+    Label = p"[" * lpeg.Cf(lpeg.Cc("") * #((c(_"Label" + _"Inline") - p"]")^1), function(accum, s) return accum .. s end) * 
              lpeg.Ct((_"Label" / function(a) return {"[",a.inlines,"]"} end + _"Inline" - p"]")^1) * p"]" /
              function(a,b) return {raw = a, inlines = b} end,
 
