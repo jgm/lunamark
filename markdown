@@ -19,7 +19,9 @@ local function read_and_expand_tabs()
   for line in io.lines() do
     table.insert(buffer, expandTabs(line,4))
   end
-  return table.concat(buffer,"\n").."\n\n"
+  -- need blank line at end to emulate Markdown.pl
+  table.insert(buffer, "\n")
+  return table.concat(buffer,"\n")
 end
 
 numargs = table.getn(arg)
