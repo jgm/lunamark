@@ -5,4 +5,5 @@
 
 - release, on luaforge, as rock?
 
-
+- stack overflow on really large input
+  this seems to be due to References
