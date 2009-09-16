@@ -20,6 +20,14 @@ Lunamark can be installed using [luarocks](http://www.luarocks.org):
 Using
 -----
 
+    lunamark.converter(in_format, out_format, options)
+
+returns a function from string to string.  `in_format` is currently
+limited to `markdown`; `out_format` can be `html` or `latex`.
+`options` is a table; currently the only supported option is
+`modify_syntax`, a function from a grammar table to a grammar
+table that can ring changes on the standard markdown syntax.
+
     require "luarocks.require"
     require "lunamark"
 
@@ -29,8 +37,12 @@ Using
     -- note: these are functions:
     markdown2html = lunamark.converter("markdown", "html")
     markdown2latex = lunamark.converter("markdown", "latex")
+    -- this one changes the syntax definition:
+    markdown2htmlCAPS = lunamark.converter("markdown", "html",
+                         { modify_syntax = function(t) t.Str = t.Str / string.upper; return t end })
 
     io.write("HTML:\n",markdown2html(inp))
     io.write("-----\n")
     io.write("LaTeX:\n",markdown2latex(inp))
-
+    io.write("-----\n")
+    io.write("HTML CAPS:\n",markdown2htmlCAPS(inp))
