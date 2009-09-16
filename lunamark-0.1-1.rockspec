@@ -1,7 +1,7 @@
 package = "lunamark"
 version = "0.1-1"
 source = {
-   url = ""
+   url = "http://github.com/jgm/lunamark/tarball/0.1"
 }
 description = {
    summary = "General markup format converter using lpeg.",
