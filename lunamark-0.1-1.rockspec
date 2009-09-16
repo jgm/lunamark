@@ -12,7 +12,7 @@ description = {
       modular structure makes it easy to add new parsers and writers.
       Parsers are written using a PEG grammar.
    ]],
-   homepage = "",
+   homepage = "http://github.com/jgm/lunamark",
    license = "MIT",
 }
 dependencies = {
