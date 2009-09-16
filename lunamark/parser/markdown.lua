@@ -13,6 +13,7 @@ function parser(writerfn, opts, refs)
   local options = opts or {}
   local references = refs or {}
   local writer = writerfn(parser, options, references)
+  local transform = options.transform or function(a) return a end
 
   local syntax = {
     "Doc"; -- initial
@@ -195,5 +196,5 @@ function parser(writerfn, opts, refs)
     Symbol = c(generic.specialchar) / writer.str
     }
 
-  return function(inp) return util.to_string(lpeg.match(p(syntax), inp)) end
+  return function(inp) return util.to_string(lpeg.match(p(transform(syntax)), inp)) end
 end
