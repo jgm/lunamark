@@ -1,7 +1,9 @@
 package = "lunamark"
 version = "0.1-1"
 source = {
-   url = "http://github.com/jgm/lunamark/tarball/0.1"
+   url = "http://github.com/jgm/lunamark/tarball/0.1",
+   md5 = "2eedaa3ee7603c26c2452f846a2f35b5",
+   file = "jgm-lunamark-43bf6475ac5c9600dcdd66f34afb29bc8d48a50a.tar.gz"
 }
 description = {
    summary = "General markup format converter using lpeg.",
@@ -13,7 +15,7 @@ description = {
       Parsers are written using a PEG grammar.
    ]],
    homepage = "http://github.com/jgm/lunamark",
-   license = "MIT",
+   license = "MIT/X11",
 }
 dependencies = {
    "lua >= 5.1",
