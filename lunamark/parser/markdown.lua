@@ -9,17 +9,18 @@ local _ = lpeg.V
 local p = lpeg.P
 local r = lpeg.R
 
-function parser(writerfn, opts, refs)
+local references = {}
+
+function parser(writerfn, opts)
   local options = opts or {}
-  local references = refs or {}
-  local writer = writerfn(parser, options, references)
+  local writer = writerfn(parser, options)
   local modify_syntax = options.modify_syntax or function(a) return a end
 
   local syntax = {
     "Doc"; -- initial
 
-    Doc = #(lpeg.Cmt(_"References", function(s,i,a) writer = writerfn(parser, options, references); return i end)) * 
-            lpeg.Ct((generic.interblockspace *  _"Block")^0) * generic.blankline^0 * generic.eof,
+    Doc = #(lpeg.Cmt(_"References", function(s,i,a) return i end)) * 
+           lpeg.Ct((generic.interblockspace *  _"Block")^0) * generic.blankline^0 * generic.eof,
 
 
     References = (_"Reference" / function(ref) references[ref.key] = ref end + (generic.nonemptyline^1 * generic.blankline^1) + generic.line)^0 * generic.blankline^0 * generic.eof,
