@@ -36,7 +36,7 @@ local function writer(parser, options)
                   loose = function(c) return {"<ol>\n", list.loose(c), "</ol>\n"} end },
   para = function(c) return {"<p>", c, "</p>\n"} end,
   plain = function(c) return c end,
-  blockquote = function(c) return {"<blockquote>", parser(writer, options)(table.concat(c,"\n")), "</blockquote>\n"} end,
+  blockquote = function(c) return {"<blockquote>\n", parser(writer, options)(table.concat(c,"\n")), "</blockquote>\n"} end,
   verbatim = function(c) return {"<pre><code>", escape(table.concat(c,"")), "</code></pre>\n"} end,
   hrule = function() return "<hr />\n" end,
   link = function(lab,src,tit)
