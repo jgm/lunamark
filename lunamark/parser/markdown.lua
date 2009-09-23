@@ -83,7 +83,7 @@ function parser(writerfn, opts)
     BlockquoteLine = ( (generic.nonindentspace * p(">") * p(" ")^-1 * c(generic.linechar^0) * generic.newline)^1
     * ((c(generic.linechar^1) - generic.blankline) * generic.newline)^0 
     * c(generic.blankline)^0 )^1,
-    Blockquote = lpeg.Ct((_"BlockquoteLine" - generic.blankline)^1) / writer.blockquote,
+    Blockquote = lpeg.Ct((_"BlockquoteLine")^1) / writer.blockquote,
 
     VerbatimChunk = generic.blankline^0 * (generic.indentedline - generic.blankline)^1,
 
