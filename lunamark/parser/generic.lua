@@ -28,7 +28,7 @@ alphanumeric = lpeg.R("AZ","az","09")
 line = c((p(1) - newline)^0 * newline) + c(p(1)^1 * eof)
 nonemptyline = (p(1) - newline)^1 * newline
 quoted = function(open, close) return (p(open) * c((p(1) - (blankline + p(close)))^0) * p(close)) end
-htmlattributevalue = (quoted("'","'") + quoted("\"","\"")) + (p(1) - spacechar)^1
+htmlattributevalue = (quoted("'","'") + quoted("\"","\"")) + (p(1) - lpeg.S("\t >"))^1
 htmlattribute = (alphanumeric + lpeg.S("_-"))^1 * spnl * (p"=" * spnl * htmlattributevalue)^-1 * spnl
 htmlcomment = p"<!--" * (p(1) - p"-->")^0 * p"-->"
 htmltag = p"<" * spnl * p"/"^-1 * alphanumeric^1 * spnl * htmlattribute^0 * p"/"^-1 * spnl * p">" 
