@@ -37,8 +37,12 @@ bullet = nonindentspace * (p"+" + (p"*" - lineof"*") + (p"-" - lineof"-")) * spa
 enumerator = nonindentspace * r"09"^1 * p"." * space
 
 openticks = lpeg.Cg(p"`"^1, "ticks")
-closeticks = sp * lpeg.Cmt(c(p"`"^1) * lpeg.Cb("ticks"), function(s,i,a,b) return string.len(a) == string.len(b) and i end)
-inticks = openticks * sp * c((p(1) - (blankline + closeticks))^1) * closeticks
+closeticks = p" "^-1 * lpeg.Cmt(c(p"`"^1) * lpeg.Cb("ticks"), function(s,i,a,b) return string.len(a) == string.len(b) and i end)
+intickschar = (p(1) - lpeg.S(" \n\r`")) +
+              (newline * -blankline) +
+              (p" " - closeticks) +
+              (p("`")^1 - closeticks)
+inticks = openticks * p(" ")^-1 * c(intickschar^1) * closeticks
 
 blocktags = { address = true, blockquote = true, center = true, dir = true, div = true, dl = true,
                     fieldset = true, form = true, h1 = true, h2 = true, h3 = true, h4 = true, h5 = true,
