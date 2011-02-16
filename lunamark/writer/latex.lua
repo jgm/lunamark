@@ -50,7 +50,7 @@ local function writer(parser, options)
   para = function(c) return {c, "\n"} end,
   plain = function(c) return c end,
   blockquote = function(c) return {"\\begin{quote}\n", parser(writer, options)(table.concat(c,"\n")), "\\end{quote}\n"} end,
-  verbatim = function(c) return {"\\begin{verbatim}\n", escape(table.concat(c,"")), "\\end{verbatim}\n"} end,
+  verbatim = function(c) return {"\\begin{verbatim}\n", table.concat(c), "\\end{verbatim}\n"} end,
   hrule = function() return "\\begin{center}\\rule{3in}{0.4pt}\\end{center}\n" end,
   link = function(lab,src,tit)
            return {"\\href{", src, "}{", lab.inlines, "}"}
