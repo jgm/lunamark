@@ -46,7 +46,7 @@ local function writer(parser, options)
   bulletlist = { tight = function(c) return {"\\begin{itemize}\n", list.tight(c), "\\end{itemize}\n"} end,
                  loose = function(c) return {"\\begin{itemize}\n", list.loose(c), "\\end{itemize}\n"} end },
   orderedlist = { tight = function(c) return {"\\begin{enumerate}\n", list.tight(c), "\\end{enumerate}\n"} end,
-                  loose = function(c) return {"\\end{enumerate}\n", list.loose(c), "\\end{enumerate}\n"} end },
+                  loose = function(c) return {"\\begin{enumerate}\n", list.loose(c), "\\end{enumerate}\n"} end },
   para = function(c) return {c, "\n"} end,
   plain = function(c) return c end,
   blockquote = function(c) return {"\\begin{quote}\n", parser(writer, options)(table.concat(c,"\n")), "\\end{quote}\n"} end,
