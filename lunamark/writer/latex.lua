@@ -51,7 +51,7 @@ local function writer(parser, options)
   plain = function(c) return c end,
   blockquote = function(c) return {"\\begin{quote}\n", parser(writer, options)(table.concat(c,"\n")), "\\end{quote}\n"} end,
   verbatim = function(c) return {"\\begin{verbatim}\n", table.concat(c), "\\end{verbatim}\n"} end,
-  hrule = function() return "\\begin{center}\\rule{.6\\linewidth}{0.4pt}\\end{center}\n" end,
+  hrule = function() return "\\hspace{\\fill}\\rule{.6\\linewidth}{0.4pt}\\hspace{\\fill}\n" end,
   link = function(lab,src,tit)
            return {"\\href{", src, "}{", lab.inlines, "}"}
          end,
