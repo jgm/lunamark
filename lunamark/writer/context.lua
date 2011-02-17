@@ -11,9 +11,9 @@ local function writer(parser, options)
   str = escape,
   entity = function(c) return "?" end, -- XXX
   space = function() return " " end,
-  emph = function(c) return {"{\\em ", c, "}"} end,
+  emph = function(c) return {"\\dontleavehmode{\\em ", c, "}"} end,
   code = function(c) return {"\\type{", c, "}"} end,
-  strong = function(c) return {"{\\bf ", c, "}"} end,
+  strong = function(c) return {"\\dontleavehmode{\\bf ", c, "}"} end,
   heading = function(lev,c) return {"\\", string.rep("sub",lev - 1), "section{", c, "}\n"} end,
   bulletlist = { tight = function(c) return {"\\startitemize[packed]\n", util.map(listitem, c), "\\stopitemize\n"} end,
                  loose = function(c) return {"\\startitemize\n", util.map(listitem, c), "\\stopitemize\n"} end },
