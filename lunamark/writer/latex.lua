@@ -1,27 +1,7 @@
 local util = require "lunamark.util"
 
 local function writer(parser, options)
-  local escape_latex_char = function(c)
-                              if c == "{" or c == "}" or c == "$" or c == "%" or
-                                 c == "&" or c == "_" or c == "#" then
-                                 return("\\"..c)
-                              elseif c == "^" then
-                                 return("{\\^}")
-                              elseif c == "\\" then
-                                 return("{\\textbackslash}")
-                              elseif c == "~" then
-                                 return("\\ensuremath{\\sim}")
-                              elseif c == "|" then
-                                 return("{\\textbar}")
-                              elseif c == "<" then
-                                 return("{\\textless}")
-                              elseif c == ">" then
-                                 return("{\\textgreater}")
-                              else
-                                 return(c)
-                              end
-                            end
-  local escape = function(s) return (string.gsub(s, "[{}$%%&_#^\\~|<>]", escape_latex_char)) end
+  local escape = function(s) return (string.gsub(s, "[{}$%%&_#^\\~|<>]", function(c) return "\\char`\\"..c end)) end
   local spliton1 = function(s) local t = {}; for m in string.gmatch(s, "([^\001]+)") do table.insert(t,m) end; return t end
   local listitem = function(c) return {"\\item ", util.map(parser(writer, options), spliton1(c)), "\n"} end
   local list = { tight = function(items) return util.map(listitem, items) end,
