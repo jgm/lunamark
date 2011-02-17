@@ -21,7 +21,7 @@ local function writer(parser, options)
                                  return(c)
                               end
                             end
-  local escape = function(s) return (string.gsub(s, "[{}$%&_#^\\~|<>]", escape_latex_char)) end
+  local escape = function(s) return (string.gsub(s, "[{}$%%&_#^\\~|<>]", escape_latex_char)) end
   local spliton1 = function(s) local t = {}; for m in string.gmatch(s, "([^\001]+)") do table.insert(t,m) end; return t end
   local listitem = function(c) return {"\\item ", util.map(parser(writer, options), spliton1(c)), "\n"} end
   local list = { tight = function(items) return util.map(listitem, items) end,
