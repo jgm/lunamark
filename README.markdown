@@ -3,7 +3,7 @@ Lunamark
 
 Lunamark is a lua library for conversion between markup
 formats. Currently markdown is the only supported input
-format, and HTML and LaTeX are the only supported output
+format, and HTML, LaTeX and ConTeXt are the only supported output
 formats.  But lunamark's modular architecture makes it
 easy to add new parsers and writers. Parsers are written
 using a PEG grammar.
@@ -23,7 +23,7 @@ Using
     lunamark.converter(in_format, out_format, options)
 
 returns a function from string to string.  `in_format` is currently
-limited to `markdown`; `out_format` can be `html` or `latex`.
+limited to `markdown`; `out_format` can be `html`, `latex` or `context`.
 `options` is a table; currently the only supported option is
 `modify_syntax`, a function from a grammar table to a grammar
 table that can ring changes on the standard markdown syntax.
