@@ -1,13 +1,12 @@
 local util = require "lunamark.util"
 
 local function writer(parser, options)
-  local escape = function(s) return (string.gsub(s, "[{}$%%&_#^\\~|<>]", function(c) return "\\char`\\"..c end)) end
   local spliton1 = function(s) local t = {}; for m in string.gmatch(s, "([^\001]+)") do table.insert(t,m) end; return t end
   local listitem = function(c) return {"\\item ", util.map(parser(writer, options), spliton1(c)), "\n"} end
   return {
   rawhtml = function(c) return "" end, -- XXX
   linebreak = function() return "\\\\\n" end, -- XXX
-  str = escape,
+  str = function(s) return (string.gsub(s, "[{}$%%&_#^\\~|<>]", function(c) return "\\char`\\"..c end)) end,
   entity = function(c) return "?" end, -- XXX
   space = function() return " " end,
   emph = function(c) return {"\\dontleavehmode{\\em ", c, "}"} end,
