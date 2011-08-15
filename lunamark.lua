@@ -228,11 +228,12 @@ function M.read_markdown(writer, options)
 
   local define_reference_parser = (leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^0) / register_link
 
-  -- local rparser = (define_reference_parser + nonemptyline^1 + blankline^1)^0
+  -- local rparser = (define_reference_parser^1 + nonemptyline^1 + blankline^1)^0
   -- We can simplify since we know we're breaking into chunks:
   local rparser = define_reference_parser^0
 
   local function referenceparser(str)
+      -- lpegmatch(rparser,str)
       -- we process in chunks to avoid stack buildup:
       dochunks(str, "\n[\n \t]*\n", function(x) lpegmatch(rparser,x) end)
       local r = { }
