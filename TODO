@@ -1,9 +1,8 @@
-_ profiling notes. experiments show that the biggest targets for optimization are
+* TODO make parser user-modifiable (as in v1)
+* TODO add latex writer
+* TODO add context writer
+* TODO documentation, including extending writer + parser
+* TODO clean up parser, split into two or three files?
+* NOTE experiments show that the biggest targets for optimization are
   - lists
   - links
-
-
-_ Clean up HTML parsing code - could refactor repetitive tag parsers
-  by parameterizing with a string->bool function
-_ Put in one file? Or split into files?
-_ Other writers
