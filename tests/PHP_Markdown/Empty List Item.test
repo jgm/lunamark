@@ -1,0 +1,86 @@
+markdown
+<<<
+With asterisks
+
+ * List item
+ *
+ * List item
+
+With numbers
+
+1. List item
+2.
+3. List item
+
+With hyphens
+
+- List item
+-
+- List item
+
+With asterisks
+
+ * List item
+ * List item
+ *
+
+With numbers
+
+1. List item
+2. List item
+3.
+
+With hyphens
+
+- List item
+- List item
+-
+
+>>>
+<p>With asterisks</p>
+
+<ul>
+<li>List item</li>
+<li></li>
+<li>List item</li>
+</ul>
+
+<p>With numbers</p>
+
+<ol>
+<li>List item</li>
+<li></li>
+<li>List item</li>
+</ol>
+
+<p>With hyphens</p>
+
+<ul>
+<li>List item</li>
+<li></li>
+<li>List item</li>
+</ul>
+
+<p>With asterisks</p>
+
+<ul>
+<li>List item</li>
+<li>List item</li>
+<li></li>
+</ul>
+
+<p>With numbers</p>
+
+<ol>
+<li>List item</li>
+<li>List item</li>
+<li></li>
+</ol>
+
+<p>With hyphens</p>
+
+<ul>
+<li>List item</li>
+<li>List item</li>
+<li></li>
+</ul>

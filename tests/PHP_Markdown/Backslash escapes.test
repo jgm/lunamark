@@ -1,0 +1,21 @@
+markdown
+<<<
+Tricky combinaisons:
+
+backslash with \\-- two dashes
+
+backslash with \\> greater than
+
+\\[test](not a link)
+
+\\\*no emphasis*
+>>>
+<p>Tricky combinaisons:</p>
+
+<p>backslash with \-- two dashes</p>
+
+<p>backslash with \&gt; greater than</p>
+
+<p>\[test](not a link)</p>
+
+<p>\*no emphasis*</p>

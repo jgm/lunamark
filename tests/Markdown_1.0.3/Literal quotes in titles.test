@@ -1,0 +1,14 @@
+markdown
+<<<
+Foo [bar][].
+
+Foo [bar](/url/ "Title with "quotes" inside").
+
+
+  [bar]: /url/ "Title with "quotes" inside"
+
+
+>>>
+<p>Foo <a href="/url/" title="Title with &quot;quotes&quot; inside">bar</a>.</p>
+
+<p>Foo <a href="/url/" title="Title with &quot;quotes&quot; inside">bar</a>.</p>

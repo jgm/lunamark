@@ -1,13 +1,9 @@
-- make it possible to insert custom parsers and callbacks
-  for them w/o modifying module code?
+_ profiling notes. experiments show that the biggest targets for optimization are
+  - lists
+  - links
 
-- better documentation, also on extending
 
-- release, on luaforge, as rock?
-
-- stack overflow on really large input
-  is this due to nested lpeg calls?  this
-  input yields a stack overflow:
-
-> > > > > > > > hi
-
+_ Clean up HTML parsing code - could refactor repetitive tag parsers
+  by parameterizing with a string->bool function
+_ Put in one file? Or split into files?
+_ Other writers

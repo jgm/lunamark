@@ -1,0 +1,5 @@
+markdown
+<<<
+[hi `there] bud`](/url)
+>>>
+<p><a href="/url">hi <code>there] bud</code></a></p>

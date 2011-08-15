@@ -1,0 +1,18 @@
+markdown
+<<<
+> foo
+>
+> > bar
+>
+> foo
+
+>>>
+<blockquote>
+<p>foo</p>
+
+<blockquote>
+<p>bar</p>
+</blockquote>
+
+<p>foo</p>
+</blockquote>

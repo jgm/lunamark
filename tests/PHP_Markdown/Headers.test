@@ -1,0 +1,21 @@
+markdown
+<<<
+### Header
+
+ - - -
+
+Paragraphr
+
+ - - -
+
+Paragraph
+>>>
+<h3>Header</h3>
+
+<hr />
+
+<p>Paragraphr</p>
+
+<hr />
+
+<p>Paragraph</p>

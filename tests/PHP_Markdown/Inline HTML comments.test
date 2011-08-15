@@ -1,0 +1,22 @@
+markdown
+<<<
+Paragraph one.
+
+<!-- double--dash (invalid SGML comment) -->
+
+Paragraph two.
+
+<!-- enclosed tag </div> -->
+
+The end.
+
+>>>
+<p>Paragraph one.</p>
+
+<!-- double--dash (invalid SGML comment) -->
+
+<p>Paragraph two.</p>
+
+<!-- enclosed tag </div> -->
+
+<p>The end.</p>

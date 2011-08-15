@@ -1,0 +1,34 @@
+markdown
+<<<
+With some attributes:
+
+<div id="test">
+	foo
+</div>
+
+<div id="test"
+     class="nono">
+	foo
+</div>
+	
+Hr's:
+
+<hr class="foo"
+    id="bar" >
+
+>>>
+<p>With some attributes:</p>
+
+<div id="test">
+    foo
+</div>
+
+<div id="test"
+     class="nono">
+    foo
+</div>
+
+<p>Hr&#39;s:</p>
+
+<hr class="foo"
+    id="bar" >

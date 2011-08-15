@@ -1,0 +1,142 @@
+markdown
+<<<
+Dashes:
+
+---
+
+ ---
+ 
+  ---
+
+   ---
+
+	---
+
+- - -
+
+ - - -
+ 
+  - - -
+
+   - - -
+
+	- - -
+
+
+Asterisks:
+
+***
+
+ ***
+ 
+  ***
+
+   ***
+
+	***
+
+* * *
+
+ * * *
+ 
+  * * *
+
+   * * *
+
+	* * *
+
+
+Underscores:
+
+___
+
+ ___
+ 
+  ___
+
+   ___
+
+    ___
+
+_ _ _
+
+ _ _ _
+ 
+  _ _ _
+
+   _ _ _
+
+    _ _ _
+
+>>>
+<p>Dashes:</p>
+
+<hr />
+
+<hr />
+
+<hr />
+
+<hr />
+
+<pre><code>---
+</code></pre>
+
+<hr />
+
+<hr />
+
+<hr />
+
+<hr />
+
+<pre><code>- - -
+</code></pre>
+
+<p>Asterisks:</p>
+
+<hr />
+
+<hr />
+
+<hr />
+
+<hr />
+
+<pre><code>***
+</code></pre>
+
+<hr />
+
+<hr />
+
+<hr />
+
+<hr />
+
+<pre><code>* * *
+</code></pre>
+
+<p>Underscores:</p>
+
+<hr />
+
+<hr />
+
+<hr />
+
+<hr />
+
+<pre><code>___
+</code></pre>
+
+<hr />
+
+<hr />
+
+<hr />
+
+<hr />
+
+<pre><code>_ _ _
+</code></pre>
