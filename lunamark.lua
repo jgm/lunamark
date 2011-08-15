@@ -199,7 +199,7 @@ function M.read_markdown(writer, options)
   end
 
   local function register_link(tag,url,title)
-      return { tag = tag, url = url, title = title }
+      return { tag = normalize_tag(tag), url = url, title = title }
   end
 
   local define_reference_parser = (leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^0) / register_link
