@@ -204,7 +204,7 @@ function M.read_markdown(writer, options)
 
   local define_reference_parser = (leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^0) / register_link
 
-  local rparser = (define_reference_parser + nonemptyline^1 / {} + blankline^1 / {})^0
+  local rparser = (define_reference_parser + nonemptyline^1 + blankline^1)^0
 
   local function referenceparser(str)
       local refs = lpegmatch(Ct(rparser),str)
