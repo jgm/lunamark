@@ -16,27 +16,6 @@ local myname = ...
 
 local M = {}
 
--- apply a function to chunks from a string separated by a pattern
--- based on split from http://lua-users.org/wiki/SplitJoin
--- Compatibility: Lua-5.1
-local function dochunks(str, pat, f)
-   local fpat = "(.-)" .. pat
-   local last_end = 1
-   local s, e, cap = str:find(fpat, 1)
-   while s do
-      if s ~= 1 or cap ~= "" then
-        f(cap)
-      end
-      last_end = e+1
-      s, e, cap = str:find(fpat, last_end)
-   end
-   if last_end <= #str then
-      cap = str:sub(last_end)
-      f(cap)
-   end
-end
-
-
 function M.read_markdown(writer, options)
 
   if not options then options = {} end
@@ -220,28 +199,19 @@ function M.read_markdown(writer, options)
   end
 
   local function register_link(tag,url,title)
-      local ref = normalize_tag(tag)
-      -- references[ref] = { url = url, title = title }
-      -- Don't insert by key here, it builds up the stack for some reason
-      references[#references+1] = { tag = tag, url = url, title = title }
+      return { tag = tag, url = url, title = title }
   end
 
   local define_reference_parser = (leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^0) / register_link
 
-  -- local rparser = (define_reference_parser^1 + nonemptyline^1 + blankline^1)^0
-  -- We can simplify since we know we're breaking into chunks:
-  local rparser = define_reference_parser^0
+  local rparser = (define_reference_parser + nonemptyline^1 / {} + blankline^1 / {})^0
 
   local function referenceparser(str)
-      -- lpegmatch(rparser,str)
-      -- we process in chunks to avoid stack buildup:
-      dochunks(str, "\n[\n \t]*\n", function(x) lpegmatch(rparser,x) end)
-      local r = { }
-      for i=1,#references do
-        local c = references[i]
-        r[c.tag] = c
+      local refs = lpegmatch(Ct(rparser),str)
+      for i=1,#refs do
+         local c = refs[i]
+         if c.tag then references[c.tag] = c end
       end
-      references = r
   end
 
   ------
