@@ -4,4 +4,4 @@ markdown
 
 [Hi]: /foo
 >>>
-<a href="/foo">hI</a>
+<p><a href="/foo">hI</a></p>
