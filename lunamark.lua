@@ -214,7 +214,6 @@ function M.read_markdown(writer, options)
   -- References
   ------------------------------------------------------------------------------
 
-  local refs = {}
   local references = {}
 
   local function normalize_tag(tag)
@@ -225,7 +224,7 @@ function M.read_markdown(writer, options)
       local ref = normalize_tag(tag)
       -- references[ref] = { url = url, title = title }
       -- Don't insert by key here, it builds up the stack for some reason
-      table.insert(refs, { tag = tag, url = url, title = title })
+      references[#references+1] = { tag = tag, url = url, title = title }
   end
 
   local define_reference_parser = (leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^0) / register_link
@@ -237,9 +236,12 @@ function M.read_markdown(writer, options)
   local function referenceparser(str)
       -- we process in chunks to avoid stack buildup:
       dochunks(str, "\n[\n \t]*\n", function(x) lpegmatch(rparser,x) end)
-      for _,v in ipairs(refs) do
-        references[v.tag] = { url = v.url, title = v.title}
+      local r = { }
+      for i=1,#references do
+        local c = references[i]
+        r[c.tag] = c
       end
+      references = r
   end
 
   ------
