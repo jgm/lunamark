@@ -1,0 +1,7 @@
+markdown
+<<<
+[hI]
+
+[Hi]: /foo
+>>>
+<a href="/foo">hI</a>
