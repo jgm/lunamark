@@ -10,6 +10,7 @@ The parser is also more accurate than before.
 ]]--
 
 -- local prof = require("profiler")
+local lpeg = require("lpeg")
 
 local myname = ...
 
@@ -42,7 +43,6 @@ function M.read_markdown(writer, options)
 
   ------------------------------------------------------------------------------
 
-  local lpeg = require("lpeg")
   local lower, upper, gsub, rep, gmatch, format, length =
     string.lower, string.upper, string.gsub, string.rep, string.gmatch,
     string.format, string.len
@@ -74,7 +74,7 @@ function M.read_markdown(writer, options)
 
   nestedparser =
     function(str)
-      local res = lpegmatch(Cs(syntax),str)
+      local res = lpegmatch(syntax, str)
       if res == nil
         then error(format("nestedparser failed on:\n%s", str:sub(1,20)))
         else return res
@@ -444,7 +444,7 @@ function M.read_markdown(writer, options)
   -- Syntax specification
   ------------------------------------------------------------------------------
 
-  syntax = { "Document",
+  syntax = Cs { "Document",
 
       Document              = V("Block")^0,
 
