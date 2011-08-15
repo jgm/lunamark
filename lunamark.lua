@@ -532,12 +532,23 @@ if type(package.loaded[myname]) == "userdata" then
     return M  -- put module stuff here
   else
 --    prof.start()
-    local mywriter = M.writers.html
-    mywriter.options.minimize = false
-    mywriter.options.blanklines = false
-    if arg[1] then
-      io.input(arg[1])
+    lapp = require("pl.lapp")
+    local args = lapp [[
+    Testing parameter handling
+        -t (default html) Output format.
+        <input> (default stdin)  File to convert.
+    ]]
+
+    local writer
+    if not args.t or args.t == "html" then
+      writer = M.writers.html
+    else
+      print("Unknown writer: " .. args.t)
+      os.exit(3)
     end
-    io.write(M.read_markdown(M.writers.html,{})(read_and_expand_tabs()))
+    writer.options.minimize = false
+    writer.options.blanklines = false
+    io.input(args.input)
+    io.write(M.read_markdown(writer,{})(read_and_expand_tabs()))
   end
 
