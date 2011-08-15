@@ -265,39 +265,74 @@ function M.read_markdown(writer, options)
   -- HTML
   ------------------------------------------------------------------------------
 
-  local function isblocktag(s)
-      local x = lower(s)
-      return (x == "address" or x == "blockquote"  or x == "center" or
-              x == "dir" or x == "div" or x == "p" or x == "pre" or
-              x == "li" or x == "ol" or x == "ul" or x == "dl" or
-              x == "dd" or x == "form" or x == "fieldset" or
-              x == "isindex" or x == "menu" or x == "noframes" or
-              x == "frameset" or x == "h1" or x == "h2" or x == "h3" or
-              x == "h4" or x == "h5" or x == "h6" or x == "hr" or
-              x == "ht" or x == "script" or x == "noscript" or
-              x == "table" or x == "tbody" or x == "tfoot" or
-              x == "thead" or x == "th" or x == "td" or x == "tr")
-  end
+  local blocktags = {
+    address = true,
+    blockquote = true,
+    center = true,
+    dir = true,
+    div = true,
+    p = true,
+    pre = true,
+    li = true,
+    ol = true,
+    ul = true,
+    dl = true,
+    dd = true,
+    form = true,
+    fieldset = true,
+    isindex = true,
+    menu = true,
+    noframes = true,
+    frameset = true,
+    h1 = true,
+    h2 = true,
+    h3 = true,
+    h4 = true,
+    h5 = true,
+    h6 = true,
+    hr = true,
+    script = true,
+    noscript = true,
+    table = true,
+    tbody = true,
+    tfoot = true,
+    thead = true,
+    th = true,
+    td = true,
+    tr = true,
+  }
 
-  -- case insensitive string (from http://lua-users.org/lists/lua-l/2010-11/msg01120.html)
-  function kw_pattern(keyword)
-    return Cmt(P(#kw), function (str,pos)
-          return (keyword == str:sub(pos-#keyword,pos-1):lower())
-        end)
-  end
+  -- make the blocktags table case insensitive
+  setmetatable(blocktags, { __index = function(t,k)
+      local l = lower(k)
+      local v = rawget(t,l) and true or false
+      t[k] = v  -- memoize
+      return v
+  end })
 
+  -- if no argument supplied, matches any keyword
+  -- if table supplied, does a table lookup
+  -- if string supplied, does a case-insensitive comparison
   local function kw_matches(f)
-    return (Cmt(kw / lower,
-      function(s,pos,c)
-        if f(c) then return pos
-        else return false
-        end
-      end))
-  end
-
-  local isany = function(c) return true end
-  local function is(c)
-    return function(x) return x == c end
+    if f then
+      return (Cmt(kw,
+        function(s,pos,c)
+          local kwmatches
+          local typef = type(f)
+          if typef == "string" then
+            kwmatches = (lower(f) == lower(c))
+          elseif typef == "table" then
+            kwmatches = f[c]
+          else
+            error("kw_matches - unknown type")
+          end
+          if kwmatches then return pos
+          else return false
+          end
+        end))
+    else
+      return kw  -- match any keyword if no argument
+    end
   end
 
   -- There is no reason to support bad html, so we expect quoted attributes
@@ -325,14 +360,14 @@ function M.read_markdown(writer, options)
   local displaytext            = (any - less)^1
 
   local function in_matched(t)
-    local p = { openelt(is(t)) * (V(1) + displaytext + (less - closeelt(is(t))))^0 * closeelt(is(t)) }
+    local p = { openelt(t) * (V(1) + displaytext + (less - closeelt(t)))^0 * closeelt(t) }
     return p
   end
 
-  local displayhtml = htmlcomment + htmlinstruction + emptyelt(isblocktag) + openelt(is("hr")) +
-                         Cmt(#(openelt(isblocktag)), function(s,pos) local t = lpegmatch(C(less * kw),s,pos) ; t = t:sub(2); return lpegmatch(in_matched(t),s,pos) end)
+  local displayhtml = htmlcomment + htmlinstruction + emptyelt(blocktags) + openelt("hr") +
+                         Cmt(#openelt(blocktags), function(s,pos) local t = lpegmatch(C(less * kw),s,pos) ; t = t:sub(2); return lpegmatch(in_matched(t),s,pos) end)
 
-  local inlinehtml             = emptyelt(isany) + htmlcomment + htmlinstruction + openelt(isany) + closeelt(isany)
+  local inlinehtml             = emptyelt() + htmlcomment + htmlinstruction + openelt() + closeelt()
 
   local hexentity = ampersand * hash * S("Xx") * C(hexdigit    ^1) * semicolon
   local decentity = ampersand * hash           * C(digit       ^1) * semicolon
