@@ -147,8 +147,7 @@ function M.read_markdown(writer, options)
   local spnl                   = optionalspace * (newline * optionalspace)^-1
   local line                   = (any - newline)^0 * newline
                                + (any - newline)^1 * eof
-  local nonemptyline           = (any - newline)^1 * newline
-                               + (any - newline)^1 * eof
+  local nonemptyline           = line - blankline
 
   ------------------------------------------------------------------------------
 
