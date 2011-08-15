@@ -110,7 +110,7 @@ function M.read_markdown(writer, options)
   local hexdigit               = R("09","af","AF")
   local letter                 = R("AZ","az")
   local alphanumeric           = R("AZ","az","09")
-  local kw                     = letter * alphanumeric^0
+  local keyword                = letter * alphanumeric^0
 
   local doubleasterisks        = P("**")
   local doubleunderscores      = P("__")
@@ -313,9 +313,9 @@ function M.read_markdown(writer, options)
   -- if no argument supplied, matches any keyword
   -- if table supplied, does a table lookup
   -- if string supplied, does a case-insensitive comparison
-  local function kw_matches(f)
+  local function keyword_matches(f)
     if f then
-      return (Cmt(kw,
+      return (Cmt(keyword,
         function(s,pos,c)
           local kwmatches
           local typef = type(f)
@@ -324,14 +324,14 @@ function M.read_markdown(writer, options)
           elseif typef == "table" then
             kwmatches = f[c]
           else
-            error("kw_matches - unknown type")
+            error("keyword_matches - unknown type")
           end
           if kwmatches then return pos
           else return false
           end
         end))
     else
-      return kw  -- match any keyword if no argument
+      return keyword  -- match any keyword if no argument
     end
   end
 
@@ -346,15 +346,15 @@ function M.read_markdown(writer, options)
   local htmlinstruction        = P("<?")   * (any - P("?>" ))^0 * P("?>" )
 
   local function openelt(f)
-    return (less * kw_matches(f) * spnl * htmlattribute^0 * more)
+    return (less * keyword_matches(f) * spnl * htmlattribute^0 * more)
   end
 
   local function closeelt(f)
-    return (less * slash * kw_matches(f) * spnl * more)
+    return (less * slash * keyword_matches(f) * spnl * more)
   end
 
   local function emptyelt(f)
-    return (less * kw_matches(f) * spnl * htmlattribute^0 * slash * more)
+    return (less * keyword_matches(f) * spnl * htmlattribute^0 * slash * more)
   end
 
   local displaytext            = (any - less)^1
@@ -365,7 +365,7 @@ function M.read_markdown(writer, options)
   end
 
   local displayhtml = htmlcomment + htmlinstruction + emptyelt(blocktags) + openelt("hr") +
-                         Cmt(#openelt(blocktags), function(s,pos) local t = lpegmatch(C(less * kw),s,pos) ; t = t:sub(2); return lpegmatch(in_matched(t),s,pos) end)
+                         Cmt(#openelt(blocktags), function(s,pos) local t = lpegmatch(C(less * keyword),s,pos) ; t = t:sub(2); return lpegmatch(in_matched(t),s,pos) end)
 
   local inlinehtml             = emptyelt() + htmlcomment + htmlinstruction + openelt() + closeelt()
 
