@@ -30,23 +30,26 @@ local function expand_tabs_in_line(s, tabstop)
         end))
 end
 
-local stringx = require("pl.stringx")
+--- return an interator over all lines in a string or file object
+function lines (self)
+  if type(self) == "file" then
+    return io.lines(self)
+  else
+    if type(inp) == "string" then
+      local s = self
+      if not s:find("\n$") then s = s.."\n" end
+      return s:gfind("([^\n]*)\n")
+    else
+      return io.lines()
+    end
+  end
+end
 
 -- Expands tabs in a string or file object.
 -- If no parameter supplied, uses stdin.
 local function expand_tabs(inp)
   local buffer = {}
-  local iterator
-  if type(inp) == "string" then
-    iterator = stringx.lines(inp)
-  else
-    if type(inp) == "file" then
-      iterator = io.lines(inp)
-    else
-      iterator = io.lines()
-    end
-  end
-  for line in iterator do
+  for line in lines(inp) do
     table.insert(buffer, expand_tabs_in_line(line,4))
   end
   -- need blank line at end to emulate Markdown.pl
@@ -618,6 +621,7 @@ if type(package.loaded[myname]) == "userdata" then
     -- local prof = require("profiler")
     -- prof.start()
     io.write(Lunamark.read_markdown(writer,{})(io.stdin))
+    io.write(Lunamark.read_markdown(writer,{})("hi\n\nthere"))
     -- prof.stop()
   end
 
