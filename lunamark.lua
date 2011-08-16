@@ -469,9 +469,12 @@ function M.read_markdown(writer, options)
       return (starter * Cs(ListBlock * Cc("\n") * (NestedList + ListContinuationBlock^0) * (blanklines / "\n\n")) / docparser / writer.listitem)
   end
 
-  BulletList = Cs(TightListItem(bullet)^1)  * Cc(true) * skipblanklines * -bullet    / writer.bulletlist
+  local BulletList =
+               Cs(TightListItem(bullet)^1)  * Cc(true) * skipblanklines * -bullet    / writer.bulletlist
              + Cs(LooseListItem(bullet)^1)  * Cc(false) * skipblanklines             / writer.bulletlist
-  OrderedList = Cs(TightListItem(enumerator)^1) * Cc(true) * skipblanklines * -enumerator  / writer.orderedlist
+
+  local OrderedList =
+               Cs(TightListItem(enumerator)^1) * Cc(true) * skipblanklines * -enumerator  / writer.orderedlist
               + Cs(LooseListItem(enumerator)^1) * Cc(false) * skipblanklines         / writer.orderedlist
 
   ------------------------------------------------------------------------------
@@ -578,7 +581,7 @@ M.writers = { html = write_html }
 if type(package.loaded[myname]) == "userdata" then
     return M  -- put module stuff here
   else
-    lapp = require("pl.lapp")
+    local lapp = require("pl.lapp")
     local args = lapp [[
     Testing parameter handling
         -t (default html) Output format.
