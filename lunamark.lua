@@ -13,9 +13,9 @@ local lpeg = require("lpeg")
 
 local myname = ...
 
-local M = {}
+local Lunamark = {}
 
-function M.read_markdown(writer, options)
+function Lunamark.read_markdown(writer, options)
 
   if not options then options = {} end
 
@@ -571,7 +571,7 @@ local function read_and_expand_tabs()
 end
 
 local write_html = require("writer.html")
-M.writers = { html = write_html }
+Lunamark.writers = { html = write_html }
 
 ------------------------------------------------------------------------------
 -- Main program - act as module if 'required', else as program.
@@ -579,7 +579,7 @@ M.writers = { html = write_html }
 
 -- http://lua-users.org/lists/lua-l/2007-02/msg00125.html
 if type(package.loaded[myname]) == "userdata" then
-    return M  -- put module stuff here
+    return Lunamark  -- put module stuff here
   else
     local lapp = require("pl.lapp")
     local args = lapp [[
@@ -590,7 +590,7 @@ if type(package.loaded[myname]) == "userdata" then
 
     local writer
     if not args.t or args.t == "html" then
-      writer = M.writers.html
+      writer = Lunamark.writers.html
     else
       print("Unknown writer: " .. args.t)
       os.exit(3)
@@ -600,7 +600,7 @@ if type(package.loaded[myname]) == "userdata" then
     io.input(args.input)
     -- local prof = require("profiler")
     -- prof.start()
-    io.write(M.read_markdown(writer,{})(read_and_expand_tabs()))
+    io.write(Lunamark.read_markdown(writer,{})(read_and_expand_tabs()))
     -- prof.stop()
   end
 
