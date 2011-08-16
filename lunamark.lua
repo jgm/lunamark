@@ -9,7 +9,6 @@ The parser is also more accurate than before.
 
 ]]--
 
--- local prof = require("profiler")
 local lpeg = require("lpeg")
 
 local myname = ...
@@ -579,7 +578,6 @@ M.writers = { html = write_html }
 if type(package.loaded[myname]) == "userdata" then
     return M  -- put module stuff here
   else
---    prof.start()
     lapp = require("pl.lapp")
     local args = lapp [[
     Testing parameter handling
@@ -597,6 +595,9 @@ if type(package.loaded[myname]) == "userdata" then
     writer.options.minimize = false
     writer.options.blanklines = false
     io.input(args.input)
+    -- local prof = require("profiler")
+    -- prof.start()
     io.write(M.read_markdown(writer,{})(read_and_expand_tabs()))
+    -- prof.stop()
   end
 
