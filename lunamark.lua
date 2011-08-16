@@ -15,6 +15,46 @@ local myname = ...
 
 local Lunamark = {}
 
+------------------------------------------------------------------------------
+-- Utility functions
+------------------------------------------------------------------------------
+
+-- from Programming Lua
+local function expand_tabs_in_line(s, tabstop)
+  local tab = tabstop or 4
+  local corr = 0
+  return (string.gsub(s, "()\t", function(p)
+          local sp = tab - (p - 1 + corr)%tab
+          corr = corr - 1 + sp
+          return string.rep(" ",sp)
+        end))
+end
+
+local stringx = require("pl.stringx")
+
+-- Expands tabs in a string or file object.
+-- If no parameter supplied, uses stdin.
+local function expand_tabs(inp)
+  local buffer = {}
+  local iterator
+  if type(inp) == "string" then
+    iterator = stringx.lines(inp)
+  else
+    if type(inp) == "file" then
+      iterator = io.lines(inp)
+    else
+      iterator = io.lines()
+    end
+  end
+  for line in iterator do
+    table.insert(buffer, expand_tabs_in_line(line,4))
+  end
+  -- need blank line at end to emulate Markdown.pl
+  table.insert(buffer, "\n")
+  return table.concat(buffer,"\n")
+end
+
+
 function Lunamark.read_markdown(writer, options)
 
   if not options then options = {} end
@@ -534,40 +574,17 @@ function Lunamark.read_markdown(writer, options)
   -- Conversion function
   ------------------------------------------------------------------------------
 
-  local function convert(str)
+  -- inp can be a string or a file object.
+  local function convert(inp)
       references = {}
-      referenceparser(str)
-      local result = writer.start_document() .. docparser(str) .. writer.stop_document()
+      local expanded = expand_tabs(inp)
+      referenceparser(expanded)
+      local result = writer.start_document() .. docparser(expanded) .. writer.stop_document()
       return result
   end
 
   return convert
 
-end
-
-------------------------------------------------------------------------------
--- Utility functions
-------------------------------------------------------------------------------
-
--- from Programming Lua
-local function expandTabs(s, tabstop)
-  local tab = tabstop or 4
-  local corr = 0
-  return (string.gsub(s, "()\t", function(p)
-          local sp = tab - (p - 1 + corr)%tab
-          corr = corr - 1 + sp
-          return string.rep(" ",sp)
-        end))
-end
-
-local function read_and_expand_tabs()
-  local buffer = {}
-  for line in io.lines() do
-    table.insert(buffer, expandTabs(line,4))
-  end
-  -- need blank line at end to emulate Markdown.pl
-  table.insert(buffer, "\n")
-  return table.concat(buffer,"\n")
 end
 
 local write_html = require("writer.html")
@@ -600,7 +617,7 @@ if type(package.loaded[myname]) == "userdata" then
     io.input(args.input)
     -- local prof = require("profiler")
     -- prof.start()
-    io.write(Lunamark.read_markdown(writer,{})(read_and_expand_tabs()))
+    io.write(Lunamark.read_markdown(writer,{})(io.stdin))
     -- prof.stop()
   end
 
