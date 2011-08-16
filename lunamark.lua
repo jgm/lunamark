@@ -234,16 +234,15 @@ function M.read_markdown(writer, options)
       end
       local r = references[normalize_tag(tag)]
       if r then
-          return pos, label, r.url, r.title
+          return pos, inlinesparser(label), r.url, r.title
       else
           return false
       end
   end
 
-  local link_parser             = Cg(tag,"label") *
-                                  ( Cb("label") / inlinesparser * spnl^-1 * lparent * (url + Cc("")) * optionaltitle * rparent
-                                  + Cmt(Cb("label") / inlinesparser  * spnl^-1 * tag, indirect_link)
-                                  + Cmt(Cb("label") / inlinesparser * Cb("label"), indirect_link) )
+   local link_parser =
+         tag / inlinesparser * spnl^-1 * lparent * (url + Cc("")) * optionaltitle * rparent
+       + Cmt(tag * (spnl^-1 * tag)^-1, indirect_link)
 
   ------------------------------------------------------------------------------
   -- HTML
