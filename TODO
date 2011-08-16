@@ -1,10 +1,11 @@
 * TODO make parser user-modifiable (as in v1)
+* TODO pluggable html parser? (any good ones for lua?)
+* TODO Think about using alternative getopt instead of penlight, for
+  portability?  unless penlight offers other things we need.
 * TODO add latex writer
 * TODO add context writer
 * TODO documentation, including extending writer + parser
 * TODO clean up parser, split into two or three files?
-* TODO Think about using alternative getopt instead of penlight, for
-  portability?  unless penlight offers other things we need.
 * NOTE experiments show that the biggest targets for optimization are
   - lists
   - links
