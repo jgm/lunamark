@@ -31,11 +31,11 @@ local function expand_tabs_in_line(s, tabstop)
 end
 
 --- return an interator over all lines in a string or file object
-function lines (self)
+function lines(self)
   if type(self) == "file" then
     return io.lines(self)
   else
-    if type(inp) == "string" then
+    if type(self) == "string" then
       local s = self
       if not s:find("\n$") then s = s.."\n" end
       return s:gfind("([^\n]*)\n")
@@ -621,7 +621,7 @@ if type(package.loaded[myname]) == "userdata" then
     -- local prof = require("profiler")
     -- prof.start()
     io.write(Lunamark.read_markdown(writer,{})(io.stdin))
-    io.write(Lunamark.read_markdown(writer,{})("hi\n\nthere"))
+    -- io.write(Lunamark.read_markdown(writer,{})("hi\n\nthere"))
     -- prof.stop()
   end
 
