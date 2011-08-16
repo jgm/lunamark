@@ -253,7 +253,7 @@ function Lunamark.read_markdown(writer, options)
   end
 
   local function register_link(tag,url,title)
-      return { tag = normalize_tag(tag), url = url, title = title }
+      references[normalize_tag(tag)] = { url = url, title = title }
   end
 
   local define_reference_parser = leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^0
@@ -261,11 +261,7 @@ function Lunamark.read_markdown(writer, options)
   local rparser = (define_reference_parser / register_link + nonemptyline^1 + blankline^1)^0
 
   local function referenceparser(str)
-      local refs = lpegmatch(Ct(rparser),str)
-      for i=1,#refs do
-         local c = refs[i]
-         if c.tag then references[c.tag] = c end
-      end
+      lpegmatch(Ct(rparser),str)
   end
 
   ------
