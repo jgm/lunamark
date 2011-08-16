@@ -228,21 +228,48 @@ function M.read_markdown(writer, options)
 
   ------
 
-  local function indirect_link(_,pos,label,tag)
-      if not tag or tag == "" then
+  -- lookup link reference and return either a link or image,
+  -- or, if the reference is not found, the original label
+  local function indirect_link(img,label,sps,tag)
+      local tagpart
+      if not tag then
           tag = label
+          tagpart = ""
+      elseif tag == "" then
+          tag = label
+          tagpart = "[]"
+      else
+          tagpart = "[" .. inlinesparser(tag) .. "]"
+      end
+      if sps then
+        tagpart = sps .. tagpart
       end
       local r = references[normalize_tag(tag)]
       if r then
-          return pos, inlinesparser(label), r.url, r.title
+        if img then
+          return writer.image(inlinesparser(label), r.url, r.title)
+        else
+          return writer.link(inlinesparser(label), r.url, r.title)
+        end
       else
-          return false
+          return ("[" .. inlinesparser(label) .. "]" .. tagpart)
       end
   end
 
-   local link_parser =
-         tag / inlinesparser * spnl^-1 * lparent * (url + Cc("")) * optionaltitle * rparent
-       + Cmt(tag * (spnl^-1 * tag)^-1, indirect_link)
+  local function direct_link(img,label,url,title)
+    if img then
+      return writer.image(label,url,title)
+    else
+      return writer.link(label,url,title)
+    end
+  end
+
+  local image_marker = (exclamation / function() return true end) + Cc(false)
+
+  -- parse a link or image (direct or indirect)
+  local link_parser =
+        image_marker * (tag / inlinesparser) * spnl^-1 * lparent * (url + Cc("")) * optionaltitle * rparent / direct_link
+       + image_marker * tag * (C(spnl^-1) * tag)^-1 / indirect_link
 
   ------------------------------------------------------------------------------
   -- HTML
@@ -398,9 +425,7 @@ function M.read_markdown(writer, options)
 
   local AutoLinkEmail    = less * C((alphanumeric + S("-._+"))^1 * P("@") * (anyescaped - (newline + more))^1) * more / writer.email_link
 
-  local Link             = link_parser / writer.link
-
-  local Image            = exclamation * link_parser / writer.image
+  local Link             = link_parser  -- includes images
 
   local UlOrStarLine     = asterisk^4
                          + underscore^4
@@ -489,7 +514,6 @@ function M.read_markdown(writer, options)
                             + UlOrStarLine
                             + Strong
                             + Emph
-                            + Image
                             + Link
                             + Code
                             + AutoLinkUrl
