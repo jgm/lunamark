@@ -48,14 +48,26 @@ function M.read_markdown(writer, options)
 
   ------------------------------------------------------------------------------
 
-  local nestedparser
   local syntax
+  local docsyntax
+  local docparser
+  local inlinessyntax
+  local inlinesparser
 
-  nestedparser =
+  docparser =
     function(str)
-      local res = lpegmatch(syntax, str)
+      local res = lpegmatch(docsyntax, str)
       if res == nil
-        then error(format("nestedparser failed on:\n%s", str:sub(1,20)))
+        then error(format("docparser failed on:\n%s", str:sub(1,20)))
+        else return res
+        end
+    end
+
+  inlinesparser =
+    function(str)
+      local res = lpegmatch(inlinessyntax, str)
+      if res == nil
+        then error(format("inlinesparser failed on:\n%s", str:sub(1,20)))
         else return res
         end
     end
@@ -229,9 +241,9 @@ function M.read_markdown(writer, options)
   end
 
   local link_parser             = Cg(tag,"label") *
-                                  ( Cb("label") / nestedparser * spnl^-1 * lparent * (url + Cc("")) * optionaltitle * rparent
-                                  + Cmt(Cb("label") / nestedparser  * spnl^-1 * tag, indirect_link)
-                                  + Cmt(Cb("label") / nestedparser * Cb("label"), indirect_link) )
+                                  ( Cb("label") / inlinesparser * spnl^-1 * lparent * (url + Cc("")) * optionaltitle * rparent
+                                  + Cmt(Cb("label") / inlinesparser  * spnl^-1 * tag, indirect_link)
+                                  + Cmt(Cb("label") / inlinesparser * Cb("label"), indirect_link) )
 
   ------------------------------------------------------------------------------
   -- HTML
@@ -409,7 +421,7 @@ function M.read_markdown(writer, options)
                               ((nonindentspace * more * space^-1)/"" * linechar^0 * newline)^1
                             * ((linechar - blankline)^1 * newline)^0
                             * blankline^0
-                           )^1) / nestedparser / writer.blockquote
+                           )^1) / docparser / writer.blockquote
 
   local HorizontalRule   = (lineof_asterisks + lineof_dashes + lineof_underscores) / writer.hrule
 
@@ -427,11 +439,11 @@ function M.read_markdown(writer, options)
   local ListContinuationBlock = blanklines * (indent / "") * ListBlock
 
   local function TightListItem(starter)
-      return (starter * Cs(ListBlock * NestedList^-1) * -(blanklines * indent) / nestedparser / writer.listitem)
+      return (starter * Cs(ListBlock * NestedList^-1) * -(blanklines * indent) / docparser / writer.listitem)
   end
 
   local function LooseListItem(starter)
-      return (starter * Cs(ListBlock * Cc("\n") * (NestedList + ListContinuationBlock^0) * (blanklines / "\n\n")) / nestedparser / writer.listitem)
+      return (starter * Cs(ListBlock * Cc("\n") * (NestedList + ListContinuationBlock^0) * (blanklines / "\n\n")) / docparser / writer.listitem)
   end
 
   BulletList = Cs(TightListItem(bullet)^1)  * Cc(true) * skipblanklines * -bullet    / writer.bulletlist
@@ -444,16 +456,19 @@ function M.read_markdown(writer, options)
   ------------------------------------------------------------------------------
 
   local AtxHeader = HeadingStart * optionalspace * Cs((V("Inline") - HeadingStop)^1) * HeadingStop / writer.heading
-  local SetextHeader = #(line * S("=-")) * Cs(line / nestedparser)
+  local SetextHeader = #(line * S("=-")) * Cs(line / inlinesparser)
                          * HeadingLevel *  optionalspace * newline / function(a,b) return writer.heading(b,a) end
 
   ------------------------------------------------------------------------------
   -- Syntax specification
   ------------------------------------------------------------------------------
 
-  syntax = Cs { "Document",
+  function syntax(start)
+    return { start,
 
       Document              = V("Block")^0,
+
+      Inlines               = V("Inline")^0,
 
       Block                 = blankline^1 / ""
                             + blocksep / "\n"
@@ -484,8 +499,11 @@ function M.read_markdown(writer, options)
                             + HtmlEntity
                             + EscapedChar
                             + Symbol,
+    }
+  end
 
-  }
+  docsyntax = Cs(syntax("Document"))
+  inlinessyntax = Cs(syntax("Inlines"))
 
   ------------------------------------------------------------------------------
   -- Conversion function
@@ -494,7 +512,7 @@ function M.read_markdown(writer, options)
   local function convert(str)
       references = {}
       referenceparser(str)
-      local result = writer.start_document() .. nestedparser(str) .. writer.stop_document()
+      local result = writer.start_document() .. docparser(str) .. writer.stop_document()
       return result
   end
 
