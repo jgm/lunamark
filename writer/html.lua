@@ -67,7 +67,7 @@ end
 
 function Html.image(lab,src,tit)
   local titattr, altattr
-  if string.len(tit) > 0
+  if tit and string.len(tit) > 0
      then titattr = format(" title=\"%s\"", Html.string(tit))
      else titattr = ""
      end
