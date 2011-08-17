@@ -44,6 +44,7 @@ local function usage(topmessage, opts)
     end
     io.write(string.format("  %-30s %s\n", optname .. " " .. argspec, descr))
   end
+  io.write(string.format("  %-30s %s\n", "--help", "This message"))
 end
 
 local function err(s,exit_code)
@@ -82,10 +83,6 @@ local function getargs(message, opt_table, opts_before_args)
   local i = 1
   while i <= table.getn(arg) do
     local this, possarg = arg[i], arg[i+1]
-    if this == "--help" or this == "-h" then
-      usage(message,opt_table)
-      os.exit(0)
-    end
     if is_option(this) then
       local opt = opts[this]
       local optname = opt and opt.optname
@@ -93,6 +90,10 @@ local function getargs(message, opt_table, opts_before_args)
         parseopts = false
         i = i + 1
       elseif not opt then
+        if this == "--help" then
+          usage(message,opt_table)
+          os.exit(0)
+        end
         local longoptname, longoptval = this:match("(--%a+)=(.*)")
         if longoptval then   --opt=val
           table.remove(arg,i)
