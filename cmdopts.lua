@@ -3,7 +3,8 @@ simple command line parser (c) 2011 John MacFarlane
 
 Features:
 
-* options can be given a short form (--help/-h)
+* automatic --help/-h usage message
+* options can be given a short form (--verbose/-v)
 * option values can be optional, and can be typed string or number
 * options can be made repeatable, in which case they return a table
 * option values can be validated
@@ -16,14 +17,31 @@ Features:
 Example: See test below.
 --]]
 
--- TODO: usage message
-
 local function is_option(s)
   if s:sub(1,1) == "-"  then return true end
 end
 
-local function usage(opts)
-  print("TBD")
+local function usage(topmessage, opts)
+  io.write(topmessage)
+  io.write("\n")
+  for k,v in pairs(opts) do
+    local optname, argspec, descr = "","",""
+    optname = "--" .. k
+    if v.shortform then
+      optname = optname .. ",-" .. k:sub(1,1)
+    end
+    if v.arg then
+      if v.optarg then
+        argspec = "["..v.arg.."]"
+      else
+        argspec = v.arg
+      end
+    end
+    if v.description then
+      descr = v.description
+    end
+    io.write(string.format("  %-30s %s\n", optname .. " " .. argspec, descr))
+  end
 end
 
 local function err(s,exit_code)
@@ -31,7 +49,7 @@ local function err(s,exit_code)
   os.exit(exit_code or 1)
 end
 
-local function getargs(opt_table, opts_before_args)
+local function getargs(message, opt_table, opts_before_args)
   local opts = {}
   local args = {}
   local parseopts = true
@@ -43,7 +61,7 @@ local function getargs(opt_table, opts_before_args)
       local firstletter = k:sub(1,1)
       vs.optname = firstletter
       if opts["-"..firstletter] then
-        err("The short option -".. firstletter .. " is defined twice.")
+        error("-"..firstletter.." is defined twice.")
       else
         opts["-"..firstletter] = vs
       end
@@ -63,7 +81,7 @@ local function getargs(opt_table, opts_before_args)
   while i <= table.getn(arg) do
     local this, possarg = arg[i], arg[i+1]
     if this == "--help" or this == "-h" then
-      usage(opts)
+      usage(message,opt_table)
       os.exit(0)
     end
     if is_option(this) then
@@ -126,12 +144,13 @@ end
 
 local test = function()
   local opts = { angle = {shortform = true, arg = "number", optarg = false,
-                           validate = function(x) return (x>=0 and x<=360) end},
-                 verbose = {shortform = true},
+                           validate = function(x) return (x>=0 and x<=360) end,
+                           description = "Angle in degrees"},
+                 verbose = {shortform = true, description = "Verbose output"},
                  venue = {arg = "string", repeatable = true},
                  output = {shortform = true, arg = "string", optarg = true},
                }
-  local args = getargs(opts)
+  local args = getargs("my function [opts] [file..]",opts)
   for k,v in pairs(args) do
     if type(v) == "table" then
       for w,z in ipairs(v) do print(k,w,z) end
