@@ -17,6 +17,8 @@ Features:
 Example: See test below.
 --]]
 
+local module = type(package.loaded[...]) == "userdata"
+
 local function is_option(s)
   if s:sub(1,1) == "-"  then return true end
 end
@@ -160,4 +162,8 @@ local test = function()
   end
 end
 
-test()
+if module then
+  return { getargs = getargs  }
+else
+  test()
+end
