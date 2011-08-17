@@ -597,13 +597,11 @@ Lunamark.writers = { html = write_html }
 if type(package.loaded[myname]) == "userdata" then
     return Lunamark  -- put module stuff here
   else
-    local lapp = require("pl.lapp")
-    local args = lapp [[
-    Testing parameter handling
-        -t (default html) Output format.
-        <input> (default stdin)  File to convert.
-    ]]
-
+    local cmdopts = require("cmdopts")
+    local args = cmdopts.getargs(
+       "lunamark [options] [file..] - convert text from markdown",
+       { to = {shortform = true, arg = "format", description = "Target format"},
+       })
     local writer
     if not args.t or args.t == "html" then
       writer = Lunamark.writers.html
