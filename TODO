@@ -1,4 +1,3 @@
-* TODO add my own command line parser, remove penlight dependency
 * TODO parse section bodies and pass to writer...so it can be put in div
 * TODO make parser user-modifiable (as in v1)
 * TODO pluggable html parser? (any good ones for lua?)
