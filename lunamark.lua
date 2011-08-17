@@ -599,7 +599,7 @@ if type(package.loaded[myname]) == "userdata" then
   else
     local cmdopts = require("util.cmdopts")
     local args = cmdopts.getargs(
-       "lunamark [options] [file..] - convert text from markdown",
+       "lunamark [options] file - convert text from markdown",
        { to = {shortform = true, arg = "format", description = "Target format"},
        })
     local writer
@@ -611,7 +611,7 @@ if type(package.loaded[myname]) == "userdata" then
     end
     writer.options.minimize = false
     writer.options.blanklines = false
-    io.input(args.input)
+    io.input(args[1])
     -- local prof = require("profiler")
     -- prof.start()
     io.write(Lunamark.read_markdown(writer,{})(io.stdin))
