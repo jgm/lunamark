@@ -598,9 +598,9 @@ if type(package.loaded[myname]) == "userdata" then
     return Lunamark  -- put module stuff here
   else
     local cmdopts = require("util.cmdopts")
-    local args = cmdopts.getargs(
+    local args = cmdopts.getargs({
        "lunamark [options] file - convert text from markdown",
-       { to = {shortform = true, arg = "format", description = "Target format"},
+       to = {shortform = true, arg = "format", description = "Target format"},
        })
     local writer
     if not args.t or args.t == "html" then

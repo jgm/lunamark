@@ -14,6 +14,23 @@ Features:
 * options and arguments can be mixed, unless opts_before_args is true
 * in any case, -- ends option parsing
 
+Format of option table:
+
+{ "top line of usage message",
+  "rest of usage message (if absent, this is automatically generated)",
+  optname = <argspec>,
+  optname = <argspec>,
+  ...
+}
+
+argspec is a table with the following fields:
+* shortform - allow a short (single dash) option based on first letter
+* arg - type of argument ("number" for numerical, "string" or anything
+  else for string)
+* optarg - if true, the argument is optional
+* validate - function that takes an argument and returns a boolean
+* description - description of option
+
 Example: See test below.
 --]]
 
@@ -23,28 +40,34 @@ local function is_option(s)
   if s:sub(1,1) == "-"  then return true end
 end
 
-local function usage(topmessage, opts)
-  io.write(topmessage)
+local function usage(opts)
+  io.write(opts[1])
   io.write("\n")
-  for k,v in pairs(opts) do
-    local optname, argspec, descr = "","",""
-    optname = "--" .. k
-    if v.shortform then
-      optname = optname .. ",-" .. k:sub(1,1)
-    end
-    if v.arg then
-      if v.optarg then
-        argspec = "["..v.arg.."]"
-      else
-        argspec = v.arg
+  if opts[2] then -- opts[2] if present overrides the automatic usage message
+    io.write(opts[2])
+  else
+    for k,v in pairs(opts) do
+      if type(k) ~= "number" then
+        local optname, argspec, descr = "","",""
+        optname = "--" .. k
+        if v.shortform then
+          optname = optname .. ",-" .. k:sub(1,1)
+        end
+        if v.arg then
+          if v.optarg then
+            argspec = "["..v.arg.."]"
+          else
+            argspec = v.arg
+          end
+        end
+        if v.description then
+          descr = v.description
+        end
+        io.write(string.format("  %-30s %s\n", optname.." "..argspec, descr))
       end
     end
-    if v.description then
-      descr = v.description
-    end
-    io.write(string.format("  %-30s %s\n", optname .. " " .. argspec, descr))
+    io.write(string.format("  %-30s %s\n", "--help", "This message"))
   end
-  io.write(string.format("  %-30s %s\n", "--help", "This message"))
 end
 
 local function err(s,exit_code)
@@ -52,25 +75,27 @@ local function err(s,exit_code)
   os.exit(exit_code or 1)
 end
 
-local function getargs(message, opt_table, opts_before_args)
+local function getargs(opt_table, opts_before_args)
   local opts = {}
   local args = {}
   local parseopts = true
   for k,v in pairs(opt_table) do
-    v.optname = k
-    opts["--"..k] = v
-    if v.shortform then
-      local vs = v
-      local firstletter = k:sub(1,1)
-      vs.optname = firstletter
-      if opts["-"..firstletter] then
-        error("-"..firstletter.." is defined twice.")
-      else
-        opts["-"..firstletter] = vs
+    if type(k) ~= "number" then
+      v.optname = k
+      opts["--"..k] = v
+      if v.shortform then
+        local vs = v
+        local firstletter = k:sub(1,1)
+        vs.optname = firstletter
+        if opts["-"..firstletter] then
+          error("-"..firstletter.." is defined twice.")
+        else
+          opts["-"..firstletter] = vs
+        end
       end
-    end
-    if opt_table[k].repeatable then
-      args[k] = {}
+      if opt_table[k].repeatable then
+        args[k] = {}
+      end
     end
   end
   local function add_value(k,v)
@@ -91,7 +116,7 @@ local function getargs(message, opt_table, opts_before_args)
         i = i + 1
       elseif not opt then
         if this == "--help" then
-          usage(message,opt_table)
+          usage(opt_table)
           os.exit(0)
         end
         local longoptname, longoptval = this:match("(--%a+)=(.*)")
@@ -134,7 +159,7 @@ local function getargs(message, opt_table, opts_before_args)
         i = i + 2
       end
       if opt and opt.validate and not opt.validate(args[optname]) then
-        err("Option " .. this .. " has illegal value. ")
+        err("Option " .. this .. " has invalid value " .. possarg .. ".")
       end
     else -- argument or --longopt=value
       table.insert(args,this)
@@ -146,14 +171,15 @@ local function getargs(message, opt_table, opts_before_args)
 end
 
 local test = function()
-  local opts = { angle = {shortform = true, arg = "number", optarg = false,
+  local opts = { "myprog [opts] file - does something",
+                 angle = {shortform = true, arg = "number", optarg = false,
                            validate = function(x) return (x>=0 and x<=360) end,
                            description = "Angle in degrees"},
                  verbose = {shortform = true, description = "Verbose output"},
                  venue = {arg = "string", repeatable = true},
                  output = {shortform = true, arg = "string", optarg = true},
                }
-  local args = getargs("my function [opts] [file..]",opts)
+  local args = getargs(opts)
   for k,v in pairs(args) do
     if type(v) == "table" then
       for w,z in ipairs(v) do print(k,w,z) end
