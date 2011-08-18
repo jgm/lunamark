@@ -15,7 +15,7 @@ local myname = ...
 
 local Lunamark = {}
 
-local misc = require("lunamark.util.misc")
+local misc = require("lunamark.util")
 
 function Lunamark.read_markdown(writer, options)
 
@@ -590,7 +590,7 @@ Lunamark.writers = { html = write_html }
 if type(package.loaded[myname]) == "userdata" then
     return Lunamark  -- put module stuff here
   else
-    local cmdopts = require("lunamark.util.cmdopts")
+    local cmdopts = require("lunamark.cmdopts")
     local args = cmdopts.getargs({
        "lunamark [options] file - convert text from markdown",
        to = {shortform = true, arg = "format", description = "Target format"},
