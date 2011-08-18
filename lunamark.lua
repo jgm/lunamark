@@ -428,17 +428,12 @@ function Lunamark.read_markdown(writer, options)
   local Symbol           = (specialchar - blocksep) / writer.string
   local Code             = inticks      / writer.code
 
-  local HeadingStart     = C(hash * hash^-5) / length
-  local HeadingStop      = optionalspace * hash^0 * optionalspace * newline
-  local HeadingLevel     = equal^1 * Cc(1)
-                         + dash ^1 * Cc(2)
-
   local Endline          = newline * -(
                                blankline
                              + blocksep
                              + eof
                              + more
-                             + HeadingStart
+                             + hash
                              + ( line * (P("===")^3 + P("---")^3) * newline )
                            ) / writer.space
 
@@ -519,6 +514,12 @@ function Lunamark.read_markdown(writer, options)
   ------------------------------------------------------------------------------
   -- Headers
   ------------------------------------------------------------------------------
+
+  local HeadingStart     = C(hash * hash^-5) / length
+  local HeadingStop      = optionalspace * hash^0 * optionalspace * newline
+  local HeadingLevel     = equal^1 * Cc(1)
+                         + dash ^1 * Cc(2)
+
 
   local AtxHeader = HeadingStart * optionalspace * Cs((V("Inline") - HeadingStop)^1) * HeadingStop / writer.heading
   local SetextHeader = #(line * S("=-")) * Cs(line / inlinesparser)
