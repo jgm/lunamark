@@ -40,13 +40,13 @@ local function is_option(s)
   if s:sub(1,1) == "-"  then return true end
 end
 
-local function usage(opts)
-  io.write(opts[1])
+local function usage(opt_table,defaults)
+  io.write(opt_table[1])
   io.write("\n")
-  if opts[2] then -- opts[2] if present overrides the automatic usage message
-    io.write(opts[2])
+  if opt_table[2] then -- opt_table[2] if present overrides the automatic usage message
+    io.write(opt_table[2])
   else
-    for k,v in pairs(opts) do
+    for k,v in pairs(opt_table) do
       if type(k) ~= "number" then
         local optname, argspec, descr = "","",""
         optname = "--" .. k
@@ -63,7 +63,13 @@ local function usage(opts)
         if v.description then
           descr = v.description
         end
-        io.write(string.format("  %-30s %s\n", optname.." "..argspec, descr))
+        defaultval = defaults and defaults[k]
+        if type(defaultval) == "string" or type(defaultval) == "number" then
+          default = "(default: " .. tostring(defaults[k]) .. ")"
+        else
+          default = ""
+        end
+        io.write(string.format("  %-30s %s %s\n", optname.." "..argspec, descr, default))
       end
     end
     io.write(string.format("  %-30s %s\n", "--help", "This message"))
@@ -75,9 +81,9 @@ local function err(s,exit_code)
   os.exit(exit_code or 1)
 end
 
-local function getargs(opt_table, opts_before_args)
+local function getargs(opt_table, defaults)
   local opts = {}
-  local args = {}
+  local args = defaults or {}
   local parseopts = true
   for k,v in pairs(opt_table) do
     if type(k) ~= "number" then
@@ -86,7 +92,7 @@ local function getargs(opt_table, opts_before_args)
       if v.shortform then
         local vs = v
         local firstletter = k:sub(1,1)
-        vs.optname = firstletter
+        vs.optname = k
         if opts["-"..firstletter] then
           error("-"..firstletter.." is defined twice.")
         else
@@ -94,7 +100,7 @@ local function getargs(opt_table, opts_before_args)
         end
       end
       if opt_table[k].repeatable then
-        args[k] = {}
+        args[k] = args[k] or {}
       end
     end
   end
@@ -116,7 +122,7 @@ local function getargs(opt_table, opts_before_args)
         i = i + 1
       elseif not opt then
         if this == "--help" then
-          usage(opt_table)
+          usage(opt_table, defaults)
           os.exit(0)
         end
         local longoptname, longoptval = this:match("(--%a+)=(.*)")
@@ -164,7 +170,6 @@ local function getargs(opt_table, opts_before_args)
     else -- argument or --longopt=value
       table.insert(args,this)
       i = i + 1
-      if opts_before_args then parseopts = false end
     end
   end
   return args
@@ -179,7 +184,7 @@ local test = function()
                  venue = {arg = "string", repeatable = true},
                  output = {shortform = true, arg = "string", optarg = true},
                }
-  local args = getargs(opts)
+  local args = getargs(opts, { angle = 45 })
   for k,v in pairs(args) do
     if type(v) == "table" then
       for w,z in ipairs(v) do print(k,w,z) end
