@@ -595,11 +595,11 @@ if type(package.loaded[myname]) == "userdata" then
     local args = cmdopts.getargs({
        "lunamark [options] file - convert text from markdown",
        to = {shortform = true, arg = "format", description = "Target format"},
-       })
-    local writer_name = args.t or "html"
+       }, { to = "html" } )
+    local writer_name = args.to
     local writer = Lunamark.writers[writer_name:lower()]
     if not writer then
-      print("Unknown writer: " .. args.t)
+      io.stderr:write("Unknown writer: " .. tostring(args.to) .. "\n")
       os.exit(3)
     end
     writer.options.minimize = false
