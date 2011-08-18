@@ -15,48 +15,7 @@ local myname = ...
 
 local Lunamark = {}
 
-------------------------------------------------------------------------------
--- Utility functions
-------------------------------------------------------------------------------
-
--- from Programming Lua
-local function expand_tabs_in_line(s, tabstop)
-  local tab = tabstop or 4
-  local corr = 0
-  return (string.gsub(s, "()\t", function(p)
-          local sp = tab - (p - 1 + corr)%tab
-          corr = corr - 1 + sp
-          return string.rep(" ",sp)
-        end))
-end
-
---- return an interator over all lines in a string or file object
-function lines(self)
-  if type(self) == "file" then
-    return io.lines(self)
-  else
-    if type(self) == "string" then
-      local s = self
-      if not s:find("\n$") then s = s.."\n" end
-      return s:gfind("([^\n]*)\n")
-    else
-      return io.lines()
-    end
-  end
-end
-
--- Expands tabs in a string or file object.
--- If no parameter supplied, uses stdin.
-local function expand_tabs(inp)
-  local buffer = {}
-  for line in lines(inp) do
-    table.insert(buffer, expand_tabs_in_line(line,4))
-  end
-  -- need blank line at end to emulate Markdown.pl
-  table.insert(buffer, "\n")
-  return table.concat(buffer,"\n")
-end
-
+local misc = require("util.misc")
 
 function Lunamark.read_markdown(writer, options)
 
@@ -515,15 +474,49 @@ function Lunamark.read_markdown(writer, options)
   -- Headers
   ------------------------------------------------------------------------------
 
-  local HeadingStart     = C(hash * hash^-5) / length
+  local function HeadingStart(maxlev)
+    return (#hash * C(hash^-(maxlev)) * -hash / length)
+  end
+
   local HeadingStop      = optionalspace * hash^0 * optionalspace * newline
-  local HeadingLevel     = equal^1 * Cc(1)
-                         + dash ^1 * Cc(2)
 
+  local function HeadingLevel(maxlev)
+    if maxlev == 1 then
+      return (equal^1 * Cc(1))
+    elseif maxlev == 2 then
+      return (equal^1 * Cc(1) + dash^1 * Cc(2))
+    else
+      error("Illegal level for setext heading")
+    end
+  end
 
-  local AtxHeader = HeadingStart * optionalspace * Cs((V("Inline") - HeadingStop)^1) * HeadingStop / writer.heading
-  local SetextHeader = #(line * S("=-")) * Cs(line / inlinesparser)
-                         * HeadingLevel *  optionalspace * newline / function(a,b) return writer.heading(b,a) end
+  local function AtxHeader(maxlev)
+    return(Cg(HeadingStart(maxlev),"level") * optionalspace * Cs((V("Inline") - HeadingStop)^1) * Cb("level") * HeadingStop)
+  end
+
+  local function SetextHeader(maxlev)
+    local markers
+    if maxlev == 1 then markers = "=" else markers = "=-" end
+    return (#(line * S(markers)) * Cs(line / inlinesparser)
+            * HeadingLevel(maxlev) *  optionalspace * newline)
+  end
+
+  -- parse a heading of level maxlev or lower
+  local function Header(maxlev)
+    if maxlev <= 2 then
+      return (AtxHeader(maxlev) + SetextHeader(maxlev))
+    else
+      return AtxHeader(maxlev)
+    end
+  end
+
+  local function SectionMax(maxlev)
+     return (Header(maxlev) * Cs((V("Block") - Header(maxlev))^0)
+             / writer.section)
+  end
+
+  local Section = SectionMax(1) + SectionMax(2) + SectionMax(3) +
+                  SectionMax(4) + SectionMax(5) + SectionMax(6)
 
   ------------------------------------------------------------------------------
   -- Syntax specification
@@ -543,9 +536,8 @@ function Lunamark.read_markdown(writer, options)
                             + HorizontalRule
                             + BulletList
                             + OrderedList
-                            + AtxHeader
+                            + SectionMax(1) + SectionMax(2) + SectionMax(3)
                             + DisplayHtml
-                            + SetextHeader
                             + Reference
                             + Paragraph
                             + Cs(V("Inline")^1),
@@ -577,7 +569,7 @@ function Lunamark.read_markdown(writer, options)
   -- inp can be a string or a file object.
   local function convert(inp)
       references = {}
-      local expanded = expand_tabs(inp)
+      local expanded = misc.expand_tabs(inp)
       referenceparser(expanded)
       local result = writer.start_document() .. docparser(expanded) .. writer.stop_document()
       return result

@@ -8,6 +8,10 @@ local formats = {}
 
 local Html = {}
 
+Html.options = { minimize   = false,
+                 blanklines = true,
+                 sectiondivs = false }
+
 -- override string.format so that %n is a variable
 -- newline (depending on the 'minimize' option).
 -- formats are memoized after conversion.
@@ -32,9 +36,6 @@ local function format(fmt,...)
   end
   return string.format(newfmt,...)
 end
-
-Html.options = { minimize   = false,
-                 blanklines = true }
 
 Html.format = format
 
@@ -143,11 +144,11 @@ function Html.verbatim(s)
   return format("\n<pre><code>%s</code></pre>\n", Html.string(s))
 end
 
-function Html.heading(level,s,contents)
-  if contents then
+function Html.section(s,level,contents)
+  if Html.options.sectiondivs then
     return format("\n<div>\n<h%d>%s</h%d>\n%s</div>\n",level,s,level,contents)
   else
-    return format("\n<h%d>%s</h%d>\n",level,s,level)
+    return format("\n<h%d>%s</h%d>\n%s\n",level,s,level,contents)
   end
 end
 
