@@ -148,7 +148,7 @@ function Html.section(s,level,contents)
   if Html.options.sectiondivs then
     return format("\n<div>\n<h%d>%s</h%d>\n%s</div>\n",level,s,level,contents)
   else
-    return format("\n<h%d>%s</h%d>\n%s\n",level,s,level,contents)
+    return format("\n<h%d>%s</h%d>\n%s",level,s,level,contents)
   end
 end
 
