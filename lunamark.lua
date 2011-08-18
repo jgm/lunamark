@@ -579,8 +579,9 @@ function Lunamark.read_markdown(writer, options)
 
 end
 
-local write_html = require("lunamark.writer.html")
-Lunamark.writers = { html = write_html }
+Lunamark.writers = { html = require("lunamark.writer.html"),
+                     html5 = require("lunamark.writer.html5")
+                   }
 
 ------------------------------------------------------------------------------
 -- Main program - act as module if 'required', else as program.
@@ -595,10 +596,9 @@ if type(package.loaded[myname]) == "userdata" then
        "lunamark [options] file - convert text from markdown",
        to = {shortform = true, arg = "format", description = "Target format"},
        })
-    local writer
-    if not args.t or args.t == "html" then
-      writer = Lunamark.writers.html
-    else
+    local writer_name = args.t or "html"
+    local writer = Lunamark.writers[writer_name:lower()]
+    if not writer then
       print("Unknown writer: " .. args.t)
       os.exit(3)
     end
