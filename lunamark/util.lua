@@ -2,6 +2,13 @@
 
 local M = {}
 
+-- shallow table copy including metatables
+function M.table_copy(t)
+  local u = { }
+  for k, v in pairs(t) do u[k] = v end
+  return setmetatable(u, getmetatable(t))
+end
+
 -- map function over elements of table
 function M.map(f, t)
   local newt = {}
