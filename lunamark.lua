@@ -623,10 +623,6 @@ if type(package.loaded[myname]) == "userdata" then
     writer.options.minimize = false
     writer.options.blanklines = false
     io.input(args[1])
-    -- local prof = require("profiler")
-    -- prof.start()
     io.write(Lunamark.read_markdown(writer,{})(io.stdin))
-    -- io.write(Lunamark.read_markdown(writer,{})("hi\n\nthere"))
-    -- prof.stop()
   end
 
