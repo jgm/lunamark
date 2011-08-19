@@ -537,26 +537,40 @@ function Lunamark.markdown(writer, options)
   -- Lists
   ------------------------------------------------------------------------------
 
-  local NestedList            = Cs((optionallyindentedline - (bullet + enumerator))^1) / function(a) return "\001"..a end
-  local ListBlockLine         = -blankline * -(indent^-1 * (bullet + enumerator)) * optionallyindentedline
+  local starter = bullet + enumerator
+
+  -- we use \001 as a blocksep between a tight list item and a
+  -- nested list under it.
+  local NestedList            = Cs((optionallyindentedline - starter)^1)
+                              / function(a) return "\001"..a end
+
+  local ListBlockLine         = optionallyindentedline
+                                - blankline - (indent^-1 * starter)
+
   local ListBlock             = line * ListBlockLine^0
+
   local ListContinuationBlock = blanklines * (indent / "") * ListBlock
 
   local function TightListItem(starter)
-      return (starter * Cs(ListBlock * NestedList^-1) * -(blanklines * indent) / docparser / writer.listitem)
+      return (starter * Cs(ListBlock * NestedList^-1)
+              * -(blanklines * indent) / docparser / writer.listitem)
   end
 
   local function LooseListItem(starter)
-      return (starter * Cs(ListBlock * Cc("\n") * (NestedList + ListContinuationBlock^0) * (blanklines / "\n\n")) / docparser / writer.listitem)
+      return (starter * Cs(ListBlock * Cc("\n")
+             * (NestedList + ListContinuationBlock^0)
+             * (blanklines / "\n\n")) / docparser / writer.listitem)
   end
 
-  local BulletList =
-               Cs(TightListItem(bullet)^1)  * Cc(true) * skipblanklines * -bullet    / writer.bulletlist
-             + Cs(LooseListItem(bullet)^1)  * Cc(false) * skipblanklines             / writer.bulletlist
+  local BulletList = ( Cs(TightListItem(bullet)^1)
+                       * Cc(true) * skipblanklines * -bullet
+                     + Cs(LooseListItem(bullet)^1)
+                       * Cc(false) * skipblanklines ) / writer.bulletlist
 
-  local OrderedList =
-               Cs(TightListItem(enumerator)^1) * Cc(true) * skipblanklines * -enumerator  / writer.orderedlist
-              + Cs(LooseListItem(enumerator)^1) * Cc(false) * skipblanklines         / writer.orderedlist
+  local OrderedList = ( Cs(TightListItem(enumerator)^1)
+                        * Cc(true) * skipblanklines * -enumerator
+                      + Cs(LooseListItem(enumerator)^1)
+                        * Cc(false) * skipblanklines ) / writer.orderedlist
 
   ------------------------------------------------------------------------------
   -- Headers
