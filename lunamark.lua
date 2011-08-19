@@ -188,19 +188,49 @@ function Lunamark.read_markdown(writer, options)
   -----------------------------------------------------------------------------
 
   local leader        = space^-3
-  local bracketed     = P{ lbracket * ((anyescaped - (lbracket + rbracket)) + V(1))^0 * rbracket }
-  local inparens      = P{ lparent * ((anyescaped - (lparent + rparent)) + V(1))^0 * rparent }
-  local squoted       = P{ squote * alphanumeric * ((anyescaped-squote) + V(1))^0 * squote }
-  local dquoted       = P{ dquote * alphanumeric * ((anyescaped-dquote) + V(1))^0 * dquote }
 
-  local tag           = lbracket * Cs((alphanumeric^1 + bracketed + inticks + (anyescaped-rbracket))^0) * rbracket
+  -- in balanced brackets, parentheses, quotes:
+  local bracketed     = P{ lbracket
+                         * ((anyescaped - (lbracket + rbracket)) + V(1))^0
+                         * rbracket }
+
+  local inparens      = P{ lparent
+                         * ((anyescaped - (lparent + rparent)) + V(1))^0
+                         * rparent }
+
+  local squoted       = P{ squote * alphanumeric
+                         * ((anyescaped-squote) + V(1))^0
+                         * squote }
+
+  local dquoted       = P{ dquote * alphanumeric
+                         * ((anyescaped-dquote) + V(1))^0
+                         * dquote }
+
+  -- bracketed 'tag' for markdown links, allowing nested brackets:
+  local tag           = lbracket
+                      * Cs((alphanumeric^1
+                           + bracketed
+                           + inticks
+                           + (anyescaped-rbracket))^0)
+                      * rbracket
+
+  -- url for markdown links, allowing balanced parentheses:
   local url           = less * Cs((anyescaped-more)^0) * more
                       + Cs((inparens + (anyescaped-spacing-rparent))^1)
+
+  -- quoted text possibly with nested quotes:
   local title_s       = squote  * Cs(((anyescaped-squote) + squoted)^0) * squote
+
   local title_d       = dquote  * Cs(((anyescaped-dquote) + dquoted)^0) * dquote
-  local title_p       = lparent * Cs((inparens + (anyescaped-rparent))^0) * rparent
-  local title         = title_s + title_d + title_p
-  local optionaltitle = (spnl^-1 * title * spacechar^0) + Cc("")
+
+  local title_p       = lparent
+                      * Cs((inparens + (anyescaped-rparent))^0)
+                      * rparent
+
+  local title         = title_d + title_s + title_p
+
+  local optionaltitle = spnl^-1 * title * spacechar^0
+                      + Cc("")
 
   ------------------------------------------------------------------------------
   -- Helpers for links and references
