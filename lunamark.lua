@@ -671,12 +671,12 @@ local function markdown(writer, options)
   -- Exported conversion function
   ------------------------------------------------------------------------------
 
-  -- inp can be a string or a file object.
+  -- inp is a string; line endings are assumed to be LF (unix-style)
+  -- and tabs are assumed to be expanded.
   local function convert(inp)
       references = {}
-      local expanded = misc.expand_tabs(inp)
-      referenceparser(expanded)
-      local result = writer.start_document() .. docparser(expanded)
+      referenceparser(inp)
+      local result = writer.start_document() .. docparser(inp)
                        .. writer.stop_document()
       return result
   end
