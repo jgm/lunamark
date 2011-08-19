@@ -104,7 +104,7 @@ function Lunamark.markdown(writer, options)
   local spaceornewline         = spacechar + newline
   local nonspacechar           = any - spaceornewline
   local blocksep               = P("\001")
-  local specialchar            = S("*_`*&[]<!\\")
+  local specialchar            = S("*_`&[]<!\\")
   local normalchar             = any - (specialchar + spaceornewline + blocksep)
   local optionalspace          = spacechar^0
   local spaces                 = spacechar^1
