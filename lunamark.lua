@@ -537,7 +537,7 @@ function Lunamark.read_markdown(writer, options)
                             + HorizontalRule
                             + BulletList
                             + OrderedList
-                            + SectionMax(1) + SectionMax(2) + SectionMax(3)
+                            + Section
                             + DisplayHtml
                             + Reference
                             + Paragraph
