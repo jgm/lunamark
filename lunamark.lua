@@ -236,28 +236,32 @@ function Lunamark.read_markdown(writer, options)
   -- Helpers for links and references
   ------------------------------------------------------------------------------
 
+  -- List of references defined in the document
   local references = {}
 
+  -- markdown reference tags are case-insensitive
   local function normalize_tag(tag)
       return lower(gsub(tag, "[ \n\r\t]+", " "))
   end
 
+  -- add a reference to the list
   local function register_link(tag,url,title)
       references[normalize_tag(tag)] = { url = url, title = title }
   end
 
-  local define_reference_parser = leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^0
+  -- parse a reference definition:  [foo]: /bar "title"
+  local define_reference_parser =
+    leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^0
 
-  local rparser = (define_reference_parser / register_link + nonemptyline^1 + blankline^1)^0
+  local rparser =
+    (define_reference_parser / register_link + nonemptyline^1 + blankline^1)^0
 
   local function referenceparser(str)
-      lpegmatch(Ct(rparser),str)
+    lpegmatch(Ct(rparser),str) -- we need the Ct or we get a stack overflow
   end
 
-  ------
-
-  -- lookup link reference and return either a link or image,
-  -- or, if the reference is not found, the original label
+  -- lookup link reference and return either a link or image.
+  -- if the reference is not found, return the bracketed label.
   local function indirect_link(img,label,sps,tag)
       local tagpart
       if not tag then
@@ -273,14 +277,12 @@ function Lunamark.read_markdown(writer, options)
         tagpart = sps .. tagpart
       end
       local r = references[normalize_tag(tag)]
-      if r then
-        if img then
-          return writer.image(inlinesparser(label), r.url, r.title)
-        else
-          return writer.link(inlinesparser(label), r.url, r.title)
-        end
+      if r and img then
+        return writer.image(inlinesparser(label), r.url, r.title)
+      elseif r and not img then
+        return writer.link(inlinesparser(label), r.url, r.title)
       else
-          return ("[" .. inlinesparser(label) .. "]" .. tagpart)
+        return ("[" .. inlinesparser(label) .. "]" .. tagpart)
       end
   end
 
@@ -292,6 +294,7 @@ function Lunamark.read_markdown(writer, options)
     end
   end
 
+  -- parse an exclamation mark and return true, or return false
   local image_marker = (exclamation / function() return true end) + Cc(false)
 
   ------------------------------------------------------------------------------
