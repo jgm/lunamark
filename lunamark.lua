@@ -23,7 +23,7 @@ local P, R, S, V, C, Ct, Cg, Cb, Cmt, Cc, Cf, Cs =
   lpeg.Cmt, lpeg.Cc, lpeg.Cf, lpeg.Cs
 local lpegmatch = lpeg.match
 
-function Lunamark.read_markdown(writer, options)
+function Lunamark.markdown(writer, options)
 
   if not options then options = {} end
 
@@ -671,6 +671,6 @@ if type(package.loaded[myname]) == "userdata" then
     writer.options.minimize = false
     writer.options.blanklines = false
     io.input(args[1])
-    io.write(Lunamark.read_markdown(writer,{})(io.stdin))
+    io.write(Lunamark.markdown(writer,{})(io.stdin))
   end
 
