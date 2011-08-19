@@ -9,43 +9,27 @@ The parser is also more accurate than before.
 
 ]]--
 
-local lpeg = require("lpeg")
-
+local Lunamark = {}
 local myname = ...
 
-local Lunamark = {}
-
+local lpeg = require("lpeg")
 local misc = require("lunamark.util")
+local lower, upper, gsub, rep, gmatch, format, length =
+  string.lower, string.upper, string.gsub, string.rep, string.gmatch,
+  string.format, string.len
+local concat = table.concat
+local P, R, S, V, C, Ct, Cg, Cb, Cmt, Cc, Cf, Cs =
+  lpeg.P, lpeg.R, lpeg.S, lpeg.V, lpeg.C, lpeg.Ct, lpeg.Cg, lpeg.Cb,
+  lpeg.Cmt, lpeg.Cc, lpeg.Cf, lpeg.Cs
+local lpegmatch = lpeg.match
 
 function Lunamark.read_markdown(writer, options)
 
   if not options then options = {} end
 
-  ------------------------------------------------------------------------------
-
-  local lower, upper, gsub, rep, gmatch, format, length =
-    string.lower, string.upper, string.gsub, string.rep, string.gmatch,
-    string.format, string.len
-  local concat = table.concat
-  local P, R, S, V, C, Ct, Cg, Cb, Cmt, Cc, Cf, Cs =
-    lpeg.P, lpeg.R, lpeg.S, lpeg.V, lpeg.C, lpeg.Ct, lpeg.Cg, lpeg.Cb,
-    lpeg.Cmt, lpeg.Cc, lpeg.Cf, lpeg.Cs
-  local lpegmatch = lpeg.match
-
-  ------------------------------------------------------------------------------
-
-  local function if_option(opt)
-    return Cmt(P(0), function(s,pos) if options[opt] then return pos else return false end end)
-  end
-
-  local function unless_option(opt)
-    return Cmt(P(0), function(s,pos) if options[opt] then return false else return pos end end)
-  end
-
-  local function diagnostic(x)
-    print(format("|%s|",x))
-    return x
-  end
+  -- parser succeeds if condition evaluates to true
+  local function guard(condition)
+    return Cmt(P(0), function(s,pos) return condition and pos end) end
 
   ------------------------------------------------------------------------------
 
