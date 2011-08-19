@@ -374,10 +374,22 @@ function Lunamark.read_markdown(writer, options)
     return p
   end
 
-  local displayhtml = htmlcomment + htmlinstruction + emptyelt(blocktags) + openelt("hr") +
-                         Cmt(#openelt(blocktags), function(s,pos) local t = lpegmatch(C(less * keyword),s,pos) ; t = t:sub(2); return lpegmatch(in_matched(t),s,pos) end)
+  local displayhtml = htmlcomment
+                    + htmlinstruction
+                    + emptyelt(blocktags)
+                    + openelt("hr")
+                    + Cmt(#openelt(blocktags),
+                      function(s,pos)
+                        local t = lpegmatch(C(less * keyword),s,pos)
+                        t = t:sub(2)
+                        return lpegmatch(in_matched(t),s,pos)
+                      end)
 
-  local inlinehtml             = emptyelt() + htmlcomment + htmlinstruction + openelt() + closeelt()
+  local inlinehtml  = emptyelt()
+                    + htmlcomment
+                    + htmlinstruction
+                    + openelt()
+                    + closeelt()
 
   ------------------------------------------------------------------------------
   -- Entities
