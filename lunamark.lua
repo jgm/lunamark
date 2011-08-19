@@ -435,28 +435,29 @@ function Lunamark.markdown(writer, options)
   -- Inline elements
   ------------------------------------------------------------------------------
 
-  local Inline           = V("Inline")
+  local Inline    = V("Inline")
 
-  local Str              = normalchar^1 / writer.string
+  local Str       = normalchar^1 / writer.string
 
-  local Symbol           = (specialchar - blocksep) / writer.string
-  local Code             = inticks      / writer.code
+  local Symbol    = (specialchar - blocksep) / writer.string
 
-  local Endline          = newline * -(
-                               blankline
-                             + blocksep
-                             + eof
-                             + more
-                             + hash
-                             + ( line * (P("===")^3 + P("---")^3) * newline )
-                           ) / writer.space
+  local Code      = inticks / writer.code
 
-  local Space            = spacechar / "" *
-                         ( spacechar^1 * Endline / writer.linebreak
-                         + spacechar^0 * Endline^-1 * eof / ""
-                         + spacechar^0 * Endline^-1 * optionalspace / writer.space
-                         )
+  local Endline   = newline * -( -- newline, but not before...
+                        blankline -- paragraph break
+                      + blocksep  -- nested list
+                      + eof       -- end of document
+                      + more      -- blockquote
+                      + hash      -- atx header
+                      + ( line * (equal^1 + dash^1)
+                        * optionalspace * newline )  -- setext header
+                    ) / writer.space
 
+  local Space     = spacechar^2 * Endline / writer.linebreak
+                  + spacechar^1 * Endline^-1 * eof / ""
+                  + spacechar^1 * Endline^-1 * optionalspace / writer.space
+
+  -- parse many p between starter and ender
   local function between(p, starter, ender)
       local ender2 = lpeg.B(nonspacechar) * ender
       return (starter * #nonspacechar * Cs(p * (p - ender2)^0) * ender2)
