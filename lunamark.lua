@@ -340,10 +340,10 @@ function Lunamark.read_markdown(writer, options)
 
   -- make the blocktags table case insensitive
   setmetatable(blocktags, { __index = function(t,k)
-      local l = lower(k)
-      local v = rawget(t,l) and true or false
-      t[k] = v  -- memoize
-      return v
+    local l = lower(k)
+    local v = rawget(t,l) and true or false
+    t[k] = v  -- memoize
+    return v
   end })
 
   -- if no argument supplied, matches any keyword
@@ -351,35 +351,40 @@ function Lunamark.read_markdown(writer, options)
   -- if string supplied, does a case-insensitive comparison
   local function keyword_matches(f)
     if f then
-      return (Cmt(keyword,
-        function(s,pos,c)
-          local kwmatches
-          local typef = type(f)
-          if typef == "string" then
-            kwmatches = (lower(f) == lower(c))
-          elseif typef == "table" then
-            kwmatches = f[c]
-          else
-            error("keyword_matches - unknown type")
-          end
-          if kwmatches then return pos
-          else return false
-          end
-        end))
+      local typef = type(f)
+      local function cond(c)
+        if typef == "string" then
+          return (lower(f) == lower(c))
+        elseif typef == "table" then
+          return f[c]
+        else
+          error("keyword_matches - unknown type")
+        end
+      end
+      local func = function(s,pos,c)
+        if cond(c) then return pos
+        else return false
+        end
+      end
+      return Cmt(keyword,
+                 function(s,pos,c)
+                   if cond(c) then return pos else return false end
+                  end)
     else
       return keyword  -- match any keyword if no argument
     end
   end
 
   -- There is no reason to support bad html, so we expect quoted attributes
-  local htmlattributevalue     = squote * (any - (blankline + squote))^0 * squote
-                               + dquote * (any - (blankline + dquote))^0 * dquote
+  local htmlattributevalue  = squote * (any - (blankline + squote))^0 * squote
+                            + dquote * (any - (blankline + dquote))^0 * dquote
 
-  local htmlattribute          = (alphanumeric + S("_-"))^1 * spnl * equal * spnl * htmlattributevalue * spnl
+  local htmlattribute       = (alphanumeric + S("_-"))^1 * spnl * equal
+                            * spnl * htmlattributevalue * spnl
 
-  local htmlcomment            = P("<!--") * (any - P("-->"))^0 * P("-->")
+  local htmlcomment         = P("<!--") * (any - P("-->"))^0 * P("-->")
 
-  local htmlinstruction        = P("<?")   * (any - P("?>" ))^0 * P("?>" )
+  local htmlinstruction     = P("<?")   * (any - P("?>" ))^0 * P("?>" )
 
   local function openelt(f)
     return (less * keyword_matches(f) * spnl * htmlattribute^0 * more)
@@ -393,23 +398,24 @@ function Lunamark.read_markdown(writer, options)
     return (less * keyword_matches(f) * spnl * htmlattribute^0 * slash * more)
   end
 
-  local displaytext            = (any - less)^1
+  local displaytext         = (any - less)^1
 
+  -- return content between two matched HTML tags that match t
   local function in_matched(t)
-    local p = { openelt(t) * (V(1) + displaytext + (less - closeelt(t)))^0 * closeelt(t) }
-    return p
+    return { openelt(t)
+           * (V(1) + displaytext + (less - closeelt(t)))^0
+           * closeelt(t) }
   end
 
   local displayhtml = htmlcomment
-                    + htmlinstruction
                     + emptyelt(blocktags)
                     + openelt("hr")
                     + Cmt(#openelt(blocktags),
                       function(s,pos)
-                        local t = lpegmatch(C(less * keyword),s,pos)
-                        t = t:sub(2)
+                        local t = lpegmatch(less * C(keyword),s,pos)
                         return lpegmatch(in_matched(t),s,pos)
                       end)
+                    + htmlinstruction
 
   local inlinehtml  = emptyelt()
                     + htmlcomment
