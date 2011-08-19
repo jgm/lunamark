@@ -17,6 +17,7 @@
 * TODO add docbook writer
 * TODO make rock
 * TODO Replace master with v2
+* TODO documentation w luadoc
 * TODO add groff man writer
 * TODO make epub tool
 * TODO make pdf tool
