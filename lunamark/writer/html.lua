@@ -12,19 +12,19 @@ Html.options = { minimize   = false,
                  blanklines = true,
                  containers = false }
 
--- override string.format so that %n is a variable
+-- override string.format so that \n is a variable
 -- newline (depending on the 'minimize' option).
 -- formats are memoized after conversion.
 local function format(fmt,...)
   local newfmt = formats[fmt]
   if not newfmt then
     newfmt = fmt
-    local nl = "\n"
-    if Html.options.minimize then nl = "" end
-    newfmt = newfmt:gsub("\n",nl)
+    if Html.options.minimize then
+      newfmt = newfmt:gsub("\n","")
+    end
     local starts_with_nl = newfmt:byte(1) == 10
     if starts_with_nl and not Html.options.blanklines then
-      newfmt  = newfmt:sub(2)
+      newfmt = newfmt:sub(2)
       starts_with_nl = false
     end
     formats[fmt] = newfmt
