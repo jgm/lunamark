@@ -382,6 +382,8 @@ function Lunamark.read_markdown(writer, options)
 
   ------------------------------------------------------------------------------
 
+  local Inline           = V("Inline")
+
   local Str              = normalchar^1 / writer.string
 
   local Symbol           = (specialchar - blocksep) / writer.string
@@ -407,11 +409,11 @@ function Lunamark.read_markdown(writer, options)
       return (starter * #nonspacechar * Cs(p * (p - ender2)^0) * ender2)
   end
 
-  local Strong = ( between(V("Inline"), doubleasterisks, doubleasterisks)
-                 + between(V("Inline"), doubleunderscores, doubleunderscores) ) / writer.strong
+  local Strong = ( between(Inline, doubleasterisks, doubleasterisks)
+                 + between(Inline, doubleunderscores, doubleunderscores) ) / writer.strong
 
-  local Emph   = ( between(V("Inline"), asterisk, asterisk)
-                 + between(V("Inline"), underscore, underscore)) / writer.emphasis
+  local Emph   = ( between(Inline, asterisk, asterisk)
+                 + between(Inline, underscore, underscore)) / writer.emphasis
 
   local AutoLinkUrl      = less * C(alphanumeric^1 * P("://") * (anyescaped - (newline + more))^1)       * more / writer.url_link
 
@@ -443,7 +445,7 @@ function Lunamark.read_markdown(writer, options)
 
   local Reference        = define_reference_parser / ""
 
-  local Paragraph        = nonindentspace * Cs(V("Inline")^1) * newline * blankline^1 / writer.paragraph
+  local Paragraph        = nonindentspace * Cs(Inline^1) * newline * blankline^1 / writer.paragraph
 
   ------------------------------------------------------------------------------
   -- Lists
@@ -491,7 +493,7 @@ function Lunamark.read_markdown(writer, options)
   end
 
   local function AtxHeader(maxlev)
-    return(Cg(HeadingStart(maxlev),"level") * optionalspace * Cs((V("Inline") - HeadingStop)^1) * Cb("level") * HeadingStop)
+    return(Cg(HeadingStart(maxlev),"level") * optionalspace * Cs((Inline - HeadingStop)^1) * Cb("level") * HeadingStop)
   end
 
   local function SetextHeader(maxlev)
@@ -527,7 +529,7 @@ function Lunamark.read_markdown(writer, options)
 
       Document              = V("Block")^0,
 
-      Inlines               = V("Inline")^0,
+      Inlines               = Inline^0,
 
       Block                 = blankline^1 / ""
                             + blocksep / "\n"
@@ -540,7 +542,7 @@ function Lunamark.read_markdown(writer, options)
                             + DisplayHtml
                             + Reference
                             + Paragraph
-                            + Cs(V("Inline")^1),
+                            + Cs(Inline^1),
 
       Inline                = Str
                             + Space
