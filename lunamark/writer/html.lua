@@ -10,7 +10,7 @@ local Html = {}
 
 Html.options = { minimize   = false,
                  blanklines = true,
-                 sectiondivs = false }
+                 containers = false }
 
 -- override string.format so that %n is a variable
 -- newline (depending on the 'minimize' option).
@@ -145,7 +145,7 @@ function Html.verbatim(s)
 end
 
 function Html.section(s,level,contents)
-  if Html.options.sectiondivs then
+  if Html.options.containers then
     return format("\n<div>\n<h%d>%s</h%d>\n%s</div>\n",level,s,level,contents)
   else
     return format("\n<h%d>%s</h%d>\n%s",level,s,level,contents)

@@ -7,8 +7,12 @@ local Html5 = util.table_copy(Html)
 
 local format = Html.format
 
-Html5.section = function(s,level,contents)
-  return format("\n<section>\n<h%d>%s</h%d>\n%s</section>\n",level,s,level,contents)
+function Html5.section(s,level,contents)
+  if Html5.options.containers then
+    return format("\n<section>\n<h%d>%s</h%d>\n%s</section>\n",level,s,level,contents)
+  else
+    return format("\n<h%d>%s</h%d>\n%s",level,s,level,contents)
+  end
 end
 
 return Html5
