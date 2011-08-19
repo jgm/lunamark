@@ -27,10 +27,6 @@ function Lunamark.read_markdown(writer, options)
 
   if not options then options = {} end
 
-  -- parser succeeds if condition evaluates to true
-  local function guard(condition)
-    return Cmt(P(0), function(s,pos) return condition and pos end) end
-
   ------------------------------------------------------------------------------
 
   local syntax
@@ -58,7 +54,7 @@ function Lunamark.read_markdown(writer, options)
     end
 
   ------------------------------------------------------------------------------
-  -- basic parsers
+  -- Generic parsers
   ------------------------------------------------------------------------------
 
   local asterisk               = P("*")
@@ -127,6 +123,10 @@ function Lunamark.read_markdown(writer, options)
                                + (any - newline)^1 * eof
   local nonemptyline           = line - blankline
 
+  -- parser succeeds if condition evaluates to true
+  local function guard(condition)
+    return Cmt(P(0), function(s,pos) return condition and pos end) end
+
   local function lineof(c)
       return (nonindentspace * (P(c) * optionalspace)^3 * newline * blankline^1)
   end
@@ -150,11 +150,13 @@ function Lunamark.read_markdown(writer, options)
   end
 
   local bulletchar = plus + asterisk + dash
-  local bullet  =  ( bulletchar * #spacing * space^-3
-                   + space * bulletchar * #spacing * space^-2
-                   + space * space * bulletchar * #spacing * space^-1
-                   + space * space * space * bulletchar * #spacing
-                   ) * -bulletchar
+
+  local bullet     = ( bulletchar * #spacing * space^-3
+                     + space * bulletchar * #spacing * space^-2
+                     + space * space * bulletchar * #spacing * space^-1
+                     + space * space * space * bulletchar * #spacing
+                     ) * -bulletchar
+
   local enumerator = digit^3 * period * #spacing
                    + digit^2 * period * #spacing * space^1
                    + digit * period * #spacing * space^-2
@@ -166,13 +168,20 @@ function Lunamark.read_markdown(writer, options)
   -- Parsers used for markdown code spans
   -----------------------------------------------------------------------------
 
-  local openticks              = Cg(backtick^1, "ticks")
-  local closeticks             = space^-1 * Cmt(C(backtick^1) * Cb("ticks"), function(s,i,a,b) return #a == #b and i end)
-  local intickschar            = (any - S(" \n\r`"))
-                               + (newline * -blankline)
-                               + (space - closeticks)
-                               + (backtick^1 - closeticks)
-  local inticks                = openticks * space^-1 * C(intickschar^1) * closeticks
+  local openticks   = Cg(backtick^1, "ticks")
+
+  local closeticks  = space^-1 *
+                      Cmt(C(backtick^1) * Cb("ticks"),
+                          function(s,i,a,b)
+                            return #a == #b and i
+                          end)
+
+  local intickschar = (any - S(" \n\r`"))
+                    + (newline * -blankline)
+                    + (space - closeticks)
+                    + (backtick^1 - closeticks)
+
+  local inticks     = openticks * space^-1 * C(intickschar^1) * closeticks
 
   -----------------------------------------------------------------------------
   -- Parsers used for markdown tags and links
