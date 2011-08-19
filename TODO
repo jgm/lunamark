@@ -1,9 +1,21 @@
+* TODO extensions
+  [ ] framework for individually controllabel exts
+  [ ] footnotes
+  [ ] smart
+  [ ] defn lists
+  [ ] fenced code blocks
+  [ ] math
+  [ ] consecutive ordered/unordered list
+  [ ] significant list start number
+  [ ] tests for exts
+* TODO standalone or templates? use start/end document?
+* TODO split off executable
 * TODO make parser user-modifiable (as in v1)
 * TODO pluggable html parser? (any good ones for lua?)
 * TODO add latex writer
 * TODO add context writer
+* TODO add docbook writer
+* TODO add groff man writer
+* TODO make epub tool
+* TODO make pdf tool
 * TODO documentation, including extending writer + parser
-* TODO clean up parser, split into two or three files?
-* NOTE experiments show that the biggest targets for optimization are
-  - lists
-  - links
