@@ -597,8 +597,8 @@ function Lunamark.read_markdown(writer, options)
 
 end
 
-Lunamark.writers = { html = require("lunamark.writer.html"),
-                     html5 = require("lunamark.writer.html5")
+Lunamark.writers = { html = "lunamark.writer.html",
+                     html5 ="lunamark.writer.html5"
                    }
 
 ------------------------------------------------------------------------------
@@ -615,7 +615,7 @@ if type(package.loaded[myname]) == "userdata" then
        to = {shortform = true, arg = "format", description = "Target format"},
        }, { to = "html" } )
     local writer_name = args.to
-    local writer = Lunamark.writers[writer_name:lower()]
+    local writer = require(Lunamark.writers[writer_name:lower()])
     if not writer then
       io.stderr:write("Unknown writer: " .. tostring(args.to) .. "\n")
       os.exit(3)
