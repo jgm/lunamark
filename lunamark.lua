@@ -1,5 +1,3 @@
-#!/usr/bin/env lua
-
 --[[
 Copyright (C) 2009-2011 John MacFarlane / Khaled Hosny / Hans Hagen
 
@@ -8,9 +6,6 @@ helped a lot to make the parser faster, more robust, and less stack-hungry.
 The parser is also more accurate than before.
 
 ]]--
-
-local Lunamark = {}
-local myname = ...
 
 local lpeg = require("lpeg")
 local misc = require("lunamark.util")
@@ -23,7 +18,7 @@ local P, R, S, V, C, Ct, Cg, Cb, Cmt, Cc, Cf, Cs =
   lpeg.Cmt, lpeg.Cc, lpeg.Cf, lpeg.Cs
 local lpegmatch = lpeg.match
 
-function Lunamark.markdown(writer, options)
+local function markdown(writer, options)
 
   if not options then options = {} end
 
@@ -690,31 +685,7 @@ function Lunamark.markdown(writer, options)
 
 end
 
-Lunamark.writers = { html = "lunamark.writer.html",
-                     html5 ="lunamark.writer.html5"
-                   }
-
-------------------------------------------------------------------------------
--- Main program - act as module if 'required', else as program.
-------------------------------------------------------------------------------
-
--- http://lua-users.org/lists/lua-l/2007-02/msg00125.html
-if type(package.loaded[myname]) == "userdata" then
-    return Lunamark  -- put module stuff here
-  else
-    local cmdopts = require("lunamark.cmdopts")
-    local args = cmdopts.getargs({
-       "lunamark [options] file - convert text from markdown",
-       to = {shortform = true, arg = "format", description = "Target format"},
-       }, { to = "html" } )
-    local writer_name = args.to
-    local writer = require(Lunamark.writers[writer_name:lower()])
-    if not writer then
-      util.err("Unknown writer: " .. tostring(args.to), 3)
-    end
-    writer.options.minimize = false
-    writer.options.blanklines = false
-    io.input(args[1])
-    io.write(Lunamark.markdown(writer,{})(io.stdin))
-  end
-
+return { markdown = markdown,
+         writers = { html  = "lunamark.writer.html",
+                     html5 = "lunamark.writer.html5" }
+       }
