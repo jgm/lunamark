@@ -464,31 +464,50 @@ function Lunamark.markdown(writer, options)
   end
 
   local Strong = ( between(Inline, doubleasterisks, doubleasterisks)
-                 + between(Inline, doubleunderscores, doubleunderscores) ) / writer.strong
+                 + between(Inline, doubleunderscores, doubleunderscores)
+                 ) / writer.strong
 
   local Emph   = ( between(Inline, asterisk, asterisk)
-                 + between(Inline, underscore, underscore)) / writer.emphasis
+                 + between(Inline, underscore, underscore)
+                 ) / writer.emphasis
 
-  local AutoLinkUrl      = less * C(alphanumeric^1 * P("://") * (anyescaped - (newline + more))^1)       * more / writer.url_link
+  local urlchar = anyescaped - newline - more
 
-  local AutoLinkEmail    = less * C((alphanumeric + S("-._+"))^1 * P("@") * (anyescaped - (newline + more))^1) * more / writer.email_link
+  local AutoLinkUrl   = less
+                      * C(alphanumeric^1 * P("://") * urlchar^1)
+                      * more / writer.url_link
+
+  local AutoLinkEmail = less
+                      * C((alphanumeric + S("-._+"))^1 * P("@") * urlchar^1)
+                      * more / writer.email_link
+
+  local DirectLink    = image_marker 
+                      * (tag / inlinesparser)
+                      * spnl^-1
+                      * lparent
+                      * (url + Cc(""))  -- link can be empty [foo]()
+                      * optionaltitle
+                      * rparent
+                      / direct_link
+
+   local IndirectLink = image_marker
+                      * tag
+                      * (C(spnl^-1) * tag)^-1
+                      / indirect_link
 
   -- parse a link or image (direct or indirect)
-  local Link =
-        image_marker * (tag / inlinesparser) * spnl^-1 * lparent * (url + Cc("")) * optionaltitle * rparent / direct_link
-       + image_marker * tag * (C(spnl^-1) * tag)^-1 / indirect_link
+  local Link          = DirectLink + IndirectLink
 
-  local UlOrStarLine     = asterisk^4
-                         + underscore^4
-                         + (spaces * S("*_")^1 * #spaces) / writer.string
+  -- avoid parsing long strings of * or _ as emph/strong
+  local UlOrStarLine  = asterisk^4 + underscore^4 / writer.string
 
-  local EscapedChar      = S("\\") * C(escapable) / writer.string
+  local EscapedChar   = S("\\") * C(escapable) / writer.string
 
-  local InlineHtml       = C(inlinehtml)  / writer.inline_html
+  local InlineHtml    = C(inlinehtml) / writer.inline_html
 
-  local HtmlEntity       = hexentity / writer.hex_entity
-                         + decentity / writer.dec_entity
-                         + tagentity / writer.tag_entity
+  local HtmlEntity    = hexentity / writer.hex_entity
+                      + decentity / writer.dec_entity
+                      + tagentity / writer.tag_entity
 
   ------------------------------------------------------------------------------
   -- Block elements
