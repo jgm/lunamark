@@ -379,6 +379,10 @@ function Lunamark.read_markdown(writer, options)
 
   local inlinehtml             = emptyelt() + htmlcomment + htmlinstruction + openelt() + closeelt()
 
+  ------------------------------------------------------------------------------
+  -- Entities
+  ------------------------------------------------------------------------------
+
   local hexentity = ampersand * hash * S("Xx") * C(hexdigit    ^1) * semicolon
   local decentity = ampersand * hash           * C(digit       ^1) * semicolon
   local tagentity = ampersand *                  C(alphanumeric^1) * semicolon
