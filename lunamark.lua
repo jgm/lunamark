@@ -525,12 +525,10 @@ function Lunamark.read_markdown(writer, options)
   -- Syntax specification
   ------------------------------------------------------------------------------
 
-  function syntax(start)
-    return { start,
+  syntax =
+    { "Document",
 
       Document              = Block^0,
-
-      Inlines               = Inline^0,
 
       Block                 = blankline^1 / ""
                             + blocksep / "\n"
@@ -560,10 +558,12 @@ function Lunamark.read_markdown(writer, options)
                             + EscapedChar
                             + Symbol,
     }
-  end
 
-  docsyntax = Cs(syntax("Document"))
-  inlinessyntax = Cs(syntax("Inlines"))
+  docsyntax = Cs(syntax)
+
+  inlinessyntax = Cs({ "Inlines",
+                       Inlines = Inline^0,
+                       Inline = syntax.Inline })
 
   ------------------------------------------------------------------------------
   -- Conversion function
