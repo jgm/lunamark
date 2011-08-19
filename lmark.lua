@@ -2,6 +2,7 @@
 -- lunamark program
 
 local lunamark = require("lunamark")
+local util = require("lunamark.util")
 local cmdopts = require("lunamark.cmdopts")
 local args = cmdopts.getargs({
    "lunamark [options] file - convert text from markdown",
@@ -14,5 +15,4 @@ if not writer then
 end
 writer.options.minimize = false
 writer.options.blanklines = false
-io.input(args[1])
-io.write(lunamark.markdown(writer,{})(io.stdin))
+io.write(lunamark.markdown(writer,{})(util.get_input(args,4)))
