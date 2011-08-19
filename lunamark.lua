@@ -383,6 +383,7 @@ function Lunamark.read_markdown(writer, options)
   ------------------------------------------------------------------------------
 
   local Inline           = V("Inline")
+  local Block            = V("Block")
 
   local Str              = normalchar^1 / writer.string
 
@@ -513,7 +514,7 @@ function Lunamark.read_markdown(writer, options)
   end
 
   local function SectionMax(maxlev)
-     return (Header(maxlev) * Cs((V("Block") - Header(maxlev))^0)
+     return (Header(maxlev) * Cs((Block - Header(maxlev))^0)
              / writer.section)
   end
 
@@ -527,7 +528,7 @@ function Lunamark.read_markdown(writer, options)
   function syntax(start)
     return { start,
 
-      Document              = V("Block")^0,
+      Document              = Block^0,
 
       Inlines               = Inline^0,
 
