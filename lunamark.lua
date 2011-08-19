@@ -127,14 +127,6 @@ function Lunamark.markdown(writer, options)
   local function guard(condition)
     return Cmt(P(0), function(s,pos) return condition and pos end) end
 
-  local function lineof(c)
-      return (nonindentspace * (P(c) * optionalspace)^3 * newline * blankline^1)
-  end
-
-  local lineof_asterisks       = lineof(asterisk)
-  local lineof_dashes          = lineof(dash)
-  local lineof_underscores     = lineof(underscore)
-
   -----------------------------------------------------------------------------
   -- Parsers used for markdown lists
   -----------------------------------------------------------------------------
@@ -513,23 +505,33 @@ function Lunamark.markdown(writer, options)
   -- Block elements
   ------------------------------------------------------------------------------
 
-  local Block            = V("Block")
+  local Block          = V("Block")
 
-  local DisplayHtml      = C(displayhtml) / writer.display_html
+  local DisplayHtml    = C(displayhtml) / writer.display_html
 
-  local Verbatim         = Cs((blanklines * (indentedline - blankline)^1)^1)  / writer.verbatim
+  local Verbatim       = Cs((blanklines * (indentedline - blankline)^1)^1)
+                       / writer.verbatim
 
-  local Blockquote       = Cs((
-                              ((nonindentspace * more * space^-1)/"" * linechar^0 * newline)^1
-                            * ((linechar - blankline)^1 * newline)^0
-                            * blankline^0
-                           )^1) / docparser / writer.blockquote
+  -- strip off leading > and indents, and run through docparser
+  local Blockquote     = Cs((
+            ((nonindentspace * more * space^-1)/"" * linechar^0 * newline)^1
+          * ((linechar - blankline)^1 * newline)^0
+          * blankline^0
+          )^1) / docparser / writer.blockquote
 
-  local HorizontalRule   = (lineof_asterisks + lineof_dashes + lineof_underscores) / writer.hrule
+  local function lineof(c)
+      return (nonindentspace * (P(c) * optionalspace)^3 * newline * blankline^1)
+  end
 
-  local Reference        = define_reference_parser / ""
+  local HorizontalRule = ( lineof(asterisk)
+                         + lineof(dash)
+                         + lineof(underscore)
+                         ) / writer.hrule
 
-  local Paragraph        = nonindentspace * Cs(Inline^1) * newline * blankline^1 / writer.paragraph
+  local Reference      = define_reference_parser / ""
+
+  local Paragraph      = nonindentspace * Cs(Inline^1) * newline * blankline^1
+                       / writer.paragraph
 
   ------------------------------------------------------------------------------
   -- Lists
