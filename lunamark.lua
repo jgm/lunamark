@@ -51,8 +51,8 @@ function Lunamark.read_markdown(writer, options)
 
   local syntax
   local docsyntax
-  local docparser
   local inlinessyntax
+  local docparser
   local inlinesparser
 
   docparser =
@@ -73,6 +73,8 @@ function Lunamark.read_markdown(writer, options)
         end
     end
 
+  ------------------------------------------------------------------------------
+  -- basic parsers
   ------------------------------------------------------------------------------
 
   local asterisk               = P("*")
@@ -141,8 +143,6 @@ function Lunamark.read_markdown(writer, options)
                                + (any - newline)^1 * eof
   local nonemptyline           = line - blankline
 
-  ------------------------------------------------------------------------------
-
   local function lineof(c)
       return (nonindentspace * (P(c) * optionalspace)^3 * newline * blankline^1)
   end
@@ -150,6 +150,10 @@ function Lunamark.read_markdown(writer, options)
   local lineof_asterisks       = lineof(asterisk)
   local lineof_dashes          = lineof(dash)
   local lineof_underscores     = lineof(underscore)
+
+  -----------------------------------------------------------------------------
+  -- Parsers used for markdown lists
+  -----------------------------------------------------------------------------
 
   -- gobble spaces to make the whole bullet or enumerator four spaces wide:
   local function gobbletofour(s,pos,c)
@@ -174,7 +178,9 @@ function Lunamark.read_markdown(writer, options)
                    + space * digit * period * #spacing * space^-1
                    + space * space * digit^1 * period * #spacing
 
-  ------------------------------------------------------------------------------
+  -----------------------------------------------------------------------------
+  -- Parsers used for markdown code spans
+  -----------------------------------------------------------------------------
 
   local openticks              = Cg(backtick^1, "ticks")
   local closeticks             = space^-1 * Cmt(C(backtick^1) * Cb("ticks"), function(s,i,a,b) return #a == #b and i end)
@@ -184,7 +190,9 @@ function Lunamark.read_markdown(writer, options)
                                + (backtick^1 - closeticks)
   local inticks                = openticks * space^-1 * C(intickschar^1) * closeticks
 
-  ------------------------------------------------------------------------------
+  -----------------------------------------------------------------------------
+  -- Parsers used for markdown tags and links
+  -----------------------------------------------------------------------------
 
   local leader        = space^-3
   local bracketed     = P{ lbracket * ((anyescaped - (lbracket + rbracket)) + V(1))^0 * rbracket }
@@ -202,7 +210,7 @@ function Lunamark.read_markdown(writer, options)
   local optionaltitle = (spnl^-1 * title * spacechar^0) + Cc("")
 
   ------------------------------------------------------------------------------
-  -- References
+  -- Helpers for links and references
   ------------------------------------------------------------------------------
 
   local references = {}
@@ -262,11 +270,6 @@ function Lunamark.read_markdown(writer, options)
   end
 
   local image_marker = (exclamation / function() return true end) + Cc(false)
-
-  -- parse a link or image (direct or indirect)
-  local link_parser =
-        image_marker * (tag / inlinesparser) * spnl^-1 * lparent * (url + Cc("")) * optionaltitle * rparent / direct_link
-       + image_marker * tag * (C(spnl^-1) * tag)^-1 / indirect_link
 
   ------------------------------------------------------------------------------
   -- HTML
@@ -381,9 +384,10 @@ function Lunamark.read_markdown(writer, options)
   local tagentity = ampersand *                  C(alphanumeric^1) * semicolon
 
   ------------------------------------------------------------------------------
+  -- Inline elements
+  ------------------------------------------------------------------------------
 
   local Inline           = V("Inline")
-  local Block            = V("Block")
 
   local Str              = normalchar^1 / writer.string
 
@@ -420,7 +424,10 @@ function Lunamark.read_markdown(writer, options)
 
   local AutoLinkEmail    = less * C((alphanumeric + S("-._+"))^1 * P("@") * (anyescaped - (newline + more))^1) * more / writer.email_link
 
-  local Link             = link_parser  -- includes images
+  -- parse a link or image (direct or indirect)
+  local Link =
+        image_marker * (tag / inlinesparser) * spnl^-1 * lparent * (url + Cc("")) * optionaltitle * rparent / direct_link
+       + image_marker * tag * (C(spnl^-1) * tag)^-1 / indirect_link
 
   local UlOrStarLine     = asterisk^4
                          + underscore^4
@@ -429,10 +436,18 @@ function Lunamark.read_markdown(writer, options)
   local EscapedChar      = S("\\") * C(escapable) / writer.string
 
   local InlineHtml       = C(inlinehtml)  / writer.inline_html
-  local DisplayHtml      = C(displayhtml) / writer.display_html
+
   local HtmlEntity       = hexentity / writer.hex_entity
                          + decentity / writer.dec_entity
                          + tagentity / writer.tag_entity
+
+  ------------------------------------------------------------------------------
+  -- Block elements
+  ------------------------------------------------------------------------------
+
+  local Block            = V("Block")
+
+  local DisplayHtml      = C(displayhtml) / writer.display_html
 
   local Verbatim         = Cs((blanklines * (indentedline - blankline)^1)^1)  / writer.verbatim
 
