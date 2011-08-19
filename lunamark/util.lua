@@ -2,6 +2,12 @@
 
 local M = {}
 
+-- error message and exit
+function M.err(msg, exit_code)
+  io.stderr:write("lunamark: " .. msg .. "\n")
+  os.exit(exit_code or 1)
+end
+
 -- shallow table copy including metatables
 function M.table_copy(t)
   local u = { }

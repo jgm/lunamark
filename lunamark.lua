@@ -576,12 +576,15 @@ function Lunamark.markdown(writer, options)
   -- Headers
   ------------------------------------------------------------------------------
 
+  -- parse Atx heading start and return level
   local function HeadingStart(maxlev)
     return (#hash * C(hash^-(maxlev)) * -hash / length)
   end
 
-  local HeadingStop      = optionalspace * hash^0 * optionalspace * newline
+  -- optional end of Atx header ### header ###
+  local HeadingStop = optionalspace * hash^0 * optionalspace * newline
 
+  -- parse setext header ending of max level maxlev and return level
   local function HeadingLevel(maxlev)
     if maxlev == 1 then
       return (equal^1 * Cc(1))
@@ -592,10 +595,16 @@ function Lunamark.markdown(writer, options)
     end
   end
 
+  -- parse atx header of maximum level maxlev
   local function AtxHeader(maxlev)
-    return(Cg(HeadingStart(maxlev),"level") * optionalspace * Cs((Inline - HeadingStop)^1) * Cb("level") * HeadingStop)
+    return ( Cg(HeadingStart(maxlev),"level")
+           * optionalspace
+           * Cs((Inline - HeadingStop)^1)
+           * Cb("level")
+           * HeadingStop )
   end
 
+  -- parse setext header of maximum level maxlev
   local function SetextHeader(maxlev)
     local markers
     if maxlev == 1 then markers = "=" else markers = "=-" end
@@ -613,8 +622,7 @@ function Lunamark.markdown(writer, options)
   end
 
   local function SectionMax(maxlev)
-     return (Header(maxlev) * Cs((Block - Header(maxlev))^0)
-             / writer.section)
+     return (Header(maxlev) * Cs((Block - Header(maxlev))^0) / writer.section)
   end
 
   local Section = SectionMax(1) + SectionMax(2) + SectionMax(3) +
@@ -665,7 +673,7 @@ function Lunamark.markdown(writer, options)
                        Inline = syntax.Inline })
 
   ------------------------------------------------------------------------------
-  -- Conversion function
+  -- Exported conversion function
   ------------------------------------------------------------------------------
 
   -- inp can be a string or a file object.
@@ -673,7 +681,8 @@ function Lunamark.markdown(writer, options)
       references = {}
       local expanded = misc.expand_tabs(inp)
       referenceparser(expanded)
-      local result = writer.start_document() .. docparser(expanded) .. writer.stop_document()
+      local result = writer.start_document() .. docparser(expanded)
+                       .. writer.stop_document()
       return result
   end
 
@@ -701,8 +710,7 @@ if type(package.loaded[myname]) == "userdata" then
     local writer_name = args.to
     local writer = require(Lunamark.writers[writer_name:lower()])
     if not writer then
-      io.stderr:write("Unknown writer: " .. tostring(args.to) .. "\n")
-      os.exit(3)
+      util.err("Unknown writer: " .. tostring(args.to), 3)
     end
     writer.options.minimize = false
     writer.options.blanklines = false
