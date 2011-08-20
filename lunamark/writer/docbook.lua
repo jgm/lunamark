@@ -25,7 +25,7 @@ end
 
 function Docbook.link(lab,src,tit)
   local titattr
-  if string.len(tit) > 0
+  if tit and string.len(tit) > 0
      then titattr = format(" xlink:title=\"%s\"", Docbook.string(tit))
      else titattr = ""
      end
