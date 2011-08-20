@@ -3,7 +3,7 @@
 local util = require("lunamark.util")
 local Html = require("lunamark.writer.html")
 
-local Html5 = util.table_copy(Html)
+local Html5 = util.extend(Html)
 
 local format = Html.format
 

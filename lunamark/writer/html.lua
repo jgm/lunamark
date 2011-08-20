@@ -1,57 +1,23 @@
 -- HTML writer for lunamark
 
+local Xml = require("lunamark.writer.xml")
+local util = require("lunamark.util")
+
 local gsub = string.gsub
 
 local firstline = true
 
 local formats = {}
 
-local Html = {}
+local Html = util.extend(Xml)
+
+local format = Html.format
 
 Html.options = { minimize   = false,
                  blanklines = true,
                  containers = false }
 
--- override string.format so that \n is a variable
--- newline (depending on the 'minimize' option).
--- formats are memoized after conversion.
-local function format(fmt,...)
-  local newfmt = formats[fmt]
-  if not newfmt then
-    newfmt = fmt
-    if Html.options.minimize then
-      newfmt = newfmt:gsub("\n","")
-    end
-    local starts_with_nl = newfmt:byte(1) == 10
-    if starts_with_nl and not Html.options.blanklines then
-      newfmt = newfmt:sub(2)
-      starts_with_nl = false
-    end
-    formats[fmt] = newfmt
-    -- don't memoize this change, just on first line
-    if starts_with_nl and Html.options.firstline then
-      newfmt = newfmt:sub(2)
-      firstline = false
-    end
-  end
-  return string.format(newfmt,...)
-end
-
-Html.format = format
-
 Html.linebreak = "<br/>"
-
-Html.space = " "
-
-function Html.string(s)
-  local escaped = {
-   ["<" ] = "&lt;",
-   [">" ] = "&gt;",
-   ["&" ] = "&amp;",
-   ["\"" ] = "&quot;",
-   ["'" ] = "&#39;" }
-  return s:gsub(".",escaped)
-end
 
 function Html.code(s)
   return format("<code>%s</code>",Html.string(s))
@@ -153,13 +119,5 @@ function Html.section(s,level,contents)
 end
 
 Html.hrule = format("\n<hr />\n")
-
-local meta = {}
-meta.__index =
-  function(_, key)
-    io.stderr:write(string.format("WARNING: Undefined writer function '%s'\n",key))
-    return (function(...) return table.concat(arg," ") end)
-  end
-setmetatable(Html, meta)
 
 return Html

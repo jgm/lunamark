@@ -2,6 +2,16 @@
 
 local M = {}
 
+-- extend(t) returns a table that falls back to t for non-found values
+function M.extend(prototype)
+  local newt = {}
+  local metat = { __index = function(t,key)
+                              return prototype[key]
+                            end }
+  setmetatable(newt, metat)
+  return newt
+end
+
 -- error message and exit
 function M.err(msg, exit_code)
   io.stderr:write("lunamark: " .. msg .. "\n")
