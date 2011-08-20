@@ -1,3 +1,4 @@
+* TODO Option parsing still screwy - simplify?
 * TODO docbook parser produces invalid output
 * TODO writers - make more object like?
   the idea would be to add a (self, parameter to all functions.
