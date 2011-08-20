@@ -26,6 +26,9 @@ local options = {
                 description = "Compress whitespace in output" },
    blanklines = { arg = "boolean", optarg = true,
                   description = "Leave blank lines between block elements" },
+   output  = { shortform = true,
+               arg = "file",
+               description = "Output file" },
    }
 
 local defaults = {
@@ -52,4 +55,5 @@ writer.options.blanklines = args.blanklines
 
 local convert = reader(writer,{})
 
+io.output(args.output)
 io.write(convert(lunamark.util.get_input(args,4)))
