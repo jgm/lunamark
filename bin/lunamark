@@ -3,13 +3,24 @@
 
 local lunamark = require("lunamark")
 
+local function one_of(ary)
+  return function(s)
+    for i=1,#ary do
+      if ary[i]==s then return true end
+    end
+    return false, "must be one of: " .. table.concat(ary,", ")
+  end
+end
+
 local options = {
   "lunamark [options] file - convert text from markdown",
    to      = { shortform = true,
                arg = "format",
+               validate = one_of({"html","html5"}),
                description = "Target format"},
    from    = { shortform = true,
                arg = "format",
+               validate = one_of({"markdown"}),
                description = "Source format"},
    }
 
@@ -20,12 +31,12 @@ local defaults = {
 
 local args = lunamark.cmdopts.getargs(options, defaults)
 
-local reader = lunamark.reader[args.from:lower()]
+local reader = lunamark.reader[args.from]
 if not reader then
   lunamark.util.err("Unknown reader: " .. tostring(args.from), 3)
 end
 
-local writer = lunamark.writer[args.to:lower()]
+local writer = lunamark.writer[args.to]
 if not writer then
   lunamark.util.err("Unknown writer: " .. tostring(args.to), 5)
 end
@@ -33,6 +44,6 @@ end
 writer.options.minimize = false
 writer.options.blanklines = false
 
-local convert = markdown(writer,{})
+local convert = reader(writer,{})
 
-io.write(convert(util.get_input(args,4)))
+io.write(convert(lunamark.util.get_input(args,4)))
