@@ -23,9 +23,9 @@ local options = {
                validate = one_of({"markdown"}),
                description = "Source format"},
    minimize = { arg = "boolean", optarg = true,
-                description = "Compress whitespace in output." },
+                description = "Compress whitespace in output" },
    blanklines = { arg = "boolean", optarg = true,
-                  description = "Leave blank lines between block elements." },
+                  description = "Leave blank lines between block elements" },
    }
 
 local defaults = {
