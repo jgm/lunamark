@@ -13,7 +13,7 @@ local function one_of(ary)
 end
 
 local options = {
-  "lunamark [options] file - convert text from markdown",
+  "lunamark [options] [file..] - convert text between formats",
    to      = { shortform = true,
                arg = "format",
                validate = one_of({"html","html5"}),
@@ -22,11 +22,17 @@ local options = {
                arg = "format",
                validate = one_of({"markdown"}),
                description = "Source format"},
+   minimize = { arg = "boolean", optarg = true,
+                description = "Compress whitespace in output." },
+   blanklines = { arg = "boolean", optarg = true,
+                  description = "Leave blank lines between block elements." },
    }
 
 local defaults = {
    to  = "html",
-   from = "markdown"
+   from = "markdown",
+   minimize = false,
+   blanklines = true
  }
 
 local args = lunamark.cmdopts.getargs(options, defaults)
@@ -41,8 +47,8 @@ if not writer then
   lunamark.util.err("Unknown writer: " .. tostring(args.to), 5)
 end
 
-writer.options.minimize = false
-writer.options.blanklines = false
+writer.options.minimize = args.minimize
+writer.options.blanklines = args.blanklines
 
 local convert = reader(writer,{})
 

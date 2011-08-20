@@ -25,8 +25,8 @@ Format of option table:
 
 argspec is a table with the following fields:
 * shortform - allow a short (single dash) option based on first letter
-* arg - type of argument ("number" for numerical, "string" or anything
-  else for string)
+* arg - type of argument ("number" for numerical, "boolean" for boolean,
+  "string" or anything else for string)
 * optarg - if true, the argument is optional
 * validate - function that takes an argument and returns a boolean
 * description - description of option
@@ -46,26 +46,34 @@ local function usage(opt_table,defaults)
   else
     for k,v in pairs(opt_table) do
       if type(k) ~= "number" then
+        defaultval = defaults and defaults[k]
+        if type(defaultval) == "string" or type(defaultval) == "number" then
+          default = "(" .. tostring(defaults[k]) .. "*)"
+        else
+          default = ""
+        end
         local optname, argspec, descr = "","",""
         optname = "--" .. k
         if v.shortform then
           optname = optname .. ",-" .. k:sub(1,1)
         end
         if v.arg then
-          if v.optarg then
-            argspec = "["..v.arg.."]"
+          local vnice = v.arg
+          if vnice == "boolean" then
+            if defaultval then
+              vnice = "true*|false"
+            else
+              vnice = "true|false*"
+            end
+          end
+          if vnice then
+            argspec = "["..vnice.."]"
           else
-            argspec = v.arg
+            argspec = vnice
           end
         end
         if v.description then
           descr = v.description
-        end
-        defaultval = defaults and defaults[k]
-        if type(defaultval) == "string" or type(defaultval) == "number" then
-          default = "(default: " .. tostring(defaults[k]) .. ")"
-        else
-          default = ""
         end
         io.write(string.format("  %-30s %s %s\n", optname.." "..argspec, descr, default))
       end
@@ -158,6 +166,18 @@ local function getargs(opt_table, defaults)
         else
           err("Option " .. this .. " requires a numerical argument.")
         end
+      elseif opt.arg == "boolean" then 
+        local v = possarg:lower()
+        local b = false
+        if v == "true" or v == "yes" or v == "on" then
+          b = true
+        elseif v == "false" or v == "no" or v == "off" then
+          b = false
+        else
+          err("Option " .. this .. " requires a boolean argument.")
+        end
+        add_value(optname, b)
+        i = i + 2
       else
         add_value(optname, possarg)
         i = i + 2
