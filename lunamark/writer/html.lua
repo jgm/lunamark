@@ -25,7 +25,7 @@ end
 
 function Html.link(lab,src,tit)
   local titattr
-  if string.len(tit) > 0
+  if tit and string.len(tit) > 0
      then titattr = format(" title=\"%s\"", Html.string(tit))
      else titattr = ""
      end
@@ -42,32 +42,11 @@ function Html.image(lab,src,tit)
 end
 
 function Html.email_link(address)
-  return format("<a href=\"mailto:%s\">%s</a>",Html.string(address),Html.string(address))
+  return Html.link(address,"mailto:" .. address)
 end
 
 function Html.url_link(url)
-  return format("<a href=\"%s\">%s</a>",Html.string(url),Html.string(url))
-end
-
-function Html.hex_entity(s)
-  return format("&#x%s;",s)
-end
-
-function Html.dec_entity(s)
-  return format("&#%s;",s)
-end
-
-function Html.tag_entity(s)
-  return format("&%s;",s)
-end
-
-function Html.start_document()
-  firstline = true
-  return ""
-end
-
-function Html.stop_document()
-  return ""
+  return Html.link(url,url)
 end
 
 function Html.paragraph(s)

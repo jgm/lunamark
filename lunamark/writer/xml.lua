@@ -53,36 +53,6 @@ function Xml.string(s)
   return s:gsub(".",escaped)
 end
 
-function Xml.code(s)
-  return format("<code>%s</code>",Xml.string(s))
-end
-
-function Xml.link(lab,src,tit)
-  local titattr
-  if string.len(tit) > 0
-     then titattr = format(" title=\"%s\"", Xml.string(tit))
-     else titattr = ""
-     end
-  return format("<link href=\"%s\"%s>%s</link>",Xml.string(src),titattr,lab)
-end
-
-function Xml.image(lab,src,tit)
-  local titattr, altattr
-  if tit and string.len(tit) > 0
-     then titattr = format(" title=\"%s\"", Xml.string(tit))
-     else titattr = ""
-     end
-  return format("<image src=\"%s\" label=\"%s\"%s />",Xml.string(src),Xml.string(lab),titattr)
-end
-
-function Xml.email_link(address)
-  return format("<link href=\"mailto:%s\">%s</a>",Xml.string(address),Xml.string(address))
-end
-
-function Xml.url_link(url)
-  return format("<link href=\"%s\">%s</a>",Xml.string(url),Xml.string(url))
-end
-
 function Xml.hex_entity(s)
   return format("&#x%s;",s)
 end
@@ -103,52 +73,6 @@ end
 function Xml.stop_document()
   return ""
 end
-
-function Xml.paragraph(s)
-  return format("\n<paragraph>%s</paragraph>\n",s)
-end
-
-function Xml.listitem(s)
-  return format("<item>%s</item>\n",s)
-end
-
-function Xml.bulletlist(s)
-  return format("\n<bulletlist>\n%s</bulletlist>\n",s)
-end
-
-function Xml.orderedlist(s)
-  return format("\n<orderedlist>\n%s</orderedlist>\n",s)
-end
-
-function Xml.inline_html(s)
-  return format("<inlinehtml>%s</inlinehtml>",s)
-end
-
-function Xml.display_html(s)
-  return format("\n<displayhtml>\n%s</displayhtml>\n",s)
-end
-
-function Xml.emphasis(s)
-  return format("<emphasis>%s</emphasis>",s)
-end
-
-function Xml.strong(s)
-  return format("<strong>%s</strong>",s)
-end
-
-function Xml.blockquote(s)
-  return format("\n<blockquote>\n%s</blockquote>\n", s)
-end
-
-function Xml.verbatim(s)
-  return format("\n<verbatim>%s</verbatim>\n", Xml.string(s))
-end
-
-function Xml.section(s,level,contents)
-  return format("\n<section>\n<heading level=\"%d\">%s</heading>\n%s</section>\n",level,s,level,contents)
-end
-
-Xml.hrule = format("\n<hrule />\n")
 
 local meta = {}
 meta.__index =
