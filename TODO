@@ -4,6 +4,8 @@
   advantage would be that you could do things like
   autolink(self,url) = self:link(url,url)
 
+  see http://www.bresciascienza.it/erix/progutil/gpeddler2/help/oo.html
+
 * TODO extensions
   [ ] framework for individually controllabel exts
   [ ] footnotes
