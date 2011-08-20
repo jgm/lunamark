@@ -162,8 +162,15 @@ local function getargs(opt_table, defaults)
         add_value(optname, possarg)
         i = i + 2
       end
-      if opt and opt.validate and not opt.validate(args[optname]) then
-        err("Option " .. this .. " has invalid value " .. possarg .. ".")
+      if opt and opt.validate then
+        local valid, helpmsg = opt.validate(args[optname])
+        if not valid then
+          if helpmsg then
+            err("Option " .. this .. " " .. helpmsg .. ".")
+          else
+            err("Option " .. this .. " has invalid value " .. possarg .. ".")
+          end
+        end
       end
     else -- argument or --longopt=value
       table.insert(args,this)
