@@ -32,6 +32,7 @@ build = {
        ["lunamark.util"]            = "lunamark/util.lua",
        ["lunamark.cmdopts"]         = "lunamark/cmdopts.lua",
        ["lunamark.writer"]          = "lunamark/writer.lua",
+       ["lunamark.writer.xml"]      = "lunamark/writer/xml.lua",
        ["lunamark.writer.html"]     = "lunamark/writer/html.lua",
        ["lunamark.writer.html5"]    = "lunamark/writer/html5.lua",
        ["lunamark.reader"]          = "lunamark/reader.lua",
