@@ -22,3 +22,57 @@
 * TODO make epub tool
 * TODO make pdf tool
 * TODO documentation, including extending writer + parser
+
+Notes on a possible macro system:  Simply add a function
+to the writer:
+
+    W.name = function(last,first)
+      return first .. writer(space) .. writer.strong(last)
+    end
+
+    W.repeat = function(num,x)
+      return string.rep(x, tonumber(num))
+    end
+
+When lunamark encounters %name{<inlines>}{<inlines>}
+or %repeat[7]{Hi there%space}, it simply calls the writer.name function.
+
+Note that writer.space is currently not a function; maybe that should
+change for uniformity.  We may want macros with no arguments that
+need to be functions: e.g. %currenttime.
+
+Probably we'd need several types of arguments:
+
+* parsed inline lists
+* parsed block lists
+* raw text
+
+Also we'd have to know whether to parse as a block or an inline.
+So perhaps we'd need two different kinds of macros.
+
+* inline macros:
+
+        %name{<inlines>}  -- with inline argument
+        %name[raw text]   -- with raw argument
+
+* block macros
+
+        .admonition{<inlines>}{|  -- multiline block
+        <blocks>
+        |}
+
+        .startsource[|
+        multiline raw text - first newline ignored
+
+        |]
+
+These macros are all on the writer side. What about the reader side?
+E.g. what if we want a macro
+
+    #include[myfile.txt]
+
+that reads myfile.txt and parses the source as markdown?
+This can't happen in the writer.  But there could be a way to
+register a reader macro.  This would simply call a match-time
+parser function that directly modifies the input string.
+
