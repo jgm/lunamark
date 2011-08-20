@@ -14,7 +14,7 @@
 * TODO pluggable html parser? (any good ones for lua?)
 * TODO add latex writer
 * TODO add context writer
-* INPROGRESS add docbook writer
+* DONE add docbook writer
 * DONE make rock
 * TODO Replace master with v2
 * TODO documentation w luadoc
