@@ -163,6 +163,9 @@ local function getargs(opt_table, defaults)
         if num then
           add_value(optname, num)
           i = i + 2
+        elseif opt.optarg then
+          args[optname] = true
+          i = i + 1
         else
           err("Option " .. this .. " requires a numerical argument.")
         end
@@ -170,14 +173,17 @@ local function getargs(opt_table, defaults)
         local v = possarg:lower()
         local b = false
         if v == "true" or v == "yes" or v == "on" then
-          b = true
+          add_value(optname, true)
+          i = i + 2
         elseif v == "false" or v == "no" or v == "off" then
-          b = false
+          add_value(optname, false)
+          i = i + 2
+        elseif opt.optarg then
+          args[optname] = true
+          i = i + 1
         else
           err("Option " .. this .. " requires a boolean argument.")
         end
-        add_value(optname, b)
-        i = i + 2
       else
         add_value(optname, possarg)
         i = i + 2
