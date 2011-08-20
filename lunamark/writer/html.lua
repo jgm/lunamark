@@ -5,10 +5,6 @@ local util = require("lunamark.util")
 
 local gsub = string.gsub
 
-local firstline = true
-
-local formats = {}
-
 local Html = util.extend(Xml)
 
 local format = Html.format
@@ -97,6 +93,6 @@ function Html.section(s,level,contents)
   end
 end
 
-Html.hrule = format("\n<hr />\n")
+Html.hrule = "\n<hr />\n"
 
 return Html

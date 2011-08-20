@@ -1,3 +1,4 @@
+* TODO docbook parser produces invalid output
 * TODO writers - make more object like?
   the idea would be to add a (self, parameter to all functions.
   then you would call the writers like this:  writer:para(s)

@@ -2,21 +2,20 @@
 
 local gsub = string.gsub
 
-local firstline = true
-
-local formats = {}
-
 local Xml = {}
 
 Xml.options = { minimize   = false,
                 blanklines = true,
                 containers = false }
 
+Xml.firstline = true
+Xml.formats = {}
+
 -- override string.format so that \n is a variable
 -- newline (depending on the 'minimize' option).
 -- formats are memoized after conversion.
 local function format(fmt,...)
-  local newfmt = formats[fmt]
+  local newfmt = Xml.formats[fmt]
   if not newfmt then
     newfmt = fmt
     if Xml.options.minimize then
@@ -27,11 +26,13 @@ local function format(fmt,...)
       newfmt = newfmt:sub(2)
       starts_with_nl = false
     end
-    formats[fmt] = newfmt
+    Xml.formats[fmt] = newfmt
     -- don't memoize this change, just on first line
-    if starts_with_nl and Xml.options.firstline then
+    if starts_with_nl and Xml.firstline then
       newfmt = newfmt:sub(2)
-      firstline = false
+    end
+    if Xml.firstline then
+      Xml.firstline = false
     end
   end
   return string.format(newfmt,...)
@@ -66,7 +67,7 @@ function Xml.tag_entity(s)
 end
 
 function Xml.start_document()
-  firstline = true
+  Xml.firstline = true
   return ""
 end
 
