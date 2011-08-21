@@ -49,6 +49,10 @@ function Xml.stop_document()
   return ""
 end
 
+function Xml.plain(s)
+  return s
+end
+
 local meta = {}
 meta.__index =
   function(_, key)

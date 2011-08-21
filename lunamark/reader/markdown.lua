@@ -528,6 +528,8 @@ local function markdown(writer, options)
   local Paragraph      = nonindentspace * Cs(Inline^1) * newline * blankline^1
                        / writer.paragraph
 
+  local Plain          = Cs(Inline^1) / writer.plain
+
   ------------------------------------------------------------------------------
   -- Lists
   ------------------------------------------------------------------------------
@@ -643,7 +645,7 @@ local function markdown(writer, options)
                             + DisplayHtml
                             + Reference
                             + Paragraph
-                            + Cs(Inline^1),
+                            + Plain,
 
       Inline                = Str
                             + Space

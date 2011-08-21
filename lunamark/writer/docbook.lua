@@ -50,6 +50,8 @@ function Docbook.paragraph(s)
   return format("\n<para>%s</para>\n",s)
 end
 
+Docbook.plain = Docbook.paragraph
+
 function Docbook.listitem(s)
   return format("<listitem>%s</listitem>\n",s)
 end
