@@ -14,7 +14,7 @@ TeX.formats = {}
 
 local format = string.format
 
-TeX.linebreak = "\\\n"
+TeX.linebreak = "\\\\\n"
 
 TeX.space = " "
 
@@ -27,11 +27,11 @@ local escaped = {
    ["_"] = "\\_",
    ["#"] = "\\#",
    ["^"] = "\\^{}",
-   ["\\"] = "\\char92",
-   ["~"] = "\\char126",
-   ["|"] = "\\char124",
-   ["<"] = "\\char60",
-   [">"] = "\\char62",
+   ["\\"] = "\\char92{}",
+   ["~"] = "\\char126{}",
+   ["|"] = "\\char124{}",
+   ["<"] = "\\char60{}",
+   [">"] = "\\char62{}",
    ["["] = "{[}", -- to avoid interpretation as optional argument
    ["]"] = "{]}",
    ["\160"] = "~",
