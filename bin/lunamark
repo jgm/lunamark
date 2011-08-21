@@ -26,6 +26,8 @@ local options = {
                 description = "Compress whitespace in output" },
    blanklines = { arg = "boolean", optarg = true,
                   description = "Leave blank lines between block elements" },
+   strict  = { arg = "boolean", optarg = true,
+                description = "Disable markdown extensions" },
    output  = { shortform = true,
                arg = "file",
                description = "Output file" },
@@ -35,7 +37,8 @@ local defaults = {
    to  = "html",
    from = "markdown",
    minimize = false,
-   blanklines = true
+   blanklines = true,
+   strict = false,
  }
 
 local args = lunamark.cmdopts.getargs(options, defaults)
@@ -52,6 +55,7 @@ end
 
 writer.options.minimize = args.minimize
 writer.options.blanklines = args.blanklines
+writer.options.startnum = not args.strict
 
 local convert = reader(writer,{})
 

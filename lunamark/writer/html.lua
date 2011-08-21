@@ -45,12 +45,16 @@ function Html.listitem(s)
   return format("<li>%s</li>\n",s)
 end
 
-function Html.bulletlist(s)
+function Html.bulletlist(s,tight)
   return format("\n<ul>\n%s</ul>\n",s)
 end
 
-function Html.orderedlist(s)
-  return format("\n<ol>\n%s</ol>\n",s)
+function Html.orderedlist(s,tight,startnum)
+  local start = ""
+  if startnum and Html.options.startnum and startnum ~= 1 then
+    start = string.format(" start=\"%d\"",startnum)
+  end
+  return format("\n<ol%s>\n%s</ol>\n",start,s)
 end
 
 function Html.inline_html(s)

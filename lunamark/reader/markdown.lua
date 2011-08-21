@@ -562,15 +562,18 @@ local function markdown(writer, options)
              * (blanklines / "\n\n")) / docparser / writer.listitem)
   end
 
-  local BulletList = ( Cs(TightListItem(bullet)^1)
+  local BulletList = bullet *
+                     ( Cs(TightListItem(P(0)) * TightListItem(bullet)^0)
                        * Cc(true) * skipblanklines * -bullet
-                     + Cs(LooseListItem(bullet)^1)
+                     + Cs(LooseListItem(P(0)) * LooseListItem(bullet)^0)
                        * Cc(false) * skipblanklines ) / writer.bulletlist
 
-  local OrderedList = ( Cs(TightListItem(enumerator)^1)
+  local OrderedList = Cg(enumerator / tonumber, "startnum") *
+                      ( Cs(TightListItem(P(0)) * TightListItem(enumerator)^0)
                         * Cc(true) * skipblanklines * -enumerator
-                      + Cs(LooseListItem(enumerator)^1)
-                        * Cc(false) * skipblanklines ) / writer.orderedlist
+                      + Cs(LooseListItem(P(0)) * LooseListItem(enumerator)^0)
+                        * Cc(false) * skipblanklines
+                      ) * Cb("startnum") / writer.orderedlist
 
   ------------------------------------------------------------------------------
   -- Headers

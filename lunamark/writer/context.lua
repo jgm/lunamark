@@ -33,9 +33,10 @@ function Context.bulletlist(s,tight)
   return format("\\startitemize%s\n%s\\stopitemize\n\n",opt,s)
 end
 
-function Context.orderedlist(s,tight)
-  local opt = "[1]"
-  if tight then opt = "[1,packed]" end
+function Context.orderedlist(s,tight,startnum)
+  local tightstr = ""
+  if tight then tightstr = ",packed" end
+  local opt = string.format("[%d%s]",(Context.options.startnum and startnum) or 1, tightstr)
   return format("\\startitemize%s\n%s\\stopitemize\n\n",opt,s)
 end
 
