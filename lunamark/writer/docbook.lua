@@ -16,7 +16,7 @@ Docbook.options = { minimize   = false,
 Docbook.linebreak = "<literallayout>&#xA;</literallayout>"
 
 function Docbook.code(s)
-  return format("<literal>%s</literal>",Docbook.string(s))
+  return string.format("<literal>%s</literal>",Docbook.string(s))
 end
 
 function Docbook.link(lab,src,tit)
@@ -25,17 +25,17 @@ function Docbook.link(lab,src,tit)
   --   then titattr = format(" xlink:title=\"%s\"", Docbook.string(tit))
   --   else titattr = ""
   --   end
-  return format("<ulink url=\"%s\">%s</ulink>",Docbook.string(src),lab)
+  return string.format("<ulink url=\"%s\">%s</ulink>",Docbook.string(src),lab)
 end
 
 function Docbook.image(lab,src,tit)
   local titattr, altattr
   if tit and string.len(tit) > 0
-     then titattr = format("<objectinfo><title>%s%</title></objectinfo>",
+     then titattr = string.format("<objectinfo><title>%s%</title></objectinfo>",
                       Docbook.string(tit))
      else titattr = ""
      end
-  return format("<inlinemediaobject><imageobject>%s<imagedata fileref="%s" /></imageobject></inlinemediaobject>",titattr,Docbook.string(src))
+  return string.format("<inlinemediaobject><imageobject>%s<imagedata fileref="%s" /></imageobject></inlinemediaobject>",titattr,Docbook.string(src))
 end
 
 function Docbook.paragraph(s)
@@ -65,11 +65,11 @@ function Docbook.display_html(s)
 end
 
 function Docbook.emphasis(s)
-  return format("<emphasis>%s</emphasis>",s)
+  return string.format("<emphasis>%s</emphasis>",s)
 end
 
 function Docbook.strong(s)
-  return format("<emphasis role=\"strong\">%s</emphasis>",s)
+  return string.format("<emphasis role=\"strong\">%s</emphasis>",s)
 end
 
 function Docbook.blockquote(s)

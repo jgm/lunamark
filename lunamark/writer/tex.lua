@@ -12,8 +12,6 @@ TeX.options = { minimize   = false,
 TeX.firstline = true
 TeX.formats = {}
 
-local format = string.format
-
 TeX.linebreak = "\\\\\n"
 
 TeX.space = " "
@@ -61,7 +59,7 @@ function TeX.display_html(s)
 end
 
 function TeX.paragraph(s)
-  return format("%s\n\n",s)
+  return string.format("%s\n\n",s)
 end
 
 function TeX.plain(s)

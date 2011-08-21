@@ -16,25 +16,25 @@ Html.options = { minimize   = false,
 Html.linebreak = "<br/>"
 
 function Html.code(s)
-  return format("<code>%s</code>",Html.string(s))
+  return string.format("<code>%s</code>",Html.string(s))
 end
 
 function Html.link(lab,src,tit)
   local titattr
   if tit and string.len(tit) > 0
-     then titattr = format(" title=\"%s\"", Html.string(tit))
+     then titattr = string.format(" title=\"%s\"", Html.string(tit))
      else titattr = ""
      end
-  return format("<a href=\"%s\"%s>%s</a>",Html.string(src),titattr,lab)
+  return string.format("<a href=\"%s\"%s>%s</a>",Html.string(src),titattr,lab)
 end
 
 function Html.image(lab,src,tit)
   local titattr, altattr
   if tit and string.len(tit) > 0
-     then titattr = format(" title=\"%s\"", Html.string(tit))
+     then titattr = string.format(" title=\"%s\"", Html.string(tit))
      else titattr = ""
      end
-  return format("<img src=\"%s\" alt=\"%s\"%s />",Html.string(src),Html.string(lab),titattr)
+  return string.format("<img src=\"%s\" alt=\"%s\"%s />",Html.string(src),Html.string(lab),titattr)
 end
 
 function Html.paragraph(s)
@@ -66,11 +66,11 @@ function Html.display_html(s)
 end
 
 function Html.emphasis(s)
-  return format("<em>%s</em>",s)
+  return string.format("<em>%s</em>",s)
 end
 
 function Html.strong(s)
-  return format("<strong>%s</strong>",s)
+  return string.format("<strong>%s</strong>",s)
 end
 
 function Html.blockquote(s)
