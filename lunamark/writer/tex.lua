@@ -14,7 +14,7 @@ TeX.formats = {}
 
 local format = string.format
 
-TeX.linebreak = "\\\n"
+TeX.linebreak = "\\\\\n"
 
 TeX.space = " "
 
