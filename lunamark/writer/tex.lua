@@ -21,11 +21,27 @@ TeX.space = " "
 function TeX.string(s)
   -- str = function(s) return (string.gsub(s, "[{}$%%&_#^\\~|<>]", function(c) return "\\char`\\"..c end)) end,
   local escaped = {
-   ["<" ] = "&lt;",
-   [">" ] = "&gt;",
-   ["&" ] = "&amp;",
-   ["\"" ] = "&quot;",
-   ["'" ] = "&#39;" }
+   ["{"] = "\\{",
+   ["}"] = "\\}",
+   ["$"] = "\\$",
+   ["%"] = "\\%",
+   ["&"] = "\\&",
+   ["_"] = "\\_",
+   ["#"] = "\\#",
+   ["^"] = "{\\^}",
+   ["\\"] = "{\\textbackslash}",
+   ["~"] = "{\\ensuremath{\\sim}}",
+   ["|"] = "{\\textbar}",
+   ["<"] = "{\\textless}",
+   [">"] = "{\\textgreater}",
+   ["["] = "{[}", -- to avoid interpretation as optional argument
+   ["]"] = "{]}",
+   ["\160"] = "~",
+   ["\0x2018"] = "`",
+   ["\0x2019"] = "'",
+   ["\0x201C"] = "``",
+   ["\0x201D"] = "''",
+ }
   return s:gsub(".",escaped)
 end
 
