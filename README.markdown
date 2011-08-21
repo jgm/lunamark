@@ -9,7 +9,7 @@ using a PEG grammar.
 
 The library is as portable as lua and has very good performance.
 It is slightly faster than the author's own C library
-[peg-markdown](http://github.com/jgm/peg-markdown.git).
+[peg-markdown](http://github.com/jgm/peg-markdown).
 
 ## Installing
 
