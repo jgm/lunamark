@@ -1,8 +1,6 @@
 * TODO escaping in tex more complicated;
   don't escape in code blocks;
   urls
-* TODO add latex writer (extends tex)
-* TODO add context writer (extends tex)
 * TODO standalone or templates? use start/end document?
 * TODO extensions
   [ ] framework for individually controllabel exts
