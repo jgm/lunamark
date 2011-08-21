@@ -29,19 +29,6 @@ function TeX.string(s)
   return s:gsub(".",escaped)
 end
 
--- need functions to convert these to utf-8 (borrow from context?)
-function TeX.hex_entity(s)
-  return entities.hex_ent(s)
-end
-
-function TeX.dec_entity(s)
-  return entities.dec_ent(s)
-end
-
-function TeX.tag_entity(s)
-  return entities.char_ent(s)
-end
-
 function TeX.start_document()
   TeX.firstline = true
   return ""

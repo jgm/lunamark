@@ -9,6 +9,7 @@ The parser is also more accurate than before.
 
 local lpeg = require("lpeg")
 local misc = require("lunamark.util")
+local entities = require("lunamark.entities")
 local lower, upper, gsub, rep, gmatch, format, length =
   string.lower, string.upper, string.gsub, string.rep, string.gmatch,
   string.format, string.len
@@ -492,9 +493,9 @@ local function markdown(writer, options)
 
   local InlineHtml    = C(inlinehtml) / writer.inline_html
 
-  local HtmlEntity    = hexentity / writer.hex_entity
-                      + decentity / writer.dec_entity
-                      + tagentity / writer.tag_entity
+  local HtmlEntity    = hexentity / entities.hex_ent  / writer.string
+                      + decentity / entities.dec_ent  / writer.string
+                      + tagentity / entities.char_ent / writer.string
 
   ------------------------------------------------------------------------------
   -- Block elements

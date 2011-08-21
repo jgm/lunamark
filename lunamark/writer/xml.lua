@@ -28,18 +28,6 @@ function Xml.string(s)
   return s:gsub(".",escaped)
 end
 
-function Xml.hex_entity(s)
-  return format("&#x%s;",s)
-end
-
-function Xml.dec_entity(s)
-  return format("&#%s;",s)
-end
-
-function Xml.tag_entity(s)
-  return format("&%s;",s)
-end
-
 function Xml.start_document()
   Xml.firstline = true
   return ""
