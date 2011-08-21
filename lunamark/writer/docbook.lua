@@ -21,11 +21,11 @@ end
 
 function Docbook.link(lab,src,tit)
   local titattr
-  if tit and string.len(tit) > 0
-     then titattr = format(" xlink:title=\"%s\"", Docbook.string(tit))
-     else titattr = ""
-     end
-  return format("<link xlink:href=\"%s\"%s>%s</a>",Docbook.string(src),titattr,lab)
+  -- if tit and string.len(tit) > 0
+  --   then titattr = format(" xlink:title=\"%s\"", Docbook.string(tit))
+  --   else titattr = ""
+  --   end
+  return format("<ulink url=\"%s\">%s</ulink>",Docbook.string(src),lab)
 end
 
 function Docbook.image(lab,src,tit)
