@@ -1,3 +1,7 @@
+* TODO get rid of char_entity, etc. in writers - insntead,
+  convert in parser and call string
+* TODO get rid of email-link, auto-link - instead, just call
+  link with different parameters
 * TODO proper character escaping in tex module (see pandoc)
 * TODO add latex writer (extends tex)
 * TODO add context writer (extends tex)
