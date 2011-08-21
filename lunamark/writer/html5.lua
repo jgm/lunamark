@@ -3,9 +3,9 @@
 local util = require("lunamark.util")
 local Html = require("lunamark.writer.html")
 
-local Html5 = util.extend(Html)
+local Html5 = util.table_copy(Html)
 
-local format = Html.format
+local format = function(...) return util.format(Html,...) end
 
 function Html5.section(s,level,contents)
   if Html5.options.containers then

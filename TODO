@@ -1,12 +1,4 @@
-* TODO Option parsing still screwy - simplify?
 * TODO docbook parser produces invalid output
-* TODO writers - make more object like?
-  the idea would be to add a (self, parameter to all functions.
-  then you would call the writers like this:  writer:para(s)
-  advantage would be that you could do things like
-  autolink(self,url) = self:link(url,url)
-
-  see http://www.bresciascienza.it/erix/progutil/gpeddler2/help/oo.html
 
 * TODO extensions
   [ ] framework for individually controllabel exts

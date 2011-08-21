@@ -5,13 +5,9 @@ local util = require("lunamark.util")
 
 local gsub = string.gsub
 
-local firstline = true
+local Docbook = util.table_copy(Xml)
 
-local formats = {}
-
-local Docbook = util.extend(Xml)
-
-local format = Docbook.format
+local format = function(...) return util.format(Docbook,...) end
 
 Docbook.options = { minimize   = false,
                     blanklines = true,

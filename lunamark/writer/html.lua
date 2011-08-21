@@ -5,9 +5,9 @@ local util = require("lunamark.util")
 
 local gsub = string.gsub
 
-local Html = util.extend(Xml)
+local Html = util.table_copy(Xml)
 
-local format = Html.format
+local format = function(...) return util.format(Html,...) end
 
 Html.options = { minimize   = false,
                  blanklines = true,

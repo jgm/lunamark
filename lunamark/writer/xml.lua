@@ -1,6 +1,7 @@
 -- Generic XML writer for lunamark
 
 local gsub = string.gsub
+local util = require("lunamark.util")
 
 local Xml = {}
 
@@ -11,34 +12,7 @@ Xml.options = { minimize   = false,
 Xml.firstline = true
 Xml.formats = {}
 
--- override string.format so that \n is a variable
--- newline (depending on the 'minimize' option).
--- formats are memoized after conversion.
-local function format(fmt,...)
-  local newfmt = Xml.formats[fmt]
-  if not newfmt then
-    newfmt = fmt
-    if Xml.options.minimize then
-      newfmt = newfmt:gsub("\n","")
-    end
-    local starts_with_nl = newfmt:byte(1) == 10
-    if starts_with_nl and not Xml.options.blanklines then
-      newfmt = newfmt:sub(2)
-      starts_with_nl = false
-    end
-    Xml.formats[fmt] = newfmt
-    -- don't memoize this change, just on first line
-    if starts_with_nl and Xml.firstline then
-      newfmt = newfmt:sub(2)
-    end
-    if Xml.firstline then
-      Xml.firstline = false
-    end
-  end
-  return string.format(newfmt,...)
-end
-
-Xml.format = format
+local format = function(...) return util.format(Xml,...) end
 
 Xml.linebreak = "<linebreak />"
 
