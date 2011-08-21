@@ -242,10 +242,11 @@ local function markdown(writer, options)
     leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^0
 
   local rparser =
-    (define_reference_parser / register_link + nonemptyline^1 + blankline^1)^0
+    -- need the Ct or we get a stack overflow
+    Ct((define_reference_parser / register_link + nonemptyline^1 + blankline^1)^0)
 
   local function referenceparser(str)
-    lpegmatch(Ct(rparser),str) -- we need the Ct or we get a stack overflow
+    lpegmatch(rparser,str)
   end
 
   -- lookup link reference and return either a link or image.
