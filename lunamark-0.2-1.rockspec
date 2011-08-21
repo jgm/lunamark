@@ -20,6 +20,7 @@ description = {
 dependencies = {
    "lua >= 5.1",
    "lpeg >= 0.10",
+   "luabitop > 1.0",
 }
 build = {
    type = "none",
