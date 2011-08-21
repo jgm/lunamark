@@ -6,7 +6,7 @@
   [ ] defn lists
   [ ] fenced code blocks
   [ ] math
-  [ ] consecutive ordered/unordered list
+  [x] consecutive ordered/unordered list
   [ ] significant list start number
   [ ] tests for exts
 * TODO make parser user-modifiable (as in v1)
