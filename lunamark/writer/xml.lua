@@ -18,13 +18,15 @@ Xml.linebreak = "<linebreak />"
 
 Xml.space = " "
 
-function Xml.string(s)
-  local escaped = {
+local escaped = {
    ["<" ] = "&lt;",
    [">" ] = "&gt;",
    ["&" ] = "&amp;",
    ["\"" ] = "&quot;",
-   ["'" ] = "&#39;" }
+   ["'" ] = "&#39;"
+}
+
+function Xml.string(s)
   return s:gsub(".",escaped)
 end
 
