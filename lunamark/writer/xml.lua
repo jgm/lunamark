@@ -12,8 +12,6 @@ Xml.options = { minimize   = false,
 Xml.firstline = true
 Xml.formats = {}
 
-local format = function(...) return util.format(Xml,...) end
-
 Xml.linebreak = "<linebreak />"
 
 Xml.space = " "
