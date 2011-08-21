@@ -37,14 +37,6 @@ function Html.image(lab,src,tit)
   return format("<img src=\"%s\" alt=\"%s\"%s />",Html.string(src),Html.string(lab),titattr)
 end
 
-function Html.email_link(address)
-  return Html.link(address,"mailto:" .. address)
-end
-
-function Html.url_link(url)
-  return Html.link(url,url)
-end
-
 function Html.paragraph(s)
   return format("\n<p>%s</p>\n",s)
 end

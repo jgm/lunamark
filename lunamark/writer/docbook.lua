@@ -38,14 +38,6 @@ function Docbook.image(lab,src,tit)
   return format("<inlinemediaobject><imageobject>%s<imagedata fileref="%s" /></imageobject></inlinemediaobject>",titattr,Docbook.string(src))
 end
 
-function Docbook.email_link(address)
-  return Docbook.link(address,"mailto:" .. address)
-end
-
-function Docbook.url_link(url)
-  return Docbook.link(url,url)
-end
-
 function Docbook.paragraph(s)
   return format("\n<para>%s</para>\n",s)
 end

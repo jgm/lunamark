@@ -463,11 +463,13 @@ local function markdown(writer, options)
 
   local AutoLinkUrl   = less
                       * C(alphanumeric^1 * P("://") * urlchar^1)
-                      * more / writer.url_link
+                      * more
+                      / function(url) return writer.link(url,url) end
 
   local AutoLinkEmail = less
                       * C((alphanumeric + S("-._+"))^1 * P("@") * urlchar^1)
-                      * more / writer.email_link
+                      * more
+                      / function(email) return writer.link(email,"mailto:"..email) end
 
   local DirectLink    = image_marker 
                       * (tag / inlinesparser)
