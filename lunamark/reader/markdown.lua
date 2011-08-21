@@ -493,9 +493,9 @@ local function markdown(writer, options)
 
   local InlineHtml    = C(inlinehtml) / writer.inline_html
 
-  local HtmlEntity    = hexentity / entities.hex_ent  / writer.string
-                      + decentity / entities.dec_ent  / writer.string
-                      + tagentity / entities.char_ent / writer.string
+  local HtmlEntity    = hexentity / entities.hex_entity  / writer.string
+                      + decentity / entities.dec_entity  / writer.string
+                      + tagentity / entities.char_entity / writer.string
 
   ------------------------------------------------------------------------------
   -- Block elements

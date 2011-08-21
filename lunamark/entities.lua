@@ -286,15 +286,15 @@ local function toutf8(n)
   end
 end
 
-function Entities.dec_ent(s)
+function Entities.dec_entity(s)
   return toutf8(tonumber(s))
 end
 
-function Entities.hex_ent(s)
+function Entities.hex_entity(s)
   return toutf8(tonumber("0x"..s))
 end
 
-function Entities.char_ent(s)
+function Entities.char_entity(s)
   local n = Entities.character_entities[s]
   return toutf8(n) 
 end
