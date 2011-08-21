@@ -1,5 +1,4 @@
-* TODO docbook parser produces invalid output
-
+* TODO standalone or templates? use start/end document?
 * TODO extensions
   [ ] framework for individually controllabel exts
   [ ] footnotes
@@ -10,14 +9,10 @@
   [ ] consecutive ordered/unordered list
   [ ] significant list start number
   [ ] tests for exts
-* TODO standalone or templates? use start/end document?
-* DONE split off executable
 * TODO make parser user-modifiable (as in v1)
 * TODO pluggable html parser? (any good ones for lua?)
 * TODO add latex writer
 * TODO add context writer
-* DONE add docbook writer
-* DONE make rock
 * TODO Replace master with v2
 * TODO documentation w luadoc
 * TODO add groff man writer
