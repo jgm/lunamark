@@ -54,6 +54,16 @@ function TeX.stop_document()
   return ""
 end
 
+function TeX.inline_html(s)
+end
+
+function TeX.display_html(s)
+end
+
+function TeX.paragraph(s)
+  return format("%s\n\n",s)
+end
+
 function TeX.plain(s)
   return s
 end

@@ -16,7 +16,7 @@ local options = {
   "lunamark [options] [file..] - convert text between formats",
    to      = { shortform = true,
                arg = "format",
-               validate = one_of({"html","html5","docbook","latex"}),
+               validate = one_of({"html","html5","docbook","latex","context"}),
                description = "Target format"},
    from    = { shortform = true,
                arg = "format",

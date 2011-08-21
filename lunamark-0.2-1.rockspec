@@ -10,7 +10,7 @@ description = {
    detailed = [[
       lunamark is a lua library for converting between markup
       formats.  Currently markdown is the only supported input format,
-      and HTML, HTML5, LaTeX, and DocBook the supported output formats,
+      and HTML, HTML5, LaTeX, ConTeXt, and DocBook the supported output formats,
       but lunamark's modular structure makes it easy to add new parsers
       and writers.  Parsers are written using a PEG grammar.
    ]],
@@ -40,6 +40,7 @@ build = {
        ["lunamark.writer.html5"]    = "lunamark/writer/html5.lua",
        ["lunamark.writer.tex"]      = "lunamark/writer/tex.lua",
        ["lunamark.writer.latex"]    = "lunamark/writer/latex.lua",
+       ["lunamark.writer.contex"]   = "lunamark/writer/latex.lua",
        ["lunamark.reader"]          = "lunamark/reader.lua",
        ["lunamark.reader.markdown"] = "lunamark/reader/markdown.lua",
        },

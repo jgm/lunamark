@@ -23,12 +23,8 @@ function Latex.image(lab,src,tit)
   return format("\\includegraphics{%s}", Latex.string(src))
 end
 
-function Latex.paragraph(s)
-  return format("%s\n\n",s)
-end
-
 function Latex.listitem(s)
-  return format("\\li %s\n",s)
+  return format("\\item %s\n",s)
 end
 
 function Latex.bulletlist(s)
@@ -37,12 +33,6 @@ end
 
 function Latex.orderedlist(s)
   return format("\\begin{enumerate}\n%s\\end{enumerate}\n\n",s)
-end
-
-function Latex.inline_html(s)
-end
-
-function Latex.display_html(s)
 end
 
 function Latex.emphasis(s)
