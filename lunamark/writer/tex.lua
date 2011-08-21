@@ -18,9 +18,7 @@ TeX.linebreak = "\\\n"
 
 TeX.space = " "
 
-function TeX.string(s)
-  -- str = function(s) return (string.gsub(s, "[{}$%%&_#^\\~|<>]", function(c) return "\\char`\\"..c end)) end,
-  local escaped = {
+local escaped = {
    ["{"] = "\\{",
    ["}"] = "\\}",
    ["$"] = "\\$",
@@ -28,12 +26,12 @@ function TeX.string(s)
    ["&"] = "\\&",
    ["_"] = "\\_",
    ["#"] = "\\#",
-   ["^"] = "{\\^}",
-   ["\\"] = "{\\textbackslash}",
-   ["~"] = "{\\ensuremath{\\sim}}",
-   ["|"] = "{\\textbar}",
-   ["<"] = "{\\textless}",
-   [">"] = "{\\textgreater}",
+   ["^"] = "\\^{}",
+   ["\\"] = "\\char92",
+   ["~"] = "\\char126",
+   ["|"] = "\\char124",
+   ["<"] = "\\char60",
+   [">"] = "\\char62",
    ["["] = "{[}", -- to avoid interpretation as optional argument
    ["]"] = "{]}",
    ["\160"] = "~",
@@ -42,6 +40,8 @@ function TeX.string(s)
    ["\0x201C"] = "``",
    ["\0x201D"] = "''",
  }
+
+function TeX.string(s)
   return s:gsub(".",escaped)
 end
 
