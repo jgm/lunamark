@@ -1,4 +1,4 @@
-local bit = require("bit")
+local bit = require("lunamark.bit")
 local band, bor, rshift = bit.band, bit.bor, bit.rshift
 
 local Entities = {}

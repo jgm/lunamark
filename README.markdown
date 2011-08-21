@@ -42,3 +42,5 @@ Most of the library is written by John MacFarlane.  Hans Hagen
 made some major performance improvements.  Khaled Hosny added a
 ConTeXt writer.
 
+`lunamark/bit.lua` is slightly modified from the luabit library by
+hanzhao, released under the MIT license.
