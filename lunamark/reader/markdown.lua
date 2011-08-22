@@ -8,7 +8,6 @@ The parser is also more accurate than before.
 ]]--
 
 local lpeg = require("lpeg")
-local misc = require("lunamark.util")
 local entities = require("lunamark.entities")
 local lower, upper, gsub, rep, gmatch, format, length =
   string.lower, string.upper, string.gsub, string.rep, string.gmatch,
@@ -241,13 +240,9 @@ local function markdown(writer, options)
   local define_reference_parser =
     leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^0
 
-  local rparser =
+  local referenceparser =
     -- need the Ct or we get a stack overflow
     Ct((define_reference_parser / register_link + nonemptyline^1 + blankline^1)^0)
-
-  local function referenceparser(str)
-    lpegmatch(rparser,str)
-  end
 
   -- lookup link reference and return either a link or image.
   -- if the reference is not found, return the bracketed label.
@@ -290,79 +285,31 @@ local function markdown(writer, options)
   -- HTML
   ------------------------------------------------------------------------------
 
-  local blocktags = {
-    address = true,
-    blockquote = true,
-    center = true,
-    dir = true,
-    div = true,
-    p = true,
-    pre = true,
-    li = true,
-    ol = true,
-    ul = true,
-    dl = true,
-    dd = true,
-    form = true,
-    fieldset = true,
-    isindex = true,
-    menu = true,
-    noframes = true,
-    frameset = true,
-    h1 = true,
-    h2 = true,
-    h3 = true,
-    h4 = true,
-    h5 = true,
-    h6 = true,
-    hr = true,
-    script = true,
-    noscript = true,
-    table = true,
-    tbody = true,
-    tfoot = true,
-    thead = true,
-    th = true,
-    td = true,
-    tr = true,
-  }
-
-  -- make the blocktags table case insensitive
-  setmetatable(blocktags, { __index = function(t,k)
-    local l = lower(k)
-    local v = rawget(t,l) and true or false
-    t[k] = v  -- memoize
-    return v
-  end })
-
-  -- if no argument supplied, matches any keyword
-  -- if table supplied, does a table lookup
-  -- if string supplied, does a case-insensitive comparison
-  local function keyword_matches(f)
-    if f then
-      local typef = type(f)
-      local function cond(c)
-        if typef == "string" then
-          return (lower(f) == lower(c))
-        elseif typef == "table" then
-          return f[c]
-        else
-          error("keyword_matches - unknown type")
-        end
-      end
-      local func = function(s,pos,c)
-        if cond(c) then return pos
-        else return false
-        end
-      end
-      return Cmt(keyword,
-                 function(s,pos,c)
-                   if cond(c) then return pos else return false end
-                  end)
-    else
-      return keyword  -- match any keyword if no argument
+  -- case-insensitive match
+  local function keyword_exact(s)
+    local parser = P(0)
+    s = lower(s)
+    for i=1,#s do
+      local c = s:sub(i,i)
+      local m = c .. upper(c)
+      parser = parser * S(m)
     end
+    return parser
   end
+
+  local block_keyword =
+      keyword_exact("address") + keyword_exact("blockquote") +
+      keyword_exact("center") + keyword_exact("dir") + keyword_exact("div") +
+      keyword_exact("p") + keyword_exact("pre") + keyword_exact("li") +
+      keyword_exact("ol") + keyword_exact("ul") + keyword_exact("dl") +
+      keyword_exact("dd") + keyword_exact("form") + keyword_exact("fieldset") +
+      keyword_exact("isindex") + keyword_exact("menu") + keyword_exact("noframes") +
+      keyword_exact("frameset") + keyword_exact("h1") + keyword_exact("h2") +
+      keyword_exact("h3") + keyword_exact("h4") + keyword_exact("h5") +
+      keyword_exact("h6") + keyword_exact("hr") + keyword_exact("script") +
+      keyword_exact("noscript") + keyword_exact("table") + keyword_exact("tbody") +
+      keyword_exact(  "tfoot") + keyword_exact("thead") + keyword_exact("th") +
+      keyword_exact("td") + keyword_exact("tr")
 
   -- There is no reason to support bad html, so we expect quoted attributes
   local htmlattributevalue  = squote * (any - (blankline + squote))^0 * squote
@@ -375,42 +322,54 @@ local function markdown(writer, options)
 
   local htmlinstruction     = P("<?")   * (any - P("?>" ))^0 * P("?>" )
 
-  local function openelt(f)
-    return (less * keyword_matches(f) * spnl * htmlattribute^0 * more)
+  local openelt_any = less * keyword * spnl * htmlattribute^0 * more
+
+  local function openelt_exact(s)
+    return (less * keyword_exact(s) * spnl * htmlattribute^0 * more)
   end
 
-  local function closeelt(f)
-    return (less * slash * keyword_matches(f) * spnl * more)
+  local openelt_block = less * block_keyword * spnl * htmlattribute^0 * more
+
+  local closeelt_any = less * slash * keyword * spnl * more
+
+  local function closeelt_exact(s)
+    return (less * slash * keyword_exact(s) * spnl * more)
   end
 
-  local function emptyelt(f)
-    return (less * keyword_matches(f) * spnl * htmlattribute^0 * slash * more)
+  local closeelt_block = less * slash * block_keyword * spnl * more
+
+  local emptyelt_any = less * keyword * spnl * htmlattribute^0 * slash * more
+
+  local function emptyelt_exact(s)
+    return (less * keyword_exact(s) * spnl * htmlattribute^0 * slash * more)
   end
+
+  local emptyelt_block = less * block_keyword * spnl * htmlattribute^0 * slash * more
 
   local displaytext         = (any - less)^1
 
   -- return content between two matched HTML tags that match t
-  local function in_matched(t)
-    return { openelt(t)
-           * (V(1) + displaytext + (less - closeelt(t)))^0
-           * closeelt(t) }
+  local function in_matched(s)
+    return { openelt_exact(s)
+           * (V(1) + displaytext + (less - closeelt_exact(s)))^0
+           * closeelt_exact(s) }
   end
 
   local displayhtml = htmlcomment
-                    + emptyelt(blocktags)
-                    + openelt("hr")
-                    + Cmt(#openelt(blocktags),
+                    + emptyelt_block
+                    + openelt_exact("hr")
+                    + Cmt(#openelt_block,
                       function(s,pos)
                         local t = lpegmatch(less * C(keyword),s,pos)
                         return lpegmatch(in_matched(t),s,pos)
                       end)
                     + htmlinstruction
 
-  local inlinehtml  = emptyelt()
+  local inlinehtml  = emptyelt_any
                     + htmlcomment
                     + htmlinstruction
-                    + openelt()
-                    + closeelt()
+                    + openelt_any
+                    + closeelt_any
 
   ------------------------------------------------------------------------------
   -- Entities
@@ -684,7 +643,7 @@ local function markdown(writer, options)
   -- and tabs are assumed to be expanded.
   local function convert(inp)
       references = {}
-      referenceparser(inp)
+      lpegmatch(referenceparser,inp)
       local result = writer.start_document() .. docparser(inp)
                        .. writer.stop_document()
       return result
