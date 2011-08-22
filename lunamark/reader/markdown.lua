@@ -285,7 +285,7 @@ local function markdown(writer, options)
   -- HTML
   ------------------------------------------------------------------------------
 
-  -- case-insensitive match
+  -- case-insensitive match (we assume s is lowercase)
   local function keyword_exact(s)
     local parser = P(0)
     s = lower(s)
@@ -336,8 +336,6 @@ local function markdown(writer, options)
     return (less * slash * keyword_exact(s) * spnl * more)
   end
 
-  local closeelt_block = less * slash * block_keyword * spnl * more
-
   local emptyelt_any = less * keyword * spnl * htmlattribute^0 * slash * more
 
   local function emptyelt_exact(s)
@@ -348,7 +346,7 @@ local function markdown(writer, options)
 
   local displaytext         = (any - less)^1
 
-  -- return content between two matched HTML tags that match t
+  -- return content between two matched HTML tags
   local function in_matched(s)
     return { openelt_exact(s)
            * (V(1) + displaytext + (less - closeelt_exact(s)))^0
@@ -360,7 +358,7 @@ local function markdown(writer, options)
                     + openelt_exact("hr")
                     + Cmt(#openelt_block,
                       function(s,pos)
-                        local t = lpegmatch(less * C(keyword),s,pos)
+                        local t = lower(lpegmatch(less * C(keyword),s,pos))
                         return lpegmatch(in_matched(t),s,pos)
                       end)
                     + htmlinstruction
