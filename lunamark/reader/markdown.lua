@@ -353,14 +353,17 @@ local function markdown(writer, options)
            * closeelt_exact(s) }
   end
 
+  local function parse_matched_tags(s,pos)
+    local t = lower(lpegmatch(less * C(keyword),s,pos))
+    return lpegmatch(in_matched(t),s,pos)
+  end
+
+  local in_matched_block_tags = Cmt(#openelt_block, parse_matched_tags)
+
   local displayhtml = htmlcomment
                     + emptyelt_block
                     + openelt_exact("hr")
-                    + Cmt(#openelt_block,
-                      function(s,pos)
-                        local t = lower(lpegmatch(less * C(keyword),s,pos))
-                        return lpegmatch(in_matched(t),s,pos)
-                      end)
+                    + in_matched_block_tags
                     + htmlinstruction
 
   local inlinehtml  = emptyelt_any
