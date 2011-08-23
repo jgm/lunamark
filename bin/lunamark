@@ -14,11 +14,11 @@ end
 
 local options = {
   "lunamark [options] [file..] - convert text between formats",
-   to      = { shortform = true,
+   to      = { shortform = "t",
                arg = "format",
                validate = one_of({"html","html5","docbook","latex","context"}),
                description = "Target format"},
-   from    = { shortform = true,
+   from    = { shortform = "f",
                arg = "format",
                validate = one_of({"markdown"}),
                description = "Source format"},
@@ -28,9 +28,12 @@ local options = {
                   description = "Leave blank lines between block elements" },
    strict  = { arg = "boolean", optarg = true,
                 description = "Disable markdown extensions" },
-   output  = { shortform = true,
+   output  = { shortform = "o",
                arg = "file",
                description = "Output file" },
+   template = { shortform = "T",
+                arg = "file",
+                description = "Insert output into template" },
    }
 
 local defaults = {
@@ -58,6 +61,17 @@ writer.options.blanklines = args.blanklines
 writer.options.startnum = not args.strict
 
 local convert = reader(writer,{})
+local body = convert(lunamark.util.get_input(args,4))
 
 io.output(args.output)
-io.write(convert(lunamark.util.get_input(args,4)))
+
+if args.template then
+  local templ = io.open(args.template, "read")
+  local templcontents = templ:read("*all")
+  local templdata = { body = body,
+                      timestamp = os.date("%Y-%m-%d %X") }
+  local result = templcontents:gsub("%${(%a+)}", templdata)
+  io.write(result)
+else
+  io.write(body)
+end
