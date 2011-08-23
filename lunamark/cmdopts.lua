@@ -24,7 +24,7 @@ Format of option table:
 }
 
 argspec is a table with the following fields:
-* shortform - allow a short (single dash) option based on first letter
+* shortform - a single letter abbreviation
 * arg - type of argument ("number" for numerical, "boolean" for boolean,
   "string" or anything else for string)
 * optarg - if true, the argument is optional
@@ -55,7 +55,7 @@ local function usage(opt_table,defaults)
         local optname, argspec, descr = "","",""
         optname = "--" .. k
         if v.shortform then
-          optname = optname .. ",-" .. k:sub(1,1)
+          optname = optname .. ",-" .. v.shortform
         end
         if v.arg then
           local vnice = v.arg
@@ -97,12 +97,11 @@ local function getargs(opt_table, defaults)
       opts["--"..k] = v
       if v.shortform then
         local vs = v
-        local firstletter = k:sub(1,1)
         vs.optname = k
-        if opts["-"..firstletter] then
-          error("-"..firstletter.." is defined twice.")
+        if opts["-"..v.shortform] then
+          error("-"..v.shortform.." is defined twice.")
         else
-          opts["-"..firstletter] = vs
+          opts["-"..v.shortform] = vs
         end
       end
       if opt_table[k].repeatable then
