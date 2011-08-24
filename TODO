@@ -1,6 +1,19 @@
 * TODO tests
   adjust tests (or test runner) so that tidy isn't needed, as
   it can hide some errors, particularly in HTML output
+  --> actually, changing listitem so it doesn't put a blank
+  line after <li> or before </li> would fix most of it. This
+  is strange (note the difference):
+
+  <ul>
+  <li><p>one</p>
+  </li>
+  <li>
+  <p>two</p>
+  </li>
+  </ul>
+
+
 * TODO templates
   - have lunamark look for '<name>.<format>' by default, like pandoc,
     first in local directory, then in ~/.lunamark/templates
@@ -26,6 +39,39 @@
   [x] significant list start number
   [ ] tests for exts
 * TODO make parser user-modifiable (as in v1)
+  Good thought.  I've done something similar.  You can now pass in a
+  modify_syntax function as an option.  This is a function from a table
+  to a table, so you can perform arbitrary transformations on the input
+  format grammar.  A simple example:
+  
+      function capify(t)
+        t.Str = t.Str / string.upper
+        return t
+      end
+  
+      markdown2htmlCAPS = lunamark.converter("markdown", "html", { modify_syntax = capify })
+  
+  This gives you a markdown variant in which all strings are capitalized.
+  
+  Adding a handler for, say, wikilinks would be slightly more complicated.
+  You'd have to do two things to the grammar table:
+  (1) insert an entry for WikiLink
+  (2) register WikiLink as an Inline element by modifying Inline
+  
+  So, something like this:
+  
+      function add_wikilink(t)
+        t.WikiLink = --[[ whatever... ]] / write_wikilink
+        t.Inline = lpeg.V("WikiLink") + t.Inline
+        return t
+      end
+  
+      function write_wikilink(s)
+        -- code to write the wikilink as HTML
+      end
+  
+  I hope this is flexible enough.
+
 * TODO documentation w luadoc
 * TODO add groff man writer
 * TODO make epub tool
