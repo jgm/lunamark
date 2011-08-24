@@ -67,10 +67,11 @@ io.output(args.output)
 
 if args.template then
   local templ = io.open(args.template, "read")
-  local templcontents = templ:read("*all")
-  local templdata = { body = body,
-                      timestamp = os.date("%Y-%m-%d %X") }
-  local result = templcontents:gsub("%${(%a+)}", templdata)
+  local template = templ:read("*all")
+  local data = { body = body,
+                 timestamp = os.date("%Y-%m-%d %X"),
+                 sources = args }
+  local result = lunamark.util.fill_template(template, data)
   io.write(result)
 else
   io.write(body)

@@ -2,9 +2,10 @@
   don't escape in code blocks;
   urls
 * STARTED templates
-  - implement ${blah|...|...} (conditional) (use balanced matching)
-  - implement ${b in blah|...${b}...|, }  (bracketed bit omitted after last)
-  - newline after | is ignored
+  - implement $[if blah]{...} (conditional) (use balanced matching)
+    $[if not blah]{...}
+  - implement $[for b in blah]{...${b}...[, ]}  (bracketed bit omitted after last)
+  - newline after { or before } is ignored
   - have lunamark look for '<name>.<format>' by default, like pandoc,
     first in local directory, then in ~/.lunamark/templates
     name defaults to 'default', format to the output format.

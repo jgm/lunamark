@@ -2,6 +2,41 @@
 
 local M = {}
 
+function M.fill_template(template, dict)
+  local function adjust_cond(s)
+    return string.gsub(tostring(s),"^{\n?",""):gsub("\n?}$","")
+  end
+  local function conditional(test,yes,no)
+    local cond = dict[test]
+    if cond and not (type(cond) == "table" and #cond == 0) then
+      return adjust_cond(yes)
+    else -- count 0-length array as false
+      return (no == nil and "") or adjust_cond(no)
+    end
+  end
+  local function adjust_for(s)
+    return adjust_cond(s):gsub("%b[]$","")
+  end
+  local function forloop(var,ary,contents)
+    if not (dict[ary] and type(dict[ary]) == "table") then
+      return ""
+    end
+    local items = dict[ary]
+    local cont = adjust_for(contents)
+    local result = ""
+    local between = contents:match("%b[]}$")
+    between = (not between and "") or between:sub(2, #between - 2)
+    for i=1,#items do
+      result = result .. M.fill_template(cont, { [var] = items[i] })
+      if i ~= #items then
+        result = result .. between
+      end
+    end
+    return result
+  end
+  return template:gsub("%$%[if%s+(%a+)%]%s*(%b{})(%b{})", conditional):gsub("%$%[if%s+(%a+)%]%s*(%b{})", conditional):gsub("%$%[for%s+(%a+)%s+in%s+(%a+)%](%b{})", forloop):gsub("%${(%a+)}", dict)
+end
+
 -- override string.format so that \n is a variable
 -- newline (depending on the 'minimize' option).
 -- formats are memoized after conversion.
