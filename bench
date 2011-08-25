@@ -1,7 +1,7 @@
 #!/bin/sh
 TESTFILE=tmptest.txt
-PROG=${1:-./bin/lunamark}
-NUM=${2:-25}
+PROG=${PROG:-./bin/lunamark}
+NUM=${NUM:-25}
 rm $TESTFILE
 x=$NUM
 while [ $x -gt 0 ]
