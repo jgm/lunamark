@@ -42,7 +42,7 @@ function Html.paragraph(s)
 end
 
 function Html.listitem(s)
-  return format("<li>%s</li>\n",s)
+  return format("<li>%s</li>\n", s:gsub("\n^","") )
 end
 
 function Html.bulletlist(s,tight)
