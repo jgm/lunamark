@@ -489,7 +489,7 @@ local function markdown(writer, options)
 
   local Reference      = define_reference_parser / ""
 
-  local Skippable      = blankline + Reference
+  local Blank          = blankline + Reference + (blocksep / "\n")
 
   local Paragraph      = nonindentspace * Cs(Inline^1) * newline * blankline^1
                        / writer.paragraph
@@ -589,7 +589,7 @@ local function markdown(writer, options)
 
   local function SectionMax(maxlev)
     local secblock = Block - Header(maxlev)
-    return Header(maxlev) * Cs(Skippable^0 / "" * secblock^-1 * (Skippable^0 / writer.interblockspace * secblock)^0) / writer.section
+    return Header(maxlev) * Cs(Blank^0 / "" * secblock^-1 * (Blank^0 / writer.interblockspace * secblock)^0) / writer.section
   end
 
   local Section = SectionMax(1) + SectionMax(2) + SectionMax(3) +
@@ -602,12 +602,11 @@ local function markdown(writer, options)
   syntax =
     { "Document",
 
-      Document              = Skippable^0 / "" *
+      Document              = Blank^0 / "" *
                               Block^-1 *
-                              (Skippable^0 / writer.interblockspace * Block)^0,
+                              (Blank^0 / writer.interblockspace * Block)^0,
 
-      Block                 = blocksep / "\n"
-                            + Blockquote
+      Block                 = Blockquote
                             + Verbatim
                             + HorizontalRule
                             + BulletList
