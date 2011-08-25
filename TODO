@@ -1,3 +1,7 @@
+* TODO line spacing
+  make the \n after a listitem, blockquote tag, etc. configurable,
+  so we can get a 'minimal' output by setting it and interblockspace
+  to ""
 * TODO tests
   adjust tests (or test runner) so that tidy isn't needed, as
   it can hide some errors, particularly in HTML output
