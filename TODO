@@ -15,10 +15,6 @@
 
 
 * TODO templates
-  - have lunamark look for '<name>.<format>' by default, like pandoc,
-    first in local directory, then in ~/.lunamark/templates
-    name defaults to 'default', format to the output format.
-  - add default templates
   - avoid excess newlines?
 * TODO escaping in tex more complicated;
   don't escape in code blocks;
