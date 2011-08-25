@@ -22,10 +22,6 @@ local options = {
                arg = "format",
                validate = one_of({"markdown"}),
                description = "Source format"},
-   minimize = { arg = "boolean", optarg = true,
-                description = "Compress whitespace in output" },
-   blanklines = { arg = "boolean", optarg = true,
-                  description = "Leave blank lines between block elements" },
    strict  = { arg = "boolean", optarg = true,
                 description = "Disable markdown extensions" },
    output  = { shortform = "o",
@@ -39,8 +35,6 @@ local options = {
 local defaults = {
    to  = "html",
    from = "markdown",
-   minimize = false,
-   blanklines = true,
    strict = false,
  }
 
@@ -56,8 +50,6 @@ if not writer then
   lunamark.util.err("Unknown writer: " .. tostring(args.to), 5)
 end
 
-writer.options.minimize = args.minimize
-writer.options.blanklines = args.blanklines
 writer.options.startnum = not args.strict
 
 local convert = reader(writer,{})

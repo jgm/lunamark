@@ -65,33 +65,6 @@ function M.fill_template(template, dict)
   return template:gsub("%$%[if%s+(%a+)%]%s*(%b{})(%b{})", conditional):gsub("%$%[if%s+(%a+)%]%s*(%b{})", conditional):gsub("%$%[for%s+(%a+)%s+in%s+(%a+)%](%b{})", forloop):gsub("%${(%a+)}", dict)
 end
 
--- override string.format so that \n is a variable
--- newline (depending on the 'minimize' option).
--- formats are memoized after conversion.
-function M.format(self,fmt,...)
-  local newfmt = self.formats[fmt]
-  if not newfmt then
-    newfmt = fmt
-    if self.options.minimize then
-      newfmt = newfmt:gsub("\n","")
-    end
-    local starts_with_nl = newfmt:byte(1) == 10
-    if starts_with_nl and not self.options.blanklines then
-      newfmt = newfmt:sub(2)
-      starts_with_nl = false
-    end
-    self.formats[fmt] = newfmt
-    -- don't memoize this change, just on first line
-    if starts_with_nl and self.firstline then
-      newfmt = newfmt:sub(2)
-    end
-    if self.firstline then
-      self.firstline = false
-    end
-  end
-  return string.format(newfmt,...)
-end
-
 -- extend(t) returns a table that falls back to t for non-found values
 function M.extend(prototype)
   local newt = {}
