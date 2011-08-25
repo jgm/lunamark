@@ -18,7 +18,7 @@
   </li>
   </ul>
 
-
+* TODO Add metadata, return table as second value
 * TODO templates
   - avoid excess newlines?
 * TODO escaping in tex more complicated;
