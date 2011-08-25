@@ -51,6 +51,7 @@ if not writer then
 end
 
 writer.options.startnum = not args.strict
+-- writer.options.containers = true
 
 local convert = reader(writer,{})
 local body = convert(lunamark.util.get_input(args,4))
@@ -67,3 +68,5 @@ if args.template then
 else
   io.write(body)
 end
+
+io.write("\n")

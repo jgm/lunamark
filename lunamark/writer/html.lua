@@ -38,15 +38,15 @@ function Html.image(lab,src,tit)
 end
 
 function Html.paragraph(s)
-  return format("<p>%s</p>\n",s)
+  return format("<p>%s</p>",s)
 end
 
 function Html.listitem(s)
-  return format("<li>%s</li>\n", s:gsub("\n^","") )
+  return format("<li>%s</li>\n", s)
 end
 
 function Html.bulletlist(s,tight)
-  return format("<ul>\n%s</ul>\n",s)
+  return format("<ul>\n%s</ul>",s)
 end
 
 function Html.orderedlist(s,tight,startnum)
@@ -54,7 +54,7 @@ function Html.orderedlist(s,tight,startnum)
   if startnum and Html.options.startnum and startnum ~= 1 then
     start = format(" start=\"%d\"",startnum)
   end
-  return format("<ol%s>\n%s</ol>\n",start,s)
+  return format("<ol%s>\n%s</ol>",start,s)
 end
 
 function Html.inline_html(s)
@@ -62,7 +62,7 @@ function Html.inline_html(s)
 end
 
 function Html.display_html(s)
-  return format("%s\n",s)
+  return format("%s",s)
 end
 
 function Html.emphasis(s)
@@ -74,21 +74,21 @@ function Html.strong(s)
 end
 
 function Html.blockquote(s)
-  return format("<blockquote>\n%s</blockquote>\n", s)
+  return format("<blockquote>\n%s\n</blockquote>", s)
 end
 
 function Html.verbatim(s)
-  return format("<pre><code>%s</code></pre>\n", Html.string(s))
+  return format("<pre><code>%s</code></pre>", Html.string(s))
 end
 
 function Html.section(s,level,contents)
   if Html.options.containers then
-    return format("<div>\n<h%d>%s</h%d>\n%s</div>\n",level,s,level,contents)
+    return format("<div>\n<h%d>%s</h%d>%s%s</div>",level,s,level,Html.interblockspace,contents)
   else
-    return format("<h%d>%s</h%d>\n%s",level,s,level,contents)
+    return format("<h%d>%s</h%d>%s%s",level,s,level,Html.interblockspace,contents)
   end
 end
 
-Html.hrule = "<hr />\n"
+Html.hrule = "<hr />"
 
 return Html

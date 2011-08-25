@@ -16,6 +16,8 @@ Xml.linebreak = "<linebreak />"
 
 Xml.space = " "
 
+Xml.interblockspace = "\n\n"
+
 local escaped = {
    ["<" ] = "&lt;",
    [">" ] = "&gt;",
