@@ -2,6 +2,24 @@
 
 local M = {}
 
+-- Find a template and return its string contents.
+-- If the template has no extension, an extension
+-- is added based on the writer name.  Look first in ., then in
+-- ~/.lunamark/templates.
+function M.find_template(name, format)
+  if not name then name = "default" end
+  local base, ext = name:match("([^%.]*)(.*)")
+  if (not ext or ext == "") and format then ext = "." .. format end
+  local fname = base .. ext
+  local file = io.open(fname, "read")
+  if not file then
+    local home = os.getenv("HOME")
+    file, msg = io.open(home .. "/.lunamark/templates/" .. fname, "read")
+    if not file then M.err(msg) end
+  end
+  return file:read("*all")
+end
+
 -- Templates recognize the following constructs:
 -- * ${var} - gets filled with the value of dict[var]
 -- * $[if foo]{yes}{no} - yes if foo is true and not an empty array.
