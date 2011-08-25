@@ -66,8 +66,7 @@ local body = convert(lunamark.util.get_input(args,4))
 io.output(args.output)
 
 if args.template then
-  local templ = io.open(args.template, "read")
-  local template = templ:read("*all")
+  local template = lunamark.util.find_template(args.template, args.to)
   local data = { body = body,
                  timestamp = os.date("%Y-%m-%d %X"),
                  sources = args }
