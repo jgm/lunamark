@@ -1,8 +1,5 @@
-* TODO line spacing
-  make the \n after a listitem, blockquote tag, etc. configurable,
-  so we can get a 'minimal' output by setting it and interblockspace
-  to ""
 * TODO line spacing for docbook
+* TODO line spacing for latex, context
 * TODO indentation options?
 * TODO tests
   adjust tests (or test runner) so that tidy isn't needed, as

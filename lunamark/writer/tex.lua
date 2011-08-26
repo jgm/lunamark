@@ -5,9 +5,15 @@ local entities = require("lunamark.entities")
 
 local TeX = {}
 
-TeX.options = { minimize   = false,
-                blanklines = true,
-                containers = false }
+TeX.options = { containers = false }
+
+TeX.sep = { interblock = {compact = "\n\n", default = "\n\n", minimal = "\n\n"},
+             container = { compact = "\n", default = "\n", minimal = "\n"}
+          }
+
+TeX.interblocksep = TeX.sep.interblock.default
+
+TeX.containersep = TeX.sep.container.default
 
 TeX.firstline = true
 TeX.formats = {}

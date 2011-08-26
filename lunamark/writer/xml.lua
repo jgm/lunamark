@@ -16,11 +16,11 @@ Xml.sep = { interblock = {compact = "\n", default = "\n\n", minimal = ""},
              container = { compact = "\n", default = "\n", minimal = ""}
           }
 
-Xml.space = " "
-
 Xml.interblocksep = Xml.sep.interblock.default
 
 Xml.containersep = Xml.sep.container.default
+
+Xml.space = " "
 
 local escaped = {
    ["<" ] = "&lt;",
