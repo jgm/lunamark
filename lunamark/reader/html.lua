@@ -1,10 +1,15 @@
 local htmlparser = require("lunamark.htmlparser")
+local entities = require("lunamark.entities")
+
+local function convert_entities(s)
+  return s:gsub("&#[Xx](%x+);", entities.hex_entity):gsub("&#(%d+);", entities.dec_entity):gsub("&(%a+);", entities.char_entity)
+end
 
 local function handle_nodes(writer, nodes)
   local output = {}
   for i,node in ipairs(nodes) do
     if type(node) == "string" then -- text node
-      local contents = writer.string(node)
+      local contents = writer.string(convert_entities(node))
       table.insert(output, contents)
     elseif node.tag and node.child then -- tag with contents
       -- for now
