@@ -7,14 +7,27 @@ end
 
 local function handle_nodes(writer, nodes)
   local output = {}
+  local firstblock = true
+  local function preblockspace()
+    if firstblock then
+      firstblock = false
+    else
+      table.insert(output, writer.interblocksep)
+    end
+  end
   for i,node in ipairs(nodes) do
     if type(node) == "string" then -- text node
       local contents = writer.string(convert_entities(node))
       table.insert(output, contents)
     elseif node.tag and node.child then -- tag with contents
-      -- for now
+      local tag = node.tag
       local contents = handle_nodes(writer, node.child)
-      table.insert(output, contents)
+      if tag == "p" then
+        preblockspace()
+        table.insert(output, writer.paragraph(contents))
+      else  --skip unknown tag
+        table.insert(output, contents)
+      end
     elseif node.tag then  -- self-closing tag
       -- skip
     else -- comment or xmlheader
