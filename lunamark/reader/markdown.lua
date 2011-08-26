@@ -1,5 +1,5 @@
 --[[
-Copyright (C) 2009-2011 John MacFarlane / Khaled Hosny / Hans Hagen
+Copyright (C) 2009-2011 John MacFarlane / Hans Hagen
 
 This is a complete rewrite of the lunamark 0.1 parser.  Hans Hagen
 helped a lot to make the parser faster, more robust, and less stack-hungry.
