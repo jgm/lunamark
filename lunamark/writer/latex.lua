@@ -28,11 +28,11 @@ function Latex.listitem(s)
 end
 
 function Latex.bulletlist(s)
-  return format("\\begin{itemize}\n%s\\end{itemize}\n\n",s)
+  return format("\\begin{itemize}\n%s\n\\end{itemize}",s)
 end
 
 function Latex.orderedlist(s)
-  return format("\\begin{enumerate}\n%s\\end{enumerate}\n\n",s)
+  return format("\\begin{enumerate}\n%s\n\\end{enumerate}",s)
 end
 
 function Latex.emphasis(s)
@@ -44,17 +44,18 @@ function Latex.strong(s)
 end
 
 function Latex.blockquote(s)
-  return format("\\begin{quote}\n%s\\end{quote}\n\n", s)
+  return format("\\begin{quote}\n%s\n\\end{quote}", s)
 end
 
 function Latex.verbatim(s)
-  return format("\\begin{verbatim}\n%s\\end{verbatim}\n\n", s)
+  return format("\\begin{verbatim}\n%s\\end{verbatim}", s)
 end
 
 function Latex.section(s,level,contents)
-  return format("\\%ssection{%s}\n\n%s", string.rep("sub",level-1), s, contents)
+  return format("\\%ssection{%s}%s%s", string.rep("sub",level-1), s,
+          Latex.interblocksep, contents)
 end
 
-Latex.hrule = "\\hspace{\\fill}\\rule{.6\\linewidth}{0.4pt}\\hspace{\\fill}\n"
+Latex.hrule = "\\hspace{\\fill}\\rule{.6\\linewidth}{0.4pt}\\hspace{\\fill}"
 
 return Latex

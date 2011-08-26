@@ -30,14 +30,14 @@ end
 function Context.bulletlist(s,tight)
   local opt = ""
   if tight then opt = "[packed]" end
-  return format("\\startitemize%s\n%s\\stopitemize\n\n",opt,s)
+  return format("\\startitemize%s\n%s\\stopitemize",opt,s)
 end
 
 function Context.orderedlist(s,tight,startnum)
   local tightstr = ""
   if tight then tightstr = ",packed" end
   local opt = string.format("[%d%s]",(Context.options.startnum and startnum) or 1, tightstr)
-  return format("\\startitemize%s\n%s\\stopitemize\n\n",opt,s)
+  return format("\\startitemize%s\n%s\\stopitemize",opt,s)
 end
 
 function Context.emphasis(s)
@@ -49,17 +49,18 @@ function Context.strong(s)
 end
 
 function Context.blockquote(s)
-  return format("\\startblockquote\n%s\\stopblockquote\n\n", s)
+  return format("\\startblockquote\n%s\\stopblockquote", s)
 end
 
 function Context.verbatim(s)
-  return format("\\starttyping\n%s\\stoptyping\n\n", s)  -- escape here?
+  return format("\\starttyping\n%s\\stoptyping", s)  -- escape here?
 end
 
 function Context.section(s,level,contents)
-  return format("\\%ssection{%s}\n\n%s", string.rep("sub",level-1), s, contents)
+  return format("\\%ssection{%s}%s%s", string.rep("sub",level-1), s,
+           Context.interblocksep, contents)
 end
 
-Context.hrule = "\\hairline\n"
+Context.hrule = "\\hairline"
 
 return Context

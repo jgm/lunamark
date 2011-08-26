@@ -15,7 +15,7 @@ TeX.interblocksep = TeX.sep.interblock.default
 
 TeX.containersep = TeX.sep.container.default
 
-TeX.linebreak = "\\\\\n"
+TeX.linebreak = "\\\\"
 
 TeX.space = " "
 
@@ -61,7 +61,7 @@ function TeX.display_html(s)
 end
 
 function TeX.paragraph(s)
-  return string.format("%s\n\n",s)
+  return s
 end
 
 function TeX.plain(s)
