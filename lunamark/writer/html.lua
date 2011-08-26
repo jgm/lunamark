@@ -40,11 +40,11 @@ function Html.paragraph(s)
 end
 
 function Html.listitem(s)
-  return format("<li>%s</li>\n", s)
+  return format("<li>%s</li>%s", s, Html.containersep)
 end
 
 function Html.bulletlist(s,tight)
-  return format("<ul>\n%s</ul>",s)
+  return format("<ul>%s%s</ul>",Html.containersep,s)
 end
 
 function Html.orderedlist(s,tight,startnum)
@@ -52,7 +52,7 @@ function Html.orderedlist(s,tight,startnum)
   if startnum and Html.options.startnum and startnum ~= 1 then
     start = format(" start=\"%d\"",startnum)
   end
-  return format("<ol%s>\n%s</ol>",start,s)
+  return format("<ol%s>%s%s</ol>",start,Html.containersep,s)
 end
 
 function Html.inline_html(s)
@@ -72,7 +72,8 @@ function Html.strong(s)
 end
 
 function Html.blockquote(s)
-  return format("<blockquote>\n%s\n</blockquote>", s)
+  return format("<blockquote>%s%s%s</blockquote>",
+               Html.containersep, s, Html.containersep)
 end
 
 function Html.verbatim(s)
@@ -81,7 +82,8 @@ end
 
 function Html.section(s,level,contents)
   if Html.options.containers then
-    return format("<div>\n<h%d>%s</h%d>%s%s\n</div>",level,s,level,Html.interblocksep,contents)
+    return format("<div>%s<h%d>%s</h%d>%s%s%s</div>", Html.containersep,
+         level, s, level, Html.interblocksep, contents, Html.containersep)
   else
     return format("<h%d>%s</h%d>%s%s",level,s,level,Html.interblocksep,contents)
   end
