@@ -98,9 +98,10 @@ local function markdown(writer, options)
   local newline                = P("\n")
   local spaceornewline         = spacechar + newline
   local nonspacechar           = any - spaceornewline
-  local blocksep               = P("\001")
+  local tightblocksep          = P("\001")
   local specialchar            = S("*_`&[]<!\\")
-  local normalchar             = any - (specialchar + spaceornewline + blocksep)
+  local normalchar             = any -
+                                 (specialchar + spaceornewline + tightblocksep)
   local optionalspace          = spacechar^0
   local spaces                 = spacechar^1
   local eof                    = - any
@@ -388,13 +389,13 @@ local function markdown(writer, options)
 
   local Str       = normalchar^1 / writer.string
 
-  local Symbol    = (specialchar - blocksep) / writer.string
+  local Symbol    = (specialchar - tightblocksep) / writer.string
 
   local Code      = inticks / writer.code
 
   local Endline   = newline * -( -- newline, but not before...
                         blankline -- paragraph break
-                      + blocksep  -- nested list
+                      + tightblocksep  -- nested list
                       + eof       -- end of document
                       + more      -- blockquote
                       + hash      -- atx header
@@ -489,7 +490,7 @@ local function markdown(writer, options)
 
   local Reference      = define_reference_parser / ""
 
-  local Blank          = blankline + Reference + (blocksep / "\n")
+  local Blank          = blankline + Reference + (tightblocksep / "\n")
 
   local Paragraph      = nonindentspace * Cs(Inline^1) * newline * blankline^1
                        / writer.paragraph
@@ -502,7 +503,7 @@ local function markdown(writer, options)
 
   local starter = bullet + enumerator
 
-  -- we use \001 as a blocksep between a tight list item and a
+  -- we use \001 as a separator between a tight list item and a
   -- nested list under it.
   local NestedList            = Cs((optionallyindentedline - starter)^1)
                               / function(a) return "\001"..a end
@@ -589,7 +590,8 @@ local function markdown(writer, options)
 
   local function SectionMax(maxlev)
     local secblock = Block - Header(maxlev)
-    return Header(maxlev) * Cs(Blank^0 / "" * secblock^-1 * (Blank^0 / writer.interblockspace * secblock)^0) / writer.section
+    return Header(maxlev) * Cs(Blank^0 / "" * secblock^-1 *
+       (Blank^0 / writer.interblocksep * secblock)^0) / writer.section
   end
 
   local Section = SectionMax(1) + SectionMax(2) + SectionMax(3) +
@@ -604,7 +606,7 @@ local function markdown(writer, options)
 
       Document              = Blank^0 / "" *
                               Block^-1 *
-                              (Blank^0 / writer.interblockspace * Block)^0,
+                              (Blank^0 / writer.interblocksep * Block)^0,
 
       Block                 = Blockquote
                             + Verbatim

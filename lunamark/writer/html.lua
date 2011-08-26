@@ -9,9 +9,7 @@ local Html = util.table_copy(Xml)
 
 local format = string.format
 
-Html.options = { minimize   = false,
-                 blanklines = true,
-                 containers = false }
+Html.options = { containers = false }
 
 Html.linebreak = "<br/>"
 
@@ -83,9 +81,9 @@ end
 
 function Html.section(s,level,contents)
   if Html.options.containers then
-    return format("<div>\n<h%d>%s</h%d>%s%s\n</div>",level,s,level,Html.interblockspace,contents)
+    return format("<div>\n<h%d>%s</h%d>%s%s\n</div>",level,s,level,Html.interblocksep,contents)
   else
-    return format("<h%d>%s</h%d>%s%s",level,s,level,Html.interblockspace,contents)
+    return format("<h%d>%s</h%d>%s%s",level,s,level,Html.interblocksep,contents)
   end
 end
 

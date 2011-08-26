@@ -5,18 +5,22 @@ local util = require("lunamark.util")
 
 local Xml = {}
 
-Xml.options = { minimize   = false,
-                blanklines = true,
-                containers = false }
+Xml.options = { containers = false }
 
 Xml.firstline = true
 Xml.formats = {}
 
 Xml.linebreak = "<linebreak />"
 
+Xml.sep = { interblock = {compact = "\n", default = "\n\n", minimal = ""},
+             container = { compact = "\n", default = "\n", minimal = ""}
+          }
+
 Xml.space = " "
 
-Xml.interblockspace = "\n\n"
+Xml.interblocksep = Xml.sep.interblock.default
+
+Xml.containersep = Xml.sep.container.default
 
 local escaped = {
    ["<" ] = "&lt;",
