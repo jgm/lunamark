@@ -7,9 +7,6 @@ local Xml = {}
 
 Xml.options = { containers = false }
 
-Xml.firstline = true
-Xml.formats = {}
-
 Xml.linebreak = "<linebreak />"
 
 Xml.sep = { interblock = {compact = "\n", default = "\n\n", minimal = ""},
@@ -35,7 +32,6 @@ function Xml.string(s)
 end
 
 function Xml.start_document()
-  Xml.firstline = true
   return ""
 end
 

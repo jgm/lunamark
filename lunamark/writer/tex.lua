@@ -15,9 +15,6 @@ TeX.interblocksep = TeX.sep.interblock.default
 
 TeX.containersep = TeX.sep.container.default
 
-TeX.firstline = true
-TeX.formats = {}
-
 TeX.linebreak = "\\\\\n"
 
 TeX.space = " "
@@ -50,7 +47,6 @@ function TeX.string(s)
 end
 
 function TeX.start_document()
-  TeX.firstline = true
   return ""
 end
 
