@@ -66,7 +66,7 @@ local function usage(opt_table,defaults)
               vnice = "true|false*"
             end
           end
-          if vnice then
+          if v.optarg then
             argspec = "["..vnice.."]"
           else
             argspec = vnice
