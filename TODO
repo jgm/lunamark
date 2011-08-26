@@ -2,7 +2,7 @@
   make the \n after a listitem, blockquote tag, etc. configurable,
   so we can get a 'minimal' output by setting it and interblockspace
   to ""
-* TODO line spacing for html5, docbook
+* TODO line spacing for docbook
 * TODO tests
   adjust tests (or test runner) so that tidy isn't needed, as
   it can hide some errors, particularly in HTML output
