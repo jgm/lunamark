@@ -29,7 +29,7 @@ instructions, do `lunamark --help`.
 Simple usage example:
 
     local lunamark = require("lunamark")
-    local opts = { blanklines = true }
+    local opts = { }
     local convert = lunamark.reader.markdown(lunamark.writer.html, opts)
     print(convert("Here's my *text*"))
 
