@@ -30,12 +30,17 @@ local options = {
    template = { shortform = "T",
                 arg = "file",
                 description = "Insert output into template" },
+   standalone = { shortform = "s",
+                  description = "Add header and footer" },
+   containers = { description = "Wrap sections in containers" },
    }
 
 local defaults = {
    to  = "html",
    from = "markdown",
    strict = false,
+   containers = false,
+   standalone = false,
  }
 
 local args = lunamark.cmdopts.getargs(options, defaults)
@@ -51,12 +56,16 @@ if not writer then
 end
 
 writer.options.startnum = not args.strict
--- writer.options.containers = true
+writer.options.containers = args.containers
 
 local convert = reader(writer,{})
 local body = convert(lunamark.util.get_input(args,4))
 
 io.output(args.output)
+
+if args.standalone and not args.template then
+  args.template = "default"
+end
 
 if args.template then
   local template = lunamark.util.find_template(args.template, args.to)
