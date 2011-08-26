@@ -78,4 +78,6 @@ else
   io.write(body)
 end
 
-io.write("\n")
+if not args.template then
+  io.write("\n")
+end
