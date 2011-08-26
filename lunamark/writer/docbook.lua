@@ -81,7 +81,7 @@ function Docbook.verbatim(s)
 end
 
 function Docbook.section(s,level,contents)
-  return format("\n<section>\n<title>%s</title>\n%s</section>\n",s,contents)
+  return format("\n<section>\n<title>%s</title>\n%s\n</section>\n",s,contents)
 end
 
 Docbook.hrule = ""

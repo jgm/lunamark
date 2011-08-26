@@ -1,4 +1,3 @@
-* Put \n before closing </div>
 * TODO line spacing
   make the \n after a listitem, blockquote tag, etc. configurable,
   so we can get a 'minimal' output by setting it and interblockspace

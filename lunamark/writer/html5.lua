@@ -9,7 +9,7 @@ local format = string.format
 
 function Html5.section(s,level,contents)
   if Html5.options.containers then
-    return format("<section>\n<h%d>%s</h%d>%s%s</section>\n",level,s,level,Html5.interblockspace,contents)
+    return format("<section>\n<h%d>%s</h%d>%s%s\n</section>",level,s,level,Html5.interblockspace,contents)
   else
     return format("<h%d>%s</h%d>%s%s",level,s,level,Html5.interblockspace,contents)
   end
