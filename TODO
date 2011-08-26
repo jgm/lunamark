@@ -1,10 +1,11 @@
+* TODO finish html reader
+* TODO gh-pages website
 * TODO fix Ins & Del test failure
 * TODO indentation options?
 * TODO Add metadata, return table as second value
 * TODO escaping in tex more complicated;
   don't escape in code blocks;
   urls
-* TODO html reader based on htmlparser.lua, which I can modify?
 * TODO latex reader - write peg
 * TODO mathml - look at pandoc2?
 * TODO extensions
