@@ -1,8 +1,5 @@
 * TODO fix Ins & Del test failure
 * TODO indentation options?
-* TODO tests
-  adjust tests (or test runner) so that tidy isn't needed, as
-  it can hide some errors, particularly in HTML output
 * TODO Add metadata, return table as second value
 * TODO escaping in tex more complicated;
   don't escape in code blocks;
