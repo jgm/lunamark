@@ -5,7 +5,7 @@ local M = {}
 -- Find a template and return its string contents.
 -- If the template has no extension, an extension
 -- is added based on the writer name.  Look first in ., then in
--- templates, then in ~/.lunamark/templates.
+-- templates, then in ~/.lunamark/templates, then in APPDATA.
 function M.find_template(name, format)
   if not name then name = "default" end
   local base, ext = name:match("([^%.]*)(.*)")
@@ -17,10 +17,21 @@ function M.find_template(name, format)
   end
   if not file then
     local home = os.getenv("HOME")
-    file, msg = io.open(home .. "/.lunamark/templates/" .. fname, "read")
-    if not file then M.err(msg) end
+    if home then
+      file = io.open(home .. "/.lunamark/templates/" .. fname, "read")
+    end
   end
-  return file:read("*all")
+  if not file then
+    local appdata = os.getenv("APPDATA")
+    if appdata then
+      file = io.open(appdata .. "/lunamark/templates/" .. fname, "read")
+    end
+  end
+  if not file then
+    M.err("Could not find template '" .. fname .. "'")
+  else
+    return file:read("*all")
+  end
 end
 
 -- Templates recognize the following constructs:
