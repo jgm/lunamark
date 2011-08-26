@@ -1,23 +1,13 @@
+* Put \n before closing </div>
 * TODO line spacing
   make the \n after a listitem, blockquote tag, etc. configurable,
   so we can get a 'minimal' output by setting it and interblockspace
   to ""
 * TODO line spacing for docbook
+* TODO indentation options?
 * TODO tests
   adjust tests (or test runner) so that tidy isn't needed, as
   it can hide some errors, particularly in HTML output
-  --> actually, changing listitem so it doesn't put a blank
-  line after <li> or before </li> would fix most of it. This
-  is strange (note the difference):
-
-  <ul>
-  <li><p>one</p>
-  </li>
-  <li>
-  <p>two</p>
-  </li>
-  </ul>
-
 * TODO Add metadata, return table as second value
 * TODO templates
   - avoid excess newlines?
