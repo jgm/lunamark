@@ -7,11 +7,9 @@ local gsub = string.gsub
 
 local Docbook = util.table_copy(Xml)
 
-local format = function(...) return util.format(Docbook,...) end
+local format = string.format
 
-Docbook.options = { minimize   = false,
-                    blanklines = true,
-                  }
+Docbook.options = { blanklines = true, }
 
 Docbook.linebreak = "<literallayout>&#xA;</literallayout>"
 
@@ -39,21 +37,23 @@ function Docbook.image(lab,src,tit)
 end
 
 function Docbook.paragraph(s)
-  return format("\n<para>%s</para>\n",s)
+  return format("<para>%s</para>",s)
 end
 
 Docbook.plain = Docbook.paragraph
 
 function Docbook.listitem(s)
-  return format("<listitem>%s</listitem>\n",s)
+  return format("<listitem>%s</listitem>%s",s,Docbook.containersep)
 end
 
 function Docbook.bulletlist(s)
-  return format("\n<itemizedlist>\n%s</itemizedlist>\n",s)
+  return format("<itemizedlist>%s%s%s</itemizedlist>",Docbook.containersep,
+          s, Docbook.containersep)
 end
 
 function Docbook.orderedlist(s)
-  return format("\n<orderedlist>\n%s</orderedlist>\n",s)
+  return format("<orderedlist>%s%s%s</orderedlist>",Docbook.containersep,
+          s, Docbook.containersep)
 end
 
 function Docbook.inline_html(s)
@@ -61,7 +61,7 @@ function Docbook.inline_html(s)
 end
 
 function Docbook.display_html(s)
-  return format("\n%s\n",s)
+  return format("%s",s)
 end
 
 function Docbook.emphasis(s)
@@ -73,15 +73,18 @@ function Docbook.strong(s)
 end
 
 function Docbook.blockquote(s)
-  return format("\n<blockquote>\n%s</blockquote>\n", s)
+  return format("<blockquote>%s%s%s</blockquote>", Docbook.containersep, s,
+           Docbook.containersep)
 end
 
 function Docbook.verbatim(s)
-  return format("\n<programlisting>%s</programlisting>\n", Docbook.string(s))
+  return format("<programlisting>%s</programlisting>", Docbook.string(s))
 end
 
 function Docbook.section(s,level,contents)
-  return format("\n<section>\n<title>%s</title>\n%s\n</section>\n",s,contents)
+  return format("<section>%s<title>%s</title>%s%s%s</section>",
+              Docbook.containersep, s, Docbook.containersep, contents,
+              Docbook.containersep )
 end
 
 Docbook.hrule = ""

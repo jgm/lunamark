@@ -1,5 +1,3 @@
-* TODO line spacing for docbook
-* TODO line spacing for latex, context
 * TODO indentation options?
 * TODO tests
   adjust tests (or test runner) so that tidy isn't needed, as
