@@ -401,7 +401,7 @@ local function markdown(writer, options)
                       + hash      -- atx header
                       + ( line * (equal^1 + dash^1)
                         * optionalspace * newline )  -- setext header
-                    ) / writer.space
+                    ) * spacechar^0 / writer.space
 
   local Space     = spacechar^2 * Endline / writer.linebreak
                   + spacechar^1 * Endline^-1 * eof / ""
