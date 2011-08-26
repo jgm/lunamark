@@ -20,7 +20,7 @@ local options = {
                description = "Target format"},
    from    = { shortform = "f",
                arg = "format",
-               validate = one_of({"markdown"}),
+               validate = one_of({"markdown","html"}),
                description = "Source format"},
    strict  = { description = "Disable markdown extensions" },
    output  = { shortform = "o",

@@ -9,7 +9,7 @@ description = {
    summary = "General markup format converter using lpeg.",
    detailed = [[
       lunamark is a lua library for converting between markup
-      formats.  Currently markdown is the only supported input format,
+      formats.  Currently markdown and HTML are the supported input formats,
       and HTML, HTML5, LaTeX, ConTeXt, and DocBook the supported output formats,
       but lunamark's modular structure makes it easy to add new parsers
       and writers.  Parsers are written using a PEG grammar.
@@ -33,6 +33,7 @@ build = {
        ["lunamark.util"]            = "lunamark/util.lua",
        ["lunamark.entities"]        = "lunamark/entities.lua",
        ["lunamark.cmdopts"]         = "lunamark/cmdopts.lua",
+       ["lunamark.htmlparser"]      = "lunamark/htmlparser.lua",
        ["lunamark.writer"]          = "lunamark/writer.lua",
        ["lunamark.writer.xml"]      = "lunamark/writer/xml.lua",
        ["lunamark.writer.docbook"]  = "lunamark/writer/docbook.lua",
@@ -43,6 +44,7 @@ build = {
        ["lunamark.writer.contex"]   = "lunamark/writer/latex.lua",
        ["lunamark.reader"]          = "lunamark/reader.lua",
        ["lunamark.reader.markdown"] = "lunamark/reader/markdown.lua",
+       ["lunamark.reader.html"]     = "lunamark/reader/html.lua",
        },
    }
 }
