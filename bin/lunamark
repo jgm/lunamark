@@ -70,7 +70,7 @@ elseif args.compact then
 end
 
 local convert = reader(writer,{})
-local body = convert(lunamark.util.get_input(args,4))
+local body, metadata = convert(lunamark.util.get_input(args,4))
 
 io.output(args.output)
 
@@ -80,9 +80,11 @@ end
 
 if args.template then
   local template = lunamark.util.find_template(args.template, args.to)
-  local data = { body = body,
-                 timestamp = os.date("%Y-%m-%d %X"),
-                 sources = args }
+  local data = {}
+  if metadata then data = metadata end
+  data.body = body
+  data.timestamp = os.date("%Y-%m-%d %X")
+  data.sources = args
   local result = lunamark.util.fill_template(template, data)
   io.write(result)
 else
