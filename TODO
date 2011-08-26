@@ -1,3 +1,4 @@
+* TODO fix Ins & Del test failure
 * TODO indentation options?
 * TODO tests
   adjust tests (or test runner) so that tidy isn't needed, as
@@ -16,6 +17,8 @@
   [ ] defn lists
   [ ] fenced code blocks
   [ ] math
+  [ ] pandoc title block
+  [ ] multimarkdown style metadata
   [x] consecutive ordered/unordered list
   [ ] # enumerator in ordered lists
   [ ] non-numerical ordered lists
