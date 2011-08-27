@@ -2,6 +2,7 @@
 * TODO fix Ins & Del test failure
 * TODO indentation options?
 * TODO Add metadata, return table as second value
+* TODO quotes in context - use \quotation, \quote when we've got smart...
 * TODO escaping in tex more complicated;
   don't escape in code blocks;
   urls
