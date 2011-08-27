@@ -1,5 +1,7 @@
 --[[
-With minor bug fixes by John MacFarlane 2011.
+With minor fixes by John MacFarlane 2011 for lunamark.
+* don't gobble space after tags
+* make all tags lowercase
 
 	Copyright (c) 2009 Christopher E. Moore ( christopher.e.moore@gmail.com / http://christopheremoore.net )
 
@@ -195,7 +197,7 @@ function Parser:tagend()
 	--print('reading closing tag '..self:short(n))
 	return {
 		type='closing';
-		tag=n;
+		tag=n:lower();
 	}
 end
 
@@ -262,7 +264,7 @@ function Parser:tagstart()
 	}
 
 	self:spaces()
-	t.tag = self:name()
+	t.tag = self:name():lower()
 
 	while true do
 		self:spaces()
@@ -273,7 +275,7 @@ function Parser:tagstart()
 		end
 		if self:canbe('>') then
 			-- if it is an automatically closing tag then don't look for children
-			if self.htmlnonclosing[t.tag:lower()] then
+			if self.htmlnonclosing[t.tag] then
 				t.child = nil
 			end
 			return t
@@ -389,7 +391,7 @@ end
 
 function Parser:tag()
 	local t = self:tagstart()
-	if t.tag and (t.tag:lower() == 'script' or t.tag:lower() == 'style') then
+	if t.tag and (t.tag == 'script' or t.tag == 'style') then
 		local tagcontent = self:tagofsinglestring(t.tag)
 		if #tagcontent > 0 then
 			t.child = {tagcontent}
@@ -430,7 +432,7 @@ function Parser:tagarray(parent)
 				closer = closer or ch.tag
 				local closingindex
 				for i=#self.nodestack,1,-1 do
-					if self.nodestack[i].tag:lower() == closer:lower() then
+					if self.nodestack[i].tag == closer then
 						-- then close off all tags down to that one
 						-- and longjump into it in the stack (i.e. the flatten-stack operation)
 						-- this will be tricky...
@@ -497,7 +499,7 @@ function prettyprint(tree, tab, write)
 						write(' '..a.name..'="'..a.value..'"')
 					end
 				end
-				if (not n.child or #n.child == 0) and n.tag:lower() ~= 'script' and n.tag:lower() ~= 'style' then
+				if (not n.child or #n.child == 0) and n.tag ~= 'script' and n.tag ~= 'style' then
 					write('/>\n')
 				else
 					write('>\n')
