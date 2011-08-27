@@ -1,27 +1,21 @@
-* TODO gh-pages website
+* TODO smart quotes extension (crucial for context because of quotes)
+* TODO quotes in context - use \quotation, \quote when we've got smart...
 * TODO fix Ins & Del test failure
+* TODO footnote extension
+* TODO definition list extension
+* TODO fenced code block extension
+* TODO pandoc title block extension
+* TODO other metadata?
+* TODO math extension
+* TODO # in ordered lists extension
+* TODO gh-pages website
 * TODO indentation options?
 * TODO Add metadata, return table as second value
-* TODO quotes in context - use \quotation, \quote when we've got smart...
 * TODO escaping in tex more complicated;
   don't escape in code blocks;
   urls
 * TODO latex reader - write peg
 * TODO mathml - look at pandoc2?
-* TODO extensions
-  [ ] framework for individually controllabel exts
-  [ ] footnotes
-  [ ] smart
-  [ ] defn lists
-  [ ] fenced code blocks
-  [ ] math
-  [ ] pandoc title block
-  [ ] multimarkdown style metadata
-  [x] consecutive ordered/unordered list
-  [ ] # enumerator in ordered lists
-  [ ] non-numerical ordered lists
-  [x] significant list start number
-  [ ] tests for exts
 * TODO make parser user-modifiable (as in v1)
   Good thought.  I've done something similar.  You can now pass in a
   modify_syntax function as an option.  This is a function from a table
