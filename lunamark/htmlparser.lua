@@ -422,7 +422,7 @@ function Parser:tagarray(parent)
 		self:spaces()
 		if self:canbe('<') then
 			local ch, closer = self:tag()
-			if closer then print('closing off multiple elements down to '..closer) end
+			-- if closer then print('closing off multiple elements down to '..closer) end
 			assert(ch.type ~= 'closing' or not closer, "we shouldn't have a closing tag and a closer returned")
 			if ch.type == 'closing' or closer then
 				closer = closer or ch.tag
