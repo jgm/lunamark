@@ -93,6 +93,10 @@ local extensions = {  -- defaults
   smart = 0,
 }
 
+if optarg["0"] then
+  extensions = {}
+end
+
 local extensions_opt = optarg.X or ""
 for x in extensions_opt:gmatch("[%+%-]?[%a]+") do
   local val = true
@@ -108,12 +112,6 @@ for x in extensions_opt:gmatch("[%+%-]?[%a]+") do
   else
     extensions[x] = val
   end
-end
-
-if optarg["0"] then
-  writer.options = {}
-else
-  writer.options = extensions
 end
 
 local layout = optarg["l"] or "default"
