@@ -84,6 +84,7 @@ function M.fill_template(template, dict)
   return template:gsub("%$%[if%s+(%a+)%]%s*(%b{})(%b{})", conditional):gsub("%$%[if%s+(%a+)%]%s*(%b{})", conditional):gsub("%$%[for%s+(%a+)%s+in%s+(%a+)%](%b{})", forloop):gsub("%${(%a+)}", subvars)
 end
 
+--[[
 -- extend(t) returns a table that falls back to t for non-found values
 function M.extend(prototype)
   local newt = {}
@@ -93,6 +94,7 @@ function M.extend(prototype)
   setmetatable(newt, metat)
   return newt
 end
+--]]
 
 -- error message and exit
 function M.err(msg, exit_code)
@@ -105,23 +107,6 @@ function M.table_copy(t)
   local u = { }
   for k, v in pairs(t) do u[k] = v end
   return setmetatable(u, getmetatable(t))
-end
-
--- map function over elements of table
-function M.map(f, t)
-  local newt = {}
-  for i,v in pairs(t) do
-    newt[i] = f(v)
-  end
-  return newt
-end
-
--- left fold: f(accumulator, table-element)
-function M.fold(f, acc, t)
-  for _,v in pairs(t) do
-    acc = f(acc,v)
-  end
-  return acc
 end
 
 -- from Programming Lua
