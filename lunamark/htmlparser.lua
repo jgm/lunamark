@@ -2,6 +2,7 @@
 With minor fixes by John MacFarlane 2011 for lunamark.
 * don't gobble space after tags
 * make all tags lowercase
+* made attribute names lowercase
 * made strtil a bit faster
 
 	Copyright (c) 2009 Christopher E. Moore ( christopher.e.moore@gmail.com / http://christopheremoore.net )
@@ -291,7 +292,7 @@ function Parser:tagstart()
 			return t
 		end
 		local attr = {
-			name = self:name();
+			name = self:name():lower();
 		}
 		if not attr.name then
 			break
