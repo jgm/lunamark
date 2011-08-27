@@ -1,6 +1,3 @@
-* TODO smart quotes extension (crucial for context because of quotes)
-* TODO quotes in context - use \quotation, \quote when we've got smart...
-* TODO fix Ins & Del test failure
 * TODO footnote extension
 * TODO definition list extension
 * TODO fenced code block extension
