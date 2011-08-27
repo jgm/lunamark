@@ -73,7 +73,15 @@ function M.fill_template(template, dict)
     end
     return result
   end
-  return template:gsub("%$%[if%s+(%a+)%]%s*(%b{})(%b{})", conditional):gsub("%$%[if%s+(%a+)%]%s*(%b{})", conditional):gsub("%$%[for%s+(%a+)%s+in%s+(%a+)%](%b{})", forloop):gsub("%${(%a+)}", dict)
+  local function subvars(x)
+    local found = dict[x]
+    if found then
+      return found
+    else
+      return ""
+    end
+  end
+  return template:gsub("%$%[if%s+(%a+)%]%s*(%b{})(%b{})", conditional):gsub("%$%[if%s+(%a+)%]%s*(%b{})", conditional):gsub("%$%[for%s+(%a+)%s+in%s+(%a+)%](%b{})", forloop):gsub("%${(%a+)}", subvars)
 end
 
 -- extend(t) returns a table that falls back to t for non-found values
