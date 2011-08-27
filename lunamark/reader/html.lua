@@ -15,6 +15,11 @@ local function lookup_attr(node, name)
   end
 end
 
+-- tags that aren't interpreted, but do need to be treated as block tags
+local leavespace = { address = true, center = true, dir = true, div = true,
+                     dl = true, form = true, menu = true, noframes = true,
+                     frameset = true, table = true }
+
 local function handle_nodes(writer, nodes, preserve_space)
   local output = {}
   local firstblock = true
@@ -87,6 +92,9 @@ local function handle_nodes(writer, nodes, preserve_space)
       elseif tag == "script" or tag == "style" then
         -- skip contents
       else  --skip unknown tag
+        if leavespace[tag] then
+          preblockspace()
+        end
         table.insert(output, contents)
       end
     elseif node.tag then  -- self-closing tag
