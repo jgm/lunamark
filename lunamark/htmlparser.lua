@@ -1,4 +1,6 @@
 --[[
+With minor bug fixes by John MacFarlane 2011.
+
 	Copyright (c) 2009 Christopher E. Moore ( christopher.e.moore@gmail.com / http://christopheremoore.net )
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -419,7 +421,7 @@ function Parser:tagarray(parent)
 	--print('... entering child set of type '..tostring(parenttag))
 	local array = {}
 	while self.thistoken do
-		self:spaces()
+		-- self:spaces() -- JGM removed, as it collapses '<b>x</b> y'
 		if self:canbe('<') then
 			local ch, closer = self:tag()
 			-- if closer then print('closing off multiple elements down to '..closer) end
