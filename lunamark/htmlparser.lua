@@ -140,7 +140,7 @@ end
 -- TODO - this goes slow
 function Parser:strtil(capfinish, nodetype)
 	local s = ''
-	local capture = '^' .. '(.*)' .. capfinish .. '$'
+	local capture = '^(.*)' .. capfinish .. '$'
 	while self.thistoken do
 		s = s .. self.thistoken
 		self:nexttoken()
