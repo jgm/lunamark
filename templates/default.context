@@ -37,7 +37,7 @@
   ]
 
 \starttext
-$[if title}{
+$[if title]{
 \startalignment[center]
   \blank[2*big]
   {\tfd ${title}}
