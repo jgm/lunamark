@@ -2,6 +2,7 @@
 With minor fixes by John MacFarlane 2011 for lunamark.
 * don't gobble space after tags
 * make all tags lowercase
+* made strtil a bit faster
 
 	Copyright (c) 2009 Christopher E. Moore ( christopher.e.moore@gmail.com / http://christopheremoore.net )
 
@@ -141,22 +142,31 @@ function Parser:name()
 	return n
 end
 
--- TODO - this goes slow
 function Parser:strtil(capfinish, nodetype)
-	local s = ''
-	local capture = '^(.*)' .. capfinish .. '$'
-	while self.thistoken do
-		s = s .. self.thistoken
-		self:nexttoken()
-		local str = s:match(capture)
-		if str then
-			return {
-				type=nodetype;
-				str=str;
-			}
-		end
-	end
-	self:parseerror("found a non-terminating strtil deal "..nodetype)
+  local s = ''
+  local capfinishfirst = capfinish:sub(1,1)
+  while self.thistoken do
+    local this = self.thistoken
+    if this == capfinishfirst then
+      local ender = this
+      for i=2,#capfinish do
+        self:nexttoken()
+        ender = ender .. self.thistoken
+      end
+      if ender == capfinish then
+        return {
+          type = nodetype;
+          str = s;
+        }
+      else
+        s = s .. ender
+      end
+    else
+      s = s .. this
+    end
+    self:nexttoken()
+  end
+  self:parseerror("found a non-terminating strtil deal "..nodetype)
 end
 
 -- already got <!
@@ -164,13 +174,13 @@ function Parser:comment()
 	if self:canbe('%[') then
 		if self:canbe('C') then
 			self:mustbe('D','A','T','A','%%','%[')
-			return self:strtil('%]%]>', 'cdata')
+			return self:strtil(']]>', 'cdata')
 		else
-			return self:strtil('%]>', 'preprocessor')
+			return self:strtil(']>', 'preprocessor')
 		end
 	elseif self:canbe('%-') then
 		self:mustbe('%-')
-		return self:strtil('%-%->', 'comment')
+		return self:strtil('-->', 'comment')
 	elseif self:canbe('D') then
 		self:mustbe('O','C','T','Y','P','E')	-- there's probably a better way to optionally read a name...
 		self:spaces()
@@ -180,7 +190,7 @@ end
 
 -- already got <?
 function Parser:xmlheader()
-	return self:strtil('%?>', 'xmlheader')
+	return self:strtil('?>', 'xmlheader')
 end
 
 function Parser:short(s)
