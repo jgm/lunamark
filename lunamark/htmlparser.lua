@@ -256,6 +256,7 @@ Parser.htmlnonclosing = {
 
 -- already got <
 function Parser:tagstart()
+        self:spaces()
 	-- closing tag...
 	if self:canbe('/') then
 		return self:tagend()
