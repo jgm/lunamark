@@ -11,6 +11,11 @@ local format = string.format
 
 Context.options = { }
 
+-- we don't try to escape utf-8 characters in context
+function Context.string(s)
+  return s:gsub(".",Context.escaped)
+end
+
 function Context.singlequoted(s)
   return format("\\quote{%s}",s)
 end
