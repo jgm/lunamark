@@ -2,98 +2,151 @@
 -- lunamark program
 
 local lunamark = require("lunamark")
+local alt_getopt = require("alt_getopt")
 
-local function one_of(ary)
-  return function(s)
-    for i=1,#ary do
-      if ary[i]==s then return true end
-    end
-    return false, "must be one of: " .. table.concat(ary,", ")
+local function ensure_one_of(s,ary)
+  for i=1,#ary do
+    if ary[i]==s then return true end
+  end
+  lunamark.util.err(s .. " must be one of: " .. table.concat(ary,", "))
+end
+
+local version = [[
+lunamark 0.2 (c) 2009-2011 John MacFarlane
+]]
+
+local usage = [[
+Usage: lunamark [options] [file..] - convert text between formats
+
+Options:
+  --to,-t FORMAT             Target format (see --help-formats)
+  --from,-f FORMAT           Source format (see --help-formats)
+  --layout,-l LAYOUT         Whitespace in output (default|compact|minimize)
+  --extensions,-X EXTENSIONS Syntax extensions to use (see --help-extensions)
+  --output,-o FILE           Output file
+  --standalone,-s            Add header and footer
+  --template,-T FILE         Insert output into template
+  --strict,-0                Disable markdown extensions 
+  --version,-V               Version information
+  --help,-h                  This message
+
+FORMAT can be markdown or html for the source, and
+markdown, html, html5, docbook, latex, or context for the target.
+
+LAYOUT can be default, compact (no unnecessary blank lines), or
+minimize (no unnecessary blank space).
+
+EXTENSIONS is a comma-separated list of extensions, each optionally prefixed
+by + (enable) or - (disable).  The following extensions are defined,
+with the default setting given in parentheses:
+  (-) containers    Put sections in containers (e.g. div or section tags)
+  (+) startnum      Start number of an ordered list is significant 
+  (-) smart         Smart typography (quotes, dashes, ellipses)
+]]
+
+local long_opts = {
+  to = "t",
+  from = "f",
+  layout = "l",
+  extensions = "X",
+  output = "o",
+  standalone = "s",
+  template = "T",
+  strict = "0",
+  version = "V",
+  help = "h"
+}
+
+local short_opts = "t:f:l:X:o:sT:0Vh"
+
+local optarg,optind = alt_getopt.get_opts(arg, short_opts, long_opts)
+
+if optarg.h then
+  io.write(usage)
+  os.exit(0)
+end
+
+if optarg.V then
+  io.write(version)
+  os.exit(0)
+end
+
+local from = optarg.f or "markdown"
+local to = optarg.t or "html"
+
+ensure_one_of(from, {"markdown","html"})
+ensure_one_of(from, {"markdown","html","html5","docbook","latex","context"})
+
+local reader = lunamark.reader[from]
+if not reader then
+  lunamark.util.err("Unknown reader: " .. tostring(from), 3)
+end
+
+local writer = lunamark.writer[to]
+if not writer then
+  lunamark.util.err("Unknown writer: " .. tostring(to), 5)
+end
+
+local extensions = {  -- defaults
+  containers = 0,
+  startnum = 1,
+  smart = 0,
+}
+
+local extensions_opt = optarg.X or ""
+for x in extensions_opt:gmatch("[%+%-]?[%a]+") do
+  local val = true
+  if x:sub(1,1) == "+" then
+    val = true
+    x = x:sub(2)
+  elseif x:sub(1,1) == "-" then
+    val = false
+    x = x:sub(2)
+  end
+  if not extensions[x] then
+    lunamark.util.err("Unrecognized extension: ", x)
+  else
+    extensions[x] = val
   end
 end
 
-local options = {
-  "lunamark [options] [file..] - convert text between formats",
-   to      = { shortform = "t",
-               arg = "format",
-               validate = one_of({"html","html5","docbook","latex","context"}),
-               description = "Target format"},
-   from    = { shortform = "f",
-               arg = "format",
-               validate = one_of({"markdown","html"}),
-               description = "Source format"},
-   strict  = { description = "Disable markdown extensions" },
-   output  = { shortform = "o",
-               arg = "file",
-               description = "Output file" },
-   template = { shortform = "T",
-                arg = "file",
-                description = "Insert output into template" },
-   smart      = { shortform = "S",
-                  description = "Smart typography" },
-   standalone = { shortform = "s",
-                  description = "Add header and footer" },
-   containers = { description = "Wrap sections in containers" },
-   compact = { description = "Omit unnecessary blank lines" },
-   minimize = { description = "Omit all unnecessary white space" },
-   }
-
-local defaults = {
-   to  = "html",
-   from = "markdown",
-   strict = false,
-   containers = false,
-   standalone = false,
-   compact = false,
-   minimize = false,
-   smart = false,
- }
-
-local args = lunamark.cmdopts.getargs(options, defaults)
-
-local reader = lunamark.reader[args.from]
-if not reader then
-  lunamark.util.err("Unknown reader: " .. tostring(args.from), 3)
+if optarg["0"] then
+  writer.options = {}
+else
+  writer.options = extensions
 end
 
-local writer = lunamark.writer[args.to]
-if not writer then
-  lunamark.util.err("Unknown writer: " .. tostring(args.to), 5)
+local layout = optarg["l"] or "default"
+ensure_one_of(layout,{"default","compact","minimize"})
+writer.containersep = writer.sep.container[layout]
+writer.interblocksep = writer.sep.interblock[layout]
+
+local convert = reader(writer,{ smart = extensions.smart })
+local body, metadata = convert(lunamark.util.get_input(optind,4))
+
+local output = optarg.o
+io.output(output)
+
+local standalone = optarg.s
+local template = optarg.T
+
+if standalone and not template then
+  template = "default"
 end
 
-writer.options.startnum = not args.strict
-writer.options.containers = args.containers
-
-if args.minimize then
-  writer.containersep = writer.sep.container.minimal
-  writer.interblocksep = writer.sep.interblock.minimal
-elseif args.compact then
-  writer.containersep = writer.sep.container.compact
-  writer.interblocksep = writer.sep.interblock.compact
-end
-
-local convert = reader(writer,{ smart = args.smart })
-local body, metadata = convert(lunamark.util.get_input(args,4))
-
-io.output(args.output)
-
-if args.standalone and not args.template then
-  args.template = "default"
-end
-
-if args.template then
-  local template = lunamark.util.find_template(args.template, args.to)
+if template then
+  local contents = lunamark.util.find_template(template, to)
   local data = {}
   if metadata then data = metadata end
   data.body = body
   data.timestamp = os.date("%Y-%m-%d %X")
   data.sources = args
-  local result = lunamark.util.fill_template(template, data)
+  local result = lunamark.util.fill_template(contents, data)
   io.write(result)
 else
   io.write(body)
 end
 
-if not args.template then
+if not template then
   io.write("\n")
 end
