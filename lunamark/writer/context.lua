@@ -11,6 +11,14 @@ local format = string.format
 
 Context.options = { }
 
+function Context.singlequoted(s)
+  return format("\\quote{%s}",s)
+end
+
+function Context.doublequoted(s)
+  return format("\\quotation{%s}",s)
+end
+
 function Context.code(s)
   return format("\\type{%s}", s)  -- escape here?
 end

@@ -19,6 +19,20 @@ TeX.linebreak = "\\\\"
 
 TeX.space = " "
 
+TeX.ellipsis = "\ldots{}"
+
+TeX.mdash = "---"
+
+TeX.ndash = "--"
+
+function TeX.singlequoted(s)
+  return format("`%s'",s)
+end
+
+function TeX.doublequoted(s)
+  return format("``%s''",s)
+end
+
 local escaped = {
    ["{"] = "\\{",
    ["}"] = "\\}",

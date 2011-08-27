@@ -19,6 +19,21 @@ Xml.containersep = Xml.sep.container.default
 
 Xml.space = " "
 
+Xml.ellipsis = "&#8230;"
+
+Xml.mdash = "&#8212;"
+
+Xml.ndash = "&#8211;"
+
+function Xml.singlequoted(s)
+  return string.format("&#8216;%s&#8217;",s)
+end
+
+function Xml.doublequoted(s)
+  return string.format("&#8220;%s&#8221;",s)
+end
+
+
 local escaped = {
    ["<" ] = "&lt;",
    [">" ] = "&gt;",

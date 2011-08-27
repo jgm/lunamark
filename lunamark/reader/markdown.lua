@@ -86,6 +86,7 @@ local function markdown(writer, options)
   local fourspaces             = P("    ")
 
   local any                    = P(1)
+  local none                   = any - 1
   local always                 = P("")
 
   local escapable              = S("\\`*_{}[]()+_.!<>#-")
@@ -99,7 +100,7 @@ local function markdown(writer, options)
   local spaceornewline         = spacechar + newline
   local nonspacechar           = any - spaceornewline
   local tightblocksep          = P("\001")
-  local specialchar            = S("*_`&[]<!\\")
+  local specialchar            = S("*_`&[]<!\\'\"-.")
   local normalchar             = any -
                                  (specialchar + spaceornewline + tightblocksep)
   local optionalspace          = spacechar^0
@@ -389,6 +390,28 @@ local function markdown(writer, options)
 
   local Str       = normalchar^1 / writer.string
 
+  local Ellipsis  = P("...") / writer.ellipsis
+
+  local Dash      = P("---") / writer.mdash
+                  + P("--") / writer.ndash
+
+  local DoubleQuoted = dquote * (Inline - dquote)^1 * dquote
+                     / writer.doublequoted
+
+  local squote_start = squote * -spacing
+
+  local squote_end = squote * lpeg.B(nonspacechar, 2)
+
+  local SingleQuoted = squote_start * (Inline - squote_end)^1 * squote_end
+                     / writer.singlequoted
+
+  local Smart
+  if options.smart then
+    Smart         = Ellipsis + Dash + SingleQuoted + DoubleQuoted
+  else
+    Smart         = none
+  end
+
   local Symbol    = (specialchar - tightblocksep) / writer.string
 
   local Code      = inticks / writer.code
@@ -631,6 +654,7 @@ local function markdown(writer, options)
                             + InlineHtml
                             + HtmlEntity
                             + EscapedChar
+                            + Smart
                             + Symbol,
     }
 

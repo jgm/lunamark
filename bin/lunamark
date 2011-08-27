@@ -29,6 +29,8 @@ local options = {
    template = { shortform = "T",
                 arg = "file",
                 description = "Insert output into template" },
+   smart      = { shortform = "S",
+                  description = "Smart typography" },
    standalone = { shortform = "s",
                   description = "Add header and footer" },
    containers = { description = "Wrap sections in containers" },
@@ -43,7 +45,8 @@ local defaults = {
    containers = false,
    standalone = false,
    compact = false,
-   minimize = false
+   minimize = false,
+   smart = false,
  }
 
 local args = lunamark.cmdopts.getargs(options, defaults)
@@ -69,7 +72,7 @@ elseif args.compact then
   writer.interblocksep = writer.sep.interblock.compact
 end
 
-local convert = reader(writer,{})
+local convert = reader(writer,{ smart = args.smart })
 local body, metadata = convert(lunamark.util.get_input(args,4))
 
 io.output(args.output)
