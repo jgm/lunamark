@@ -88,9 +88,9 @@ if not writer then
 end
 
 local extensions = {  -- defaults
-  containers = 0,
-  startnum = 1,
-  smart = 0,
+  containers = false,
+  startnum = true,
+  smart = false,
 }
 
 if optarg["0"] then
@@ -107,12 +107,14 @@ for x in extensions_opt:gmatch("[%+%-]?[%a]+") do
     val = false
     x = x:sub(2)
   end
-  if not extensions[x] then
+  if type(extensions[x]) ~= "boolean" then
     lunamark.util.err("Unrecognized extension: ", x)
   else
     extensions[x] = val
   end
 end
+
+writer.options = extensions
 
 local layout = optarg["l"] or "default"
 ensure_one_of(layout,{"default","compact","minimize"})
