@@ -148,7 +148,7 @@ function M.get_input(inp, tabstop)
   local function addlines(iterator)
     for line in iterator do
       if tabstop then
-        table.insert(buffer, M.expand_tabs_in_line(line,tapstop))
+        table.insert(buffer, M.expand_tabs_in_line(line,tabstop))
       else
         table.insert(buffer, line)
       end
@@ -159,7 +159,7 @@ function M.get_input(inp, tabstop)
       addlines(io.lines(f))
     end
   elseif inptype == "string" then
-    local s = self
+    local s = inp
     if not s:find("\n$") then s = s.."\n" end
     addlines(s:gfind("([^\n]*)\n"))
   else
