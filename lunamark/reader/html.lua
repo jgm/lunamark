@@ -84,6 +84,8 @@ local function handle_nodes(writer, nodes, preserve_space)
         table.insert(output, writer.strong(contents))
       elseif tag == "code" then
         table.insert(output, writer.code(contents))
+      elseif tag == "script" or tag == "style" then
+        -- skip contents
       else  --skip unknown tag
         table.insert(output, contents)
       end
