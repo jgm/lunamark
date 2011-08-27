@@ -1,18 +1,18 @@
 local htmlparser = require("lunamark.htmlparser")
 local entities = require("lunamark.entities")
 
+local function convert_entities(s)
+  return s:gsub("&#[Xx](%x+);", entities.hex_entity):gsub("&#(%d+);", entities.dec_entity):gsub("&(%a+);", entities.char_entity)
+end
+
 local function lookup_attr(node, name)
-  if node.attr then
-    for _,x in ipairs(t) do
+  if node.attrs then
+    for _,x in ipairs(node.attrs) do
       if x.name == name then
-        return convert_entities(x.value)
+        return convert_entities(x.value or "")
       end
     end
   end
-end
-
-local function convert_entities(s)
-  return s:gsub("&#[Xx](%x+);", entities.hex_entity):gsub("&#(%d+);", entities.dec_entity):gsub("&(%a+);", entities.char_entity)
 end
 
 local function handle_nodes(writer, nodes, preserve_space)
