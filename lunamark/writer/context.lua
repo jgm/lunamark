@@ -57,8 +57,21 @@ function Context.verbatim(s)
 end
 
 function Context.section(s,level,contents)
-  return format("\\%ssection{%s}%s%s", string.rep("sub",level-1), s,
-           Context.interblocksep, contents)
+  local cmd
+  if level == 1 then
+    cmd = "\\section"
+  elseif level == 2 then
+    cmd = "\\subsection"
+  elseif level == 3 then
+    cmd = "\\subsubsection"
+  elseif level == 4 then
+    cmd = "\\paragraph"
+  elseif level == 5 then
+    cmd = "\\subparagraph"
+  else
+    cmd = ""
+  end
+  return format("%s{%s}%s%s", cmd, s, Context.interblocksep, contents)
 end
 
 Context.hrule = "\\hairline"
