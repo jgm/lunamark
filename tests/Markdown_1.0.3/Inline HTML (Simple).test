@@ -1,4 +1,4 @@
-markdown
+markdown --strict
 <<<
 Here&#39;s a simple block:
 

@@ -1,4 +1,4 @@
-markdown
+markdown --strict
 <<<
 `<test a="` content of attribute `">`
 

@@ -1,4 +1,4 @@
-markdown
+markdown --strict
 <<<
 [silly URL w/ angle brackets](<?}]*+|&)>).
 

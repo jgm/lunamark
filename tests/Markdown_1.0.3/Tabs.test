@@ -1,4 +1,4 @@
-markdown
+markdown --strict
 <<<
 +	this is a list item
 	indented with tabs

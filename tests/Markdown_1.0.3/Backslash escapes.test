@@ -1,4 +1,4 @@
-markdown
+markdown --strict
 <<<
 These should all get escaped:
 

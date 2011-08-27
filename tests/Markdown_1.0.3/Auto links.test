@@ -1,4 +1,4 @@
-markdown
+markdown --strict
 <<<
 Link: <http://example.com/>.
 

@@ -1,4 +1,4 @@
-markdown
+markdown --strict
 <<<
 	code block on the first line
 	

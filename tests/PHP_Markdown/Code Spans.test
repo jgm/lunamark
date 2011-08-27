@@ -1,4 +1,4 @@
-markdown
+markdown --strict
 <<<
 From `<!--` to `-->`
 on two lines.

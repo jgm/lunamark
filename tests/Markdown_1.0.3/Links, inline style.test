@@ -1,4 +1,4 @@
-markdown
+markdown --strict
 <<<
 Just a [URL](/url/).
 

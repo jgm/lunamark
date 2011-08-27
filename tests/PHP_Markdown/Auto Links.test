@@ -1,4 +1,4 @@
-markdown
+markdown --strict
 <<<
 <HTTP://WWW.SOMEURL.COM>
 
