@@ -33,8 +33,8 @@ local function handle_nodes(writer, nodes, preserve_space)
       if preserve_space then
         contents = writer.string(convert_entities(node))
       else
-        local s = convert_entities(node)
-        contents = s:gsub("%s+", writer.space)
+        local compressed = node:gsub("%s+", writer.space)
+        contents = writer.string(convert_entities(compressed))
       end
       table.insert(output, contents)
     elseif node.tag and node.child then -- tag with contents
