@@ -110,7 +110,7 @@ function M.table_copy(t)
 end
 
 -- from Programming Lua
-function M.expand_tabs_in_line(s, tabstop)
+local function expand_tabs_in_line(s, tabstop)
   local tab = tabstop or 4
   local corr = 0
   return (string.gsub(s, "()\t", function(p)
@@ -133,7 +133,7 @@ function M.get_input(inp, tabstop)
   local function addlines(iterator)
     for line in iterator do
       if tabstop then
-        table.insert(buffer, M.expand_tabs_in_line(line,tabstop))
+        table.insert(buffer, expand_tabs_in_line(line,tabstop))
       else
         table.insert(buffer, line)
       end
