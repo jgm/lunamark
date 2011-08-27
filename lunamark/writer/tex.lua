@@ -33,7 +33,7 @@ function TeX.doublequoted(s)
   return format("``%s''",s)
 end
 
-local escaped = {
+TeX.escaped = {
    ["{"] = "\\{",
    ["}"] = "\\}",
    ["$"] = "\\$",
@@ -61,7 +61,7 @@ local escaped_utf8_triplet = {
 }
 
 function TeX.string(s)
-  return s:gsub(".",escaped):gsub("\226\128.",escaped_utf8_triplet):gsub("\194\160","~")
+  return s:gsub(".",TeX.escaped):gsub("\226\128.",escaped_utf8_triplet):gsub("\194\160","~")
 end
 
 function TeX.start_document()
