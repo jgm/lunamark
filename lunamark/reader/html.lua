@@ -1,6 +1,16 @@
 local htmlparser = require("lunamark.htmlparser")
 local entities = require("lunamark.entities")
 
+local function lookup_attr(node, name)
+  if node.attr then
+    for _,x in ipairs(t) do
+      if x.name == name then
+        return convert_entities(x.value)
+      end
+    end
+  end
+end
+
 local function convert_entities(s)
   return s:gsub("&#[Xx](%x+);", entities.hex_entity):gsub("&#(%d+);", entities.dec_entity):gsub("&(%a+);", entities.char_entity)
 end
@@ -15,7 +25,9 @@ local function handle_nodes(writer, nodes, preserve_space)
       table.insert(output, writer.interblocksep)
     end
   end
-  for i,node in ipairs(nodes) do
+  local i = 1
+  while nodes[i] do
+    local node = nodes[i]
     if type(node) == "string" then -- text node
       local contents
       if preserve_space then
@@ -28,7 +40,7 @@ local function handle_nodes(writer, nodes, preserve_space)
     elseif node.tag and node.child then -- tag with contents
       local tag = node.tag
       local contents = handle_nodes(writer, node.child,
-              preserve_space or tag == "pre")
+              preserve_space or tag == "pre" or tag == "code")
       if tag == "p" then
         preblockspace()
         table.insert(output, writer.paragraph(contents))
@@ -46,10 +58,16 @@ local function handle_nodes(writer, nodes, preserve_space)
       elseif tag == "pre" then
         preblockspace()
         table.insert(output, writer.verbatim(contents))
+      elseif tag == "link" then
+        local src = lookup_attr(node, "href")
+        local tit = lookup_attr(node, "title")
+        table.insert(output, writer.link(contents,src,tit))
       elseif tag == "em" or tag == "i" then
         table.insert(output, writer.emphasis(contents))
       elseif tag == "strong" or tag == "b" then
         table.insert(output, writer.strong(contents))
+      elseif tag == "code" then
+        table.insert(output, writer.code(contents))
       else  --skip unknown tag
         table.insert(output, contents)
       end
@@ -61,12 +79,18 @@ local function handle_nodes(writer, nodes, preserve_space)
       elseif tag == "br" then
         preblockspace()
         table.insert(output, writer.linebreak)
+      elseif tag == "img" then
+        local alt = lookup_attr(node, "alt")
+        local src = lookup_attr(node, "src")
+        local tit = lookup_attr(node, "title")
+        table.insert(output, writer.image(alt,src,tit))
       else
         -- skip
       end
     else -- comment or xmlheader
       -- skip
     end
+    i = i + 1
   end
   return table.concat(output)
 end
