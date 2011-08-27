@@ -35,15 +35,19 @@ local escaped = {
    [">"] = "\\char62{}",
    ["["] = "{[}", -- to avoid interpretation as optional argument
    ["]"] = "{]}",
-   ["\160"] = "~",
-   ["\0x2018"] = "`",
-   ["\0x2019"] = "'",
-   ["\0x201C"] = "``",
-   ["\0x201D"] = "''",
  }
 
+local escaped_utf8_triplet = {
+  ["\226\128\156"] = "``",
+  ["\226\128\157"] = "''",
+  ["\226\128\152"] = "`",
+  ["\226\128\153"] = "'",
+  ["\226\128\148"] = "---",
+  ["\226\128\147"] = "--",
+}
+
 function TeX.string(s)
-  return s:gsub(".",escaped)
+  return s:gsub(".",escaped):gsub("\226\128.",escaped_utf8_triplet):gsub("\194\160","~")
 end
 
 function TeX.start_document()
