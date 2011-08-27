@@ -58,6 +58,22 @@ local function handle_nodes(writer, nodes, preserve_space)
       elseif tag == "pre" then
         preblockspace()
         table.insert(output, writer.verbatim(contents))
+      elseif tag:match("^h[123456]$") then
+        local lev = tonumber(tag:sub(2,2))
+        preblockspace()
+        local bodynodes = {}
+        while nodes[i+1] do
+          local nd = nodes[i+1]
+          if nd.tag and nd.tag:match("^h[123456]$") and
+             tonumber(nd.tag:sub(2,2)) <= lev then
+             break
+          else
+            table.insert(bodynodes,nd)
+          end
+          i = i + 1
+        end
+        local body = handle_nodes(writer, bodynodes, preserve_space)
+        table.insert(output, writer.section(contents, lev, body))
       elseif tag == "link" then
         local src = lookup_attr(node, "href")
         local tit = lookup_attr(node, "title")
