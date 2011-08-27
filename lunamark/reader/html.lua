@@ -74,8 +74,8 @@ local function handle_nodes(writer, nodes, preserve_space)
         end
         local body = handle_nodes(writer, bodynodes, preserve_space)
         table.insert(output, writer.section(contents, lev, body))
-      elseif tag == "link" then
-        local src = lookup_attr(node, "href")
+      elseif tag == "a" then
+        local src = lookup_attr(node, "href") or ""
         local tit = lookup_attr(node, "title")
         table.insert(output, writer.link(contents,src,tit))
       elseif tag == "em" or tag == "i" then
@@ -96,8 +96,8 @@ local function handle_nodes(writer, nodes, preserve_space)
         preblockspace()
         table.insert(output, writer.linebreak)
       elseif tag == "img" then
-        local alt = lookup_attr(node, "alt")
-        local src = lookup_attr(node, "src")
+        local alt = lookup_attr(node, "alt") or ""
+        local src = lookup_attr(node, "src") or ""
         local tit = lookup_attr(node, "title")
         table.insert(output, writer.image(alt,src,tit))
       else
