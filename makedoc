@@ -1,4 +1,4 @@
 #!/bin/sh
 rm -rf doc
 mkdir doc
-luadoc -d doc --doclet markdown_doclet lunamark.lua lunamark
+luadoc -t luadoc -d doc --doclet luadoc.markdown_doclet lunamark.lua lunamark

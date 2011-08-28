@@ -38,14 +38,13 @@ end
 
 --- Fill a template with data from a dictionary.
 -- Templates recognize the following constructs:
--- <ul>
--- <li>${var} - gets filled with the value of dict[var]</li>
--- <li>$[if foo]{yes}{no} - yes if foo is true and not an empty array.
---   The {no} part may be omitted.</li>
--- <li>$[for x in foo]{blah ${x}[, ]} - prints blah ${...} for every
---   value of foo, interposing ", ".  The interposed part may be
---   omitted.</li>
--- </ul>
+--
+-- * `${var}` - gets filled with the value of `dict[var]`
+-- * `$[if foo]{yes}{no}` - `yes` if `foo` is true and not an empty array.
+--   The `{no}` part may be omitted.
+-- * `$[for x in foo]{blah ${x}[, ]}` - prints `blah ${...}` for every
+--   value of `foo`, interposing `, `.  The interposed part may be
+--   omitted.
 function fill_template(template, dict)
   local function adjust_cond(s)
     return string.gsub(tostring(s),"^{\n?",""):gsub("\n?}$","")
