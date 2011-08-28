@@ -1,7 +1,10 @@
-* TODO Think about using module system and setting up libraries
-  in oop style - see htmlparser.lua - this would allow writers
-  to keep their own states better, and wd fit better with luadoc
-* TODO Make lunadoc.lua better and add doc comments to modules
+* TODO Use lua module system for writers
+  Use a new function instead of directly returning the table.
+  New can do a tablecopy, so we don't need to do it in the reader
+  or other writers.
+* TODO Luadoc documentation.
+  (wd be nice to have a way to hack luadoc to use markdown - custom
+  taglet?)
 * TODO footnote extension
 * TODO definition list extension
 * TODO fenced code block extension
