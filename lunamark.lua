@@ -11,7 +11,7 @@ So, for example, one can refer to `lunamark.reader.markdown`.
 Modules are not loaded until they are actually needed, so
 it is safe to `require("lunamark")` even if you only intend to
 use one reader and one writer.
-]]--
+--]]
 
 local G = {}
 
