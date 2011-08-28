@@ -1,8 +1,8 @@
 -- (c) 2009-2011 John MacFarlane.  Released under MIT license.
 -- See the file LICENSE in the source for details.
 
-local bit = require("bit")
-local band, bor, rshift = bit.band, bit.bor, bit.rshift
+local bit = require("bit32")
+local band, bor, rshift = bit.band, bit.bor, bit.arshift
 
 local Entities = {}
 
