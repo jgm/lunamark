@@ -149,7 +149,7 @@ function M.get_input(inp, tabstop)
   elseif inptype == "string" then
     local s = inp
     if not s:find("\n$") then s = s.."\n" end
-    addlines(s:gfind("([^\r\n]*)"))
+    addlines(s:gfind("([^\r\n]*)\r?\n"))
   else
     addlines(io.lines())
   end
