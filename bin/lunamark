@@ -123,8 +123,13 @@ ensure_one_of("--layout,-l",layout,{"default","compact","minimize"})
 writer.containersep = writer.sep.container[layout]
 writer.interblocksep = writer.sep.interblock[layout]
 
+local args = {}
+for i=optind,#arg do
+  table.insert(args,arg[i])
+end
+
 local convert = reader(writer,{ smart = extensions.smart })
-local body, metadata = convert(lunamark.util.get_input(optind,4))
+local body, metadata = convert(lunamark.util.get_input(args,4))
 
 local output = optarg.o
 io.output(output)
