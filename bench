@@ -9,5 +9,5 @@ do
     sed -e '1,/<<</d' -e '/>>>/,$d' tests/Markdown_1.0.3/Markdown\ Documentation\ -\ Syntax.test >> $TESTFILE
     x=$(($x-1))
 done
-time $PROG < $TESTFILE > /dev/null
+time $PROG $@ < $TESTFILE > /dev/null
 du -h $TESTFILE
