@@ -25,6 +25,7 @@ With minor fixes by John MacFarlane 2011 for lunamark:
   * make all tags lowercase
   * made attribute names lowercase
   * made strtil a bit faster
+  * supported compact attribute syntax
 
 --]]
 
@@ -302,13 +303,16 @@ function Parser:tagstart()
 		end
 		--print('  reading attr name '..attr.name)
 		self:spaces()
-		self:mustbe('=')
-		self:spaces()
-		-- this is fickle
-		-- it is either a non-quoted chars-til-whitespace (or >)
-		-- or a single-quoted or a double-quoted string
-		attr.value = self:attrvalue()
-		--print('  reading attr value '..attr.value)
+		if self:canbe('=') then
+		  self:spaces()
+		  -- this is fickle
+		  -- it is either a non-quoted chars-til-whitespace (or >)
+		  -- or a single-quoted or a double-quoted string
+		  attr.value = self:attrvalue()
+		  --print('  reading attr value '..attr.value)
+                else -- compact attribute syntax
+                  attr.value = attr.name
+                end
 		if not t.attrs then t.attrs = {} end
 		table.insert(t.attrs, attr)
 	end
