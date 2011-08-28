@@ -1,15 +1,14 @@
 -- (c) 2009-2011 John MacFarlane.  Released under MIT license.
 -- See the file LICENSE in the source for details.
 
--- some miscellaneous helper functions
+--- Some miscellaneous helper functions
+module("lunamark.util",package.seeall)
 
-local M = {}
-
--- Find a template and return its string contents.
+--- Find a template and return its string contents.
 -- If the template has no extension, an extension
 -- is added based on the writer name.  Look first in ., then in
 -- templates, then in ~/.lunamark/templates, then in APPDATA.
-function M.find_template(name, format)
+function find_template(name, format)
   if not name then name = "default" end
   local base, ext = name:match("([^%.]*)(.*)")
   if (not ext or ext == "") and format then ext = "." .. format end
@@ -37,14 +36,17 @@ function M.find_template(name, format)
   end
 end
 
+--- Fill a template with data from a dictionary.
 -- Templates recognize the following constructs:
--- * ${var} - gets filled with the value of dict[var]
--- * $[if foo]{yes}{no} - yes if foo is true and not an empty array.
---   The {no} part may be omitted.
--- * $[for x in foo]{blah ${x}[, ]} - prints blah ${...} for every
+-- <ul>
+-- <li>${var} - gets filled with the value of dict[var]</li>
+-- <li>$[if foo]{yes}{no} - yes if foo is true and not an empty array.
+--   The {no} part may be omitted.</li>
+-- <li>$[for x in foo]{blah ${x}[, ]} - prints blah ${...} for every
 --   value of foo, interposing ", ".  The interposed part may be
---   omitted.
-function M.fill_template(template, dict)
+--   omitted.</li>
+-- </ul>
+function fill_template(template, dict)
   local function adjust_cond(s)
     return string.gsub(tostring(s),"^{\n?",""):gsub("\n?}$","")
   end
@@ -99,14 +101,14 @@ function M.extend(prototype)
 end
 --]]
 
--- error message and exit
-function M.err(msg, exit_code)
+--- Print error message and exit.
+function err(msg, exit_code)
   io.stderr:write("lunamark: " .. msg .. "\n")
   os.exit(exit_code or 1)
 end
 
--- shallow table copy including metatables
-function M.table_copy(t)
+-- Shallow table copy including metatables.
+function table_copy(t)
   local u = { }
   for k, v in pairs(t) do u[k] = v end
   return setmetatable(u, getmetatable(t))
@@ -123,13 +125,13 @@ local function expand_tabs_in_line(s, tabstop)
         end))
 end
 
--- Get input, converting line endings to LF and optionally expanding tabs.
+--- Get input, converting line endings to LF and optionally expanding tabs.
 -- (Tabs are expanded if the optional tabstop argument is provided.)
 -- If inp is a string, input is a string.
 -- If inp is a nonempty array, elements are assumed to be
 -- filenames and input is taken from them in sequence.
 -- Otherwise, the current input handle is used.
-function M.get_input(inp, tabstop)
+function get_input(inp, tabstop)
   local buffer = {}
   local tabstop = 4
   local inptype = type(inp)
@@ -157,5 +159,3 @@ function M.get_input(inp, tabstop)
   table.insert(buffer, "\n")
   return table.concat(buffer,"\n")
 end
-
-return M

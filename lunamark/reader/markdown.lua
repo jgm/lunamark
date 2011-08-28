@@ -1,7 +1,7 @@
 -- (c) 2009-2011 John MacFarlane, Hans Hagen.  Released under MIT license.
 -- See the file LICENSE in the source for details.
 
-local M = {}
+module("lunamark.reader.markdown", package.seeall)
 
 local lpeg = require("lpeg")
 local entities = require("lunamark.entities")
@@ -14,7 +14,8 @@ local P, R, S, V, C, Ct, Cg, Cb, Cmt, Cc, Cf, Cs =
   lpeg.Cmt, lpeg.Cc, lpeg.Cf, lpeg.Cs
 local lpegmatch = lpeg.match
 
-function M.new(writer, options)
+--- Create a new markdown parser.
+function new(writer, options)
 
   if not options then options = {} end
 
@@ -683,5 +684,3 @@ function M.new(writer, options)
   end
 
 end
-
-return M
