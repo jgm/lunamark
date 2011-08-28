@@ -1,9 +1,17 @@
+* TODO Make lunadoc.lua better and add doc comments to modules
 * TODO footnote extension
 * TODO definition list extension
 * TODO fenced code block extension
 * TODO pandoc title block extension
 * TODO other metadata?
 * TODO math extension
+* TODO add library documentation
+  - all writers have common set of functions, which can be documented once
+  - then we need a list of writers + descriptions + information on options
+  - readers just export one function, which again can be documented once
+    + info on options
+  - lunamark.util exports several functions which need documentation
+* TODO add man page
 * TODO # in ordered lists extension
 * TODO gh-pages website
 * TODO indentation options?
