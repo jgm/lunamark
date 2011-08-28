@@ -116,7 +116,8 @@ local function markdown(writer, options)
   local skipblanklines         = (optionalspace * newline)^0
   local indentedline           = indent    /"" * C(linechar^1 * (newline + eof))
   local optionallyindentedline = indent^-1 /"" * C(linechar^1 * (newline + eof))
-  local spnl                   = optionalspace * (newline * optionalspace)^-1
+  local sp                     = spacing^0
+  local spnl                   = #spacing * optionalspace * (newline * optionalspace)^-1
   local line                   = (any - newline)^0 * newline
                                + (any - newline)^1 * eof
   local nonemptyline           = line - blankline
@@ -318,34 +319,34 @@ local function markdown(writer, options)
   local htmlattributevalue  = squote * (any - (blankline + squote))^0 * squote
                             + dquote * (any - (blankline + dquote))^0 * dquote
 
-  local htmlattribute       = (alphanumeric + S("_-"))^1 * spnl * equal
-                            * spnl * htmlattributevalue * spnl
+  local htmlattribute       = spacing^1 * (alphanumeric + S("_-"))^1 * sp * equal
+                            * sp * htmlattributevalue
 
   local htmlcomment         = P("<!--") * (any - P("-->"))^0 * P("-->")
 
   local htmlinstruction     = P("<?")   * (any - P("?>" ))^0 * P("?>" )
 
-  local openelt_any = less * keyword * spnl * htmlattribute^0 * more
+  local openelt_any = less * keyword * htmlattribute^0 * sp * more
 
   local function openelt_exact(s)
-    return (less * keyword_exact(s) * spnl * htmlattribute^0 * more)
+    return (less * sp * keyword_exact(s) * htmlattribute^0 * sp * more)
   end
 
-  local openelt_block = less * block_keyword * spnl * htmlattribute^0 * more
+  local openelt_block = less * sp * block_keyword * htmlattribute^0 * sp * more
 
-  local closeelt_any = less * slash * keyword * spnl * more
+  local closeelt_any = less * sp * slash * keyword * sp * more
 
   local function closeelt_exact(s)
-    return (less * slash * keyword_exact(s) * spnl * more)
+    return (less * sp * slash * keyword_exact(s) * sp * more)
   end
 
-  local emptyelt_any = less * keyword * spnl * htmlattribute^0 * slash * more
+  local emptyelt_any = less * sp * keyword * htmlattribute^0 * sp * slash * more
 
   local function emptyelt_exact(s)
-    return (less * keyword_exact(s) * spnl * htmlattribute^0 * slash * more)
+    return (less * sp * keyword_exact(s) * htmlattribute^0 * sp * slash * more)
   end
 
-  local emptyelt_block = less * block_keyword * spnl * htmlattribute^0 * slash * more
+  local emptyelt_block = less * sp * block_keyword * htmlattribute^0 * sp * slash * more
 
   local displaytext         = (any - less)^1
 
