@@ -117,7 +117,7 @@ local function markdown(writer, options)
   local indentedline           = indent    /"" * C(linechar^1 * (newline + eof))
   local optionallyindentedline = indent^-1 /"" * C(linechar^1 * (newline + eof))
   local sp                     = spacing^0
-  local spnl                   = #spacing * optionalspace * (newline * optionalspace)^-1
+  local spnl                   = optionalspace * (newline * optionalspace)^-1
   local line                   = (any - newline)^0 * newline
                                + (any - newline)^1 * eof
   local nonemptyline           = line - blankline
@@ -220,7 +220,7 @@ local function markdown(writer, options)
 
   local title         = title_d + title_s + title_p
 
-  local optionaltitle = spnl^-1 * title * spacechar^0
+  local optionaltitle = spnl * title * spacechar^0
                       + Cc("")
 
   ------------------------------------------------------------------------------
@@ -460,7 +460,7 @@ local function markdown(writer, options)
 
   local DirectLink    = image_marker 
                       * (tag / inlinesparser)
-                      * spnl^-1
+                      * spnl
                       * lparent
                       * (url + Cc(""))  -- link can be empty [foo]()
                       * optionaltitle
@@ -469,7 +469,7 @@ local function markdown(writer, options)
 
    local IndirectLink = image_marker
                       * tag
-                      * (C(spnl^-1) * tag)^-1
+                      * (C(spnl) * tag)^-1
                       / indirect_link
 
   -- parse a link or image (direct or indirect)
