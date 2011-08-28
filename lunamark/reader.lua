@@ -1,3 +1,6 @@
+-- (c) 2009-2011 John MacFarlane.  Released under MIT license.
+-- See the file LICENSE in the source for details.
+
 local G = {}
 
 setmetatable(G,{ __index = function(t,name)

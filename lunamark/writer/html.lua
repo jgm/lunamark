@@ -1,4 +1,5 @@
--- HTML writer for lunamark
+-- (c) 2009-2011 John MacFarlane. Released under MIT license.
+-- See the file LICENSE in the source for details.
 
 local Xml = require("lunamark.writer.xml")
 local util = require("lunamark.util")

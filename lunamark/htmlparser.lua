@@ -1,10 +1,4 @@
 --[[
-With minor fixes by John MacFarlane 2011 for lunamark.
-* don't gobble space after tags
-* make all tags lowercase
-* made attribute names lowercase
-* made strtil a bit faster
-
 	Copyright (c) 2009 Christopher E. Moore ( christopher.e.moore@gmail.com / http://christopheremoore.net )
 
 	Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -24,6 +18,14 @@ With minor fixes by John MacFarlane 2011 for lunamark.
 	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 	THE SOFTWARE.
+
+With minor fixes by John MacFarlane 2011 for lunamark:
+
+  * don't gobble space after tags
+  * make all tags lowercase
+  * made attribute names lowercase
+  * made strtil a bit faster
+
 --]]
 
 --[[

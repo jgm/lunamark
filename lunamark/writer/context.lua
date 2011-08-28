@@ -1,4 +1,5 @@
--- ConTeX writer for lunamark
+-- (c) 2009-2011 John MacFarlane, Khaled Hosny, Hans Hagen.
+-- Released under MIT license. See the file LICENSE in the source for details.
 
 local Tex = require("lunamark.writer.tex")
 local util = require("lunamark.util")

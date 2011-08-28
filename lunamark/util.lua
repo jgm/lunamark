@@ -1,3 +1,6 @@
+-- (c) 2009-2011 John MacFarlane.  Released under MIT license.
+-- See the file LICENSE in the source for details.
+
 -- some miscellaneous helper functions
 
 local M = {}

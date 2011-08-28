@@ -1,11 +1,5 @@
---[[
-Copyright (C) 2009-2011 John MacFarlane / Hans Hagen
-
-This is a complete rewrite of the lunamark 0.1 parser.  Hans Hagen
-helped a lot to make the parser faster, more robust, and less stack-hungry.
-The parser is also more accurate than before.
-
-]]--
+-- (c) 2009-2011 John MacFarlane, Hans Hagen.  Released under MIT license.
+-- See the file LICENSE in the source for details.
 
 local lpeg = require("lpeg")
 local entities = require("lunamark.entities")
