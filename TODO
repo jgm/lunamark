@@ -1,3 +1,6 @@
+* TODO Think about using module system and setting up libraries
+  in oop style - see htmlparser.lua - this would allow writers
+  to keep their own states better, and wd fit better with luadoc
 * TODO Make lunadoc.lua better and add doc comments to modules
 * TODO footnote extension
 * TODO definition list extension
