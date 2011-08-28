@@ -4,11 +4,12 @@
 local lunamark = require("lunamark")
 local alt_getopt = require("alt_getopt")
 
-local function ensure_one_of(s,ary)
+local function ensure_one_of(optval,s,ary)
   for i=1,#ary do
     if ary[i]==s then return true end
   end
-  lunamark.util.err(s .. " must be one of: " .. table.concat(ary,", "))
+  lunamark.util.err("Illegal value for " .. optval ..
+     "\nLegal values are: " .. table.concat(ary,", "))
 end
 
 local version = [[
@@ -74,8 +75,9 @@ end
 local from = optarg.f or "markdown"
 local to = optarg.t or "html"
 
-ensure_one_of(from, {"markdown","html"})
-ensure_one_of(from, {"markdown","html","html5","docbook","latex","context"})
+ensure_one_of("--from,-f", from, {"markdown","html"})
+ensure_one_of("--to,-t", to,
+  {"markdown","html","html5","docbook","latex","context"})
 
 local reader = lunamark.reader[from]
 if not reader then
@@ -117,7 +119,7 @@ end
 writer.options = extensions
 
 local layout = optarg["l"] or "default"
-ensure_one_of(layout,{"default","compact","minimize"})
+ensure_one_of("--layout,-l",layout,{"default","compact","minimize"})
 writer.containersep = writer.sep.container[layout]
 writer.interblocksep = writer.sep.interblock[layout]
 
