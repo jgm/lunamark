@@ -26,6 +26,7 @@ With minor fixes by John MacFarlane 2011 for lunamark:
   * made attribute names lowercase
   * made strtil a bit faster
   * supported compact attribute syntax
+  * fixed bug causing doubled letters in non-quoted attributes
 
 --]]
 
@@ -222,8 +223,6 @@ function Parser:attrvalue()
 		local lasttoken = self.thistoken
 		if self:canbe("['\"]") then
 			quotetoken = lasttoken
-		else
-			table.insert(s, lasttoken)
 		end
 	end
 	while true do
