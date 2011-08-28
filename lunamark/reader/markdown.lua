@@ -94,7 +94,14 @@ local function markdown(writer, options)
   local spaceornewline         = spacechar + newline
   local nonspacechar           = any - spaceornewline
   local tightblocksep          = P("\001")
-  local specialchar            = S("*_`&[]<!\\'\"-.")
+
+  local specialchar
+  if options.smart then
+    specialchar                = S("*_`&[]<!\\'\"-.")
+  else
+    specialchar                = S("*_`&[]<!\\")
+  end
+
   local normalchar             = any -
                                  (specialchar + spaceornewline + tightblocksep)
   local optionalspace          = spacechar^0
