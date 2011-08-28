@@ -4,6 +4,8 @@
 local htmlparser = require("lunamark.htmlparser")
 local entities = require("lunamark.entities")
 
+local M = {}
+
 local function convert_entities(s)
   return s:gsub("&#[Xx](%x+);", entities.hex_entity):gsub("&#(%d+);", entities.dec_entity):gsub("&(%a+);", entities.char_entity)
 end
@@ -123,15 +125,14 @@ local function handle_nodes(writer, nodes, preserve_space)
   return table.concat(output)
 end
 
-local function html(writer, options)
+function M.new(writer, options)
 
-  local function convert(inp)
+  return function(inp)
     local parser = htmlparser.new(inp)
     local parsed = parser:parse()
     return handle_nodes(writer, parsed)
   end
 
-  return convert
 end
-return html
 
+return M

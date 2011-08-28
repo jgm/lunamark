@@ -30,8 +30,8 @@ Simple usage example:
 
     local lunamark = require("lunamark")
     local opts = { }
-    local convert = lunamark.reader.markdown(lunamark.writer.html, opts)
-    print(convert("Here's my *text*"))
+    local parse = lunamark.reader.markdown.new(lunamark.writer.html, opts)
+    print(parse("Here's my *text*"))
 
 For a more complex example, see the source for the
 [lunamark executable](https://github.com/jgm/lunamark/blob/master/bin/lunamark).

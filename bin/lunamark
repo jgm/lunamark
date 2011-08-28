@@ -128,8 +128,8 @@ for i=optind,#arg do
   table.insert(args,arg[i])
 end
 
-local convert = reader(writer,{ smart = extensions.smart })
-local body, metadata = convert(lunamark.util.get_input(args,4))
+local parse = reader.new(writer,{ smart = extensions.smart })
+local body, metadata = parse(lunamark.util.get_input(args,4))
 
 local output = optarg.o
 io.output(output)
