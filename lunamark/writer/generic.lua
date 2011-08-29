@@ -15,7 +15,7 @@ setmetatable(W, meta)
 
 function M.new(options)
 
-  W.options = options
+  W.options = options or {}
 
   W.space = " "
 
