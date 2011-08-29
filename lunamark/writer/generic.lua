@@ -1,10 +1,8 @@
 -- (c) 2009-2011 John MacFarlane. Released under MIT license.
 -- See the file LICENSE in the source for details.
 
-module("lunamark.writer.generic",package.seeall)
-
 local util = require("lunamark.util")
-
+local M = {}
 local W = {}
 
 local meta = {}
@@ -15,7 +13,7 @@ meta.__index =
   end
 setmetatable(W, meta)
 
-function new(options)
+function M.new(options)
 
   W.options = options
 
@@ -35,3 +33,5 @@ function new(options)
 
   return util.table_copy(W)
 end
+
+return M
