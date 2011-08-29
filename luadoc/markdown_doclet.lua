@@ -16,7 +16,7 @@ I've suggested to the maintainers that they make this change.
 standard = require("luadoc.doclet.html")
 lunamark = require("lunamark")
 
-local writer = lunamark.writer.html
+local writer = lunamark.writer.html.new()
 local markdown = lunamark.reader.markdown.new(writer,{})
 
 local function markdownify(t)
