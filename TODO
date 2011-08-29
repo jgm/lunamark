@@ -1,7 +1,11 @@
-* TODO Use lua module system for writers
-  Use a new function instead of directly returning the table.
-  New can do a tablecopy, so we don't need to do it in the reader
-  or other writers.
+* TODO faqs say that 'module' has been deprecated for lua 5.2,
+  developers are encouraged to use a simple no-magic style.
+  Go back to the old way??
+  (hm, but what about luadoc etc.?)
+* TODO Stop using package.seeall in modules
+  it's more efficient, apparently, to set local variables outside
+  the module and use them, see the faqs.
+* TODO figure out what to do about the init.lua modules
 * TODO Luadoc documentation.
   (wd be nice to have a way to hack luadoc to use markdown - custom
   taglet?)
