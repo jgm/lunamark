@@ -397,22 +397,25 @@ function new(writer, options)
 
   local Ellipsis  = P("...") / writer.ellipsis
 
-  local Dash      = P("---") / writer.mdash
-                  + P("--") / writer.ndash
+  local Dash      = P("---") * -dash / writer.mdash
+                  + P("--") * -dash / writer.ndash
+                  + P("-") * #digit * lpeg.B(digit, 2) / writer.ndash
 
-  local DoubleQuoted = dquote * (Inline - dquote)^1 * dquote
+  local DoubleQuoted = dquote * Cs((Inline - dquote)^1) * dquote
                      / writer.doublequoted
 
   local squote_start = squote * -spacing
 
   local squote_end = squote * lpeg.B(nonspacechar, 2)
 
-  local SingleQuoted = squote_start * (Inline - squote_end)^1 * squote_end
+  local SingleQuoted = squote_start * Cs((Inline - squote_end)^1) * squote_end
                      / writer.singlequoted
+
+  local Apostrophe = squote * lpeg.B(nonspacechar, 2) / "’"
 
   local Smart
   if options.smart then
-    Smart         = Ellipsis + Dash + SingleQuoted + DoubleQuoted
+    Smart         = Ellipsis + Dash + SingleQuoted + DoubleQuoted + Apostrophe
   else
     Smart         = none
   end
