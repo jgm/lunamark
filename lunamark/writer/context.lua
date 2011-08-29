@@ -1,14 +1,14 @@
 -- (c) 2009-2011 John MacFarlane, Khaled Hosny, Hans Hagen.
 -- Released under MIT license. See the file LICENSE in the source for details.
 
-module("lunamark.writer.context", package.seeall)
+local M = {}
 
 local tex = require("lunamark.writer.tex")
 local util = require("lunamark.util")
 local gsub = string.gsub
 local format = string.format
 
-function new(options)
+function M.new(options)
   local ConTeXt = tex.new(options)
 
   -- we don't try to escape utf-8 characters in context
@@ -91,3 +91,5 @@ function new(options)
 
   return ConTeXt
 end
+
+return M

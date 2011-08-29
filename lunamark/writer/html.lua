@@ -1,7 +1,7 @@
 -- (c) 2009-2011 John MacFarlane. Released under MIT license.
 -- See the file LICENSE in the source for details.
 
-module("lunamark.writer.html", package.seeall)
+local M = {}
 
 local xml = require("lunamark.writer.xml")
 local util = require("lunamark.util")
@@ -9,7 +9,7 @@ local format = string.format
 
 local gsub = string.gsub
 
-function new(options)
+function M.new(options)
   local Html = xml.new(options)
 
   Html.linebreak = "<br/>"
@@ -94,3 +94,5 @@ function new(options)
 
   return Html
 end
+
+return M

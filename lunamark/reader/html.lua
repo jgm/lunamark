@@ -1,10 +1,10 @@
 -- (c) 2009-2011 John MacFarlane.  Released under MIT license.
 -- See the file LICENSE in the source for details.
 
-module("lunamark.reader.html", package.seeall)
-
 local htmlparser = require("lunamark.htmlparser")
 local entities = require("lunamark.entities")
+
+local M = {}
 
 local function convert_entities(s)
   return s:gsub("&#[Xx](%x+);", entities.hex_entity):gsub("&#(%d+);", entities.dec_entity):gsub("&(%a+);", entities.char_entity)
@@ -126,7 +126,7 @@ local function handle_nodes(writer, nodes, preserve_space)
 end
 
 --- Create a new html parser.
-function new(writer, options)
+function M.new(writer, options)
 
   return function(inp)
     local parser = htmlparser.new(inp)
@@ -135,3 +135,5 @@ function new(writer, options)
   end
 
 end
+
+return M

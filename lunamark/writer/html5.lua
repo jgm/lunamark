@@ -1,13 +1,13 @@
 -- (c) 2009-2011 John MacFarlane. Released under MIT license.
 -- See the file LICENSE in the source for details.
 
-module("lunamark.writer.html5", package.seeall)
+local M = {}
 
 local util = require("lunamark.util")
 local html = require("lunamark.writer.html")
 local format = string.format
 
-function new(options)
+function M.new(options)
   local Html5 = html.new(options)
 
   function Html5.section(s,level,contents)
@@ -20,3 +20,5 @@ function new(options)
 
   return Html5
 end
+
+return M

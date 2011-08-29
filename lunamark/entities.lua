@@ -1,12 +1,12 @@
 -- (c) 2009-2011 John MacFarlane.  Released under MIT license.
 -- See the file LICENSE in the source for details.
 
-module("lunamark.entities",package.seeall)
+local M = {}
 
 local bit = require("bit32")
 local band, bor, rshift = bit.band, bit.bor, bit.arshift
 
-character_entities = {
+M.character_entities = {
   ["quot"] = 0x0022,
   ["amp"] = 0x0026,
   ["apos"] = 0x0027,
@@ -258,7 +258,7 @@ character_entities = {
   ["diams"] = 0x2666,
 }
 
-function utf8encode(c)
+local function utf8encode(c)
    if c < 0x80 then
      return string.char(band(c,0x7F))
    elseif c < 0x0800 then
@@ -289,15 +289,17 @@ local function toutf8(n)
   end
 end
 
-function dec_entity(s)
+function M.dec_entity(s)
   return toutf8(tonumber(s))
 end
 
-function hex_entity(s)
+function M.hex_entity(s)
   return toutf8(tonumber("0x"..s))
 end
 
-function char_entity(s)
-  local n = character_entities[s]
+function M.char_entity(s)
+  local n = M.character_entities[s]
   return toutf8(n) 
 end
+
+return M

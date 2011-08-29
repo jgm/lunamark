@@ -1,13 +1,13 @@
 -- (c) 2009-2011 John MacFarlane. Released under MIT license.
 -- See the file LICENSE in the source for details.
 
-module("lunamark.writer.tex", package.seeall)
+local M = {}
 
 local gsub = string.gsub
 local generic = require("lunamark.writer.generic")
 local entities = require("lunamark.entities")
 
-function new(options)
+function M.new(options)
   local TeX = generic.new(options)
 
   TeX.sep = { interblock = {compact = "\n\n", default = "\n\n", minimal = "\n\n"},
@@ -77,3 +77,5 @@ function new(options)
 
   return TeX
 end
+
+return M

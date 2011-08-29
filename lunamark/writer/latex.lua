@@ -1,14 +1,14 @@
 -- (c) 2009-2011 John MacFarlane. Released under MIT license.
 -- See the file LICENSE in the source for details.
 
-module("lunamark.writer.latex", package.seeall)
+local M = {}
 
 local tex = require("lunamark.writer.tex")
 local util = require("lunamark.util")
 local gsub = string.gsub
 local format = string.format
 
-function new(options)
+function M.new(options)
   local LaTeX = tex.new(options)
 
   function LaTeX.code(s)
@@ -73,3 +73,5 @@ function new(options)
 
   return LaTeX
 end
+
+return M

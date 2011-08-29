@@ -1,12 +1,12 @@
 -- (c) 2009-2011 John MacFarlane. Released under MIT license.
 -- See the file LICENSE in the source for details.
 
-module("lunamark.writer.xml", package.seeall)
+local M = {}
 
 local gsub = string.gsub
 local generic = require("lunamark.writer.generic")
 
-function new(options)
+function M.new(options)
   local Xml = generic.new(options)
 
   Xml.linebreak = "<linebreak />"
@@ -49,3 +49,5 @@ function new(options)
 
   return Xml
 end
+
+return M

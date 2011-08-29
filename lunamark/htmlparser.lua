@@ -61,12 +61,12 @@ these nodes can be of either type objects:
 
 --]]
 
-module('lunamark.htmlparser', package.seeall)
+local M = {}
 
 Parser = {}
 Parser.__index = Parser
 
-function new(page)
+function M.new(page)
 	local p = {
 		lasttoken = '';
 		thistoken = '';
@@ -501,7 +501,7 @@ end
 
 -- TODO - turn this into an instance method of the nodes' meta table
 -- pretty printer while I'm here
-function prettyprint(tree, tab, write)
+function M.prettyprint(tree, tab, write)
 	write = write or io.write
 	tab = tab or 0
 	local tabstr = string.rep('\t',tab)
@@ -544,14 +544,14 @@ function prettyprint(tree, tab, write)
 	end
 end
 
-function debugprintnode(k, n, tab)
+function M.debugprintnode(k, n, tab)
 	print(string.rep('\t',tab),k,'=>',n)
 	if type(n) == 'table' then
 		debugprint(n, tab+1)
 	end
 end
 
-function debugprint(tree, tab)
+function M.debugprint(tree, tab)
 	tab = tab or 0
 	for k,n in pairs(tree) do
 		-- technically this'll miss any numbers that are set beyond the largest contiguous 1-based index...
@@ -564,3 +564,6 @@ function debugprint(tree, tab)
 	end
 end
 
+M.Parser = Parser
+
+return M

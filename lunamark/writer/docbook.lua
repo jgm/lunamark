@@ -1,14 +1,14 @@
 -- (c) 2009-2011 John MacFarlane. Released under MIT license.
 -- See the file LICENSE in the source for details.
 
-module("lunamark.writer.docbook", package.seeall)
+local M = {}
 
 local xml = require("lunamark.writer.xml")
 local util = require("lunamark.util")
 local gsub = string.gsub
 local format = string.format
 
-function new(options)
+function M.new(options)
   local Docbook = xml.new(options)
 
   Docbook.linebreak = "<literallayout>&#xA;</literallayout>"
@@ -91,3 +91,5 @@ function new(options)
 
   return Docbook
 end
+
+return M
