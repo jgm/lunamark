@@ -22,16 +22,16 @@ local function extract_comments(f)
   return table.concat(commentlines,"\n")
 end
 
-local converter = lunamark.reader.markdown(lunamark.writer.html,{smart=true})
+local converter = lunamark.reader.markdown.new(lunamark.writer.html.new(),{smart=true})
 
 for i=1,#arg do
   local f = arg[i]
   local comments = extract_comments(f)
   local modname = f:gsub("%.lua$",""):gsub("/",".")
   local inp = lunamark.util.get_input(comments)
-  io.write("<h2 id=" .. modname .. ">" .. modname .. "</h2>\n\n")
+  io.write("<div id=\"" .. modname .. "\">\n<h1>" .. modname .. "</h1>\n")
   io.write(converter(inp))
-  io.write("\n\n")
+  io.write("\n</div>\n\n")
 end
 
 
