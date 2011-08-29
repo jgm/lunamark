@@ -1,11 +1,19 @@
 # Lunamark
 
 Lunamark is a lua library for conversion between markup
-formats. Currently markdown is the only supported input
-format, and HTML, Docbook, ConTeXt and LaTeX are the supported output
-formats.  But lunamark's modular architecture makes it
+formats. Currently Markdown and HTML are the only supported input
+formats, and HTML, Docbook, ConTeXt and LaTeX are the supported output
+formats, but lunamark's modular architecture makes it
 easy to add new parsers and writers. Parsers are written
 using a PEG grammar.
+
+Lunamark's Markdown parser currently supports the following
+extensions (which can be turned on or off individually):
+
+  - Smart typography (fancy quotes, dashes, ellipses)
+  - Significant start numbers in ordered lists
+
+More extensions will be supported in later versions.
 
 The library is as portable as lua and has very good performance.
 It is slightly faster than the author's own C library
