@@ -84,7 +84,7 @@ if not reader then
   lunamark.util.err("Unknown reader: " .. tostring(from), 3)
 end
 
-local writer = lunamark.writer[to]
+local writer = lunamark.writer[to].new()
 if not writer then
   lunamark.util.err("Unknown writer: " .. tostring(to), 5)
 end
