@@ -7,10 +7,8 @@ local gsub = string.gsub
 local generic = require("lunamark.writer.generic")
 local entities = require("lunamark.entities")
 
-function new()
-  local TeX = generic.new()
-
-  TeX.options = { containers = false }
+function new(options)
+  local TeX = generic.new(options)
 
   TeX.sep = { interblock = {compact = "\n\n", default = "\n\n", minimal = "\n\n"},
                container = { compact = "\n", default = "\n", minimal = "\n"}
@@ -21,8 +19,6 @@ function new()
   TeX.containersep = TeX.sep.container.default
 
   TeX.linebreak = "\\\\"
-
-  TeX.space = " "
 
   TeX.ellipsis = "\ldots{}"
 
@@ -69,14 +65,6 @@ function new()
     return s:gsub(".",TeX.escaped):gsub("\226\128.",escaped_utf8_triplet):gsub("\194\160","~")
   end
 
-  function TeX.start_document()
-    return ""
-  end
-
-  function TeX.stop_document()
-    return ""
-  end
-
   function TeX.inline_html(s)
   end
 
@@ -84,10 +72,6 @@ function new()
   end
 
   function TeX.paragraph(s)
-    return s
-  end
-
-  function TeX.plain(s)
     return s
   end
 

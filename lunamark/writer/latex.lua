@@ -8,10 +8,8 @@ local util = require("lunamark.util")
 local gsub = string.gsub
 local format = string.format
 
-function new()
-  local LaTeX = tex.new()
-
-  LaTeX.options = { }
+function new(options)
+  local LaTeX = tex.new(options)
 
   function LaTeX.code(s)
     return format("\\texttt{%s}", LaTeX.string(s))

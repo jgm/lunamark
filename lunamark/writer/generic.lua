@@ -15,6 +15,23 @@ meta.__index =
   end
 setmetatable(W, meta)
 
-function new()
+function new(options)
+
+  W.options = options
+
+  W.space = " "
+
+  function W.start_document()
+    return ""
+  end
+
+  function W.stop_document()
+    return ""
+  end
+
+  function W.plain(s)
+    return s
+  end
+
   return util.table_copy(W)
 end

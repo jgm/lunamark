@@ -6,10 +6,8 @@ module("lunamark.writer.xml", package.seeall)
 local gsub = string.gsub
 local generic = require("lunamark.writer.generic")
 
-function new()
-  local Xml = generic.new()
-
-  Xml.options = { containers = false }
+function new(options)
+  local Xml = generic.new(options)
 
   Xml.linebreak = "<linebreak />"
 
@@ -20,8 +18,6 @@ function new()
   Xml.interblocksep = Xml.sep.interblock.default
 
   Xml.containersep = Xml.sep.container.default
-
-  Xml.space = " "
 
   Xml.ellipsis = "&#8230;"
 
@@ -47,18 +43,6 @@ function new()
 
   function Xml.string(s)
     return s:gsub(".",escaped)
-  end
-
-  function Xml.start_document()
-    return ""
-  end
-
-  function Xml.stop_document()
-    return ""
-  end
-
-  function Xml.plain(s)
-    return s
   end
 
   return Xml

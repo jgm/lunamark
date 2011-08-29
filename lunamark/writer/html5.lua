@@ -7,8 +7,8 @@ local util = require("lunamark.util")
 local html = require("lunamark.writer.html")
 local format = string.format
 
-function new()
-  local Html5 = html.new()
+function new(options)
+  local Html5 = html.new(options)
 
   function Html5.section(s,level,contents)
     if Html5.options.containers then

@@ -9,10 +9,8 @@ local format = string.format
 
 local gsub = string.gsub
 
-function new()
-  local Html = xml.new()
-
-  Html.options = { containers = false }
+function new(options)
+  local Html = xml.new(options)
 
   Html.linebreak = "<br/>"
 

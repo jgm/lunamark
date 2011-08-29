@@ -8,10 +8,8 @@ local util = require("lunamark.util")
 local gsub = string.gsub
 local format = string.format
 
-function new()
-  local Docbook = xml.new()
-
-  Docbook.options = { blanklines = true, }
+function new(options)
+  local Docbook = xml.new(options)
 
   Docbook.linebreak = "<literallayout>&#xA;</literallayout>"
 

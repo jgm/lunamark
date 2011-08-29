@@ -8,10 +8,8 @@ local util = require("lunamark.util")
 local gsub = string.gsub
 local format = string.format
 
-function new()
-  local ConTeXt = tex.new()
-
-  ConTeXt.options = { }
+function new(options)
+  local ConTeXt = tex.new(options)
 
   -- we don't try to escape utf-8 characters in context
   function ConTeXt.string(s)
