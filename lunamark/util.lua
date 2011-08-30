@@ -3,14 +3,10 @@
 
 local M = {}
 
---[[|
-## find_template(name, format)
-
-Find a template and return its string contents.
-If the template has no extension, an extension
-is added based on the writer name.  Look first in ., then in
-templates, then in ~/.lunamark/templates, then in APPDATA.
---]]
+--- Find a template and return its string contents.
+-- If the template has no extension, an extension
+-- is added based on the writer name.  Look first in ., then in
+-- templates, then in ~/.lunamark/templates, then in APPDATA.
 function M.find_template(name, format)
   if not name then name = "default" end
   local base, ext = name:match("([^%.]*)(.*)")
@@ -39,19 +35,15 @@ function M.find_template(name, format)
   end
 end
 
---[[|
-## fill_template(template, dict)
-
-Fill a template with data from a dictionary.
-Templates recognize the following constructs:
-
-* `${var}` - gets filled with the value of `dict[var]`
-* `$[if foo]{yes}{no}` - `yes` if `foo` is true and not an empty array.
-  The `{no}` part may be omitted.
-* `$[for x in foo]{blah ${x}[, ]}` - prints `blah ${...}` for every
-  value of `foo`, interposing `, `.  The interposed part may be
-  omitted.
---]]
+--- Fill a template with data from a dictionary.
+-- Templates recognize the following constructs:
+--
+-- * `${var}` - gets filled with the value of `dict[var]`
+-- * `$[if foo]{yes}{no}` - `yes` if `foo` is true and not an empty array.
+--   The `{no}` part may be omitted.
+-- * `$[for x in foo]{blah ${x}[, ]}` - prints `blah ${...}` for every
+--   value of `foo`, interposing `, `.  The interposed part may be
+--   omitted.
 function M.fill_template(template, dict)
   local function adjust_cond(s)
     return string.gsub(tostring(s),"^{\n?",""):gsub("\n?}$","")
@@ -107,21 +99,13 @@ function M.extend(prototype)
 end
 --]]
 
---[[|
-## err(msg, exit_code)
-
-Print error message and exit.
---]]
+--- Print error message and exit.
 function M.err(msg, exit_code)
   io.stderr:write("lunamark: " .. msg .. "\n")
   os.exit(exit_code or 1)
 end
 
---[[|
-## table_copy(t)
-
-Shallow table copy including metatables.
---]]
+--- Shallow table copy including metatables.
 function M.table_copy(t)
   local u = { }
   for k, v in pairs(t) do u[k] = v end
@@ -139,16 +123,12 @@ local function expand_tabs_in_line(s, tabstop)
         end))
 end
 
---[[|
-## get_input(inp, tabstop)
-
-Get input, converting line endings to LF and optionally expanding tabs.
-(Tabs are expanded if the optional tabstop argument is provided.)
-If inp is a string, input is a string.
-If inp is a nonempty array, elements are assumed to be
-filenames and input is taken from them in sequence.
-Otherwise, the current input handle is used.
---]]
+--- Get input, converting line endings to LF and optionally expanding tabs.
+-- (Tabs are expanded if the optional tabstop argument is provided.)
+-- If inp is a string, input is a string.
+-- If inp is a nonempty array, elements are assumed to be
+-- filenames and input is taken from them in sequence.
+-- Otherwise, the current input handle is used.
 function M.get_input(inp, tabstop)
   local buffer = {}
   local tabstop = 4
