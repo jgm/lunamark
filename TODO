@@ -1,5 +1,10 @@
-* TODO docs - use lunadoc?
+* TODO add hooks for custom parsers to reader
+* TODO use these hooks to implement a link @mymodule#myfun syntax
+  in lunadoc.
+* TODO polish lunadoc, add to rock?
+* TODO document with lunadoc.
 * TODO in writers, construct table outside new function, more efficient?
+* TODO profile
 * TODO footnote extension
 * TODO definition list extension
 * TODO fenced code block extension
