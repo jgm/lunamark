@@ -3,6 +3,9 @@
 
 local M = {}
 
+local rep  = string.rep
+local insert = table.insert
+
 --- Find a template and return its string contents.
 -- If the template has no extension, an extension
 -- is added based on the writer name.  Look first in ., then in
@@ -45,15 +48,20 @@ end
 --   value of `foo`, interposing `, `.  The interposed part may be
 --   omitted.
 function M.fill_template(template, dict)
-  local function adjust_cond(s)
-    return string.gsub(tostring(s),"^{\n?",""):gsub("\n?}$","")
-  end
-  local function conditional(test,yes,no)
+  local function conditional(neg,test,body)
     local cond = dict[test]
-    if cond and not (type(cond) == "table" and #cond == 0) then
-      return adjust_cond(yes)
+    if cond and type(cond) == "table" and #cond == 0 then
+      cond = false  -- count 0-length array as false
+    end
+    if neg == "!" then
+      cond = not dict[test]
+    else
+      cond = dict[test]
+    end
+    if cond then
+      return M.fill_template(body:gsub("^{\n?",""):gsub("\n?}$",""), dict)
     else -- count 0-length array as false
-      return (no == nil and "") or adjust_cond(no)
+      return ""
     end
   end
   local function adjust_for(s)
@@ -69,7 +77,9 @@ function M.fill_template(template, dict)
     local between = contents:match("%b[]}$")
     between = (not between and "") or between:sub(2, #between - 2)
     for i=1,#items do
-      result = result .. M.fill_template(cont, { [var] = items[i] })
+      local tempdict = M.extend(dict)
+      tempdict[var] = items[i]
+      result = result .. M.fill_template(cont, tempdict)
       if i ~= #items then
         result = result .. between
       end
@@ -84,7 +94,7 @@ function M.fill_template(template, dict)
       return ""
     end
   end
-  return template:gsub("%$%[if%s+(%a+)%]%s*(%b{})(%b{})", conditional):gsub("%$%[if%s+(%a+)%]%s*(%b{})", conditional):gsub("%$%[for%s+(%a+)%s+in%s+(%a+)%](%b{})", forloop):gsub("%${(%a+)}", subvars)
+  return template:gsub("%$%[if%s+(%!?)(%a+)%]%s*(%b{})", conditional):gsub("%$%[for%s+(%a+)%s+in%s+(%a+)%](%b{})", forloop):gsub("%${(%a+)}", subvars)
 end
 
 --[[
@@ -116,10 +126,10 @@ end
 local function expand_tabs_in_line(s, tabstop)
   local tab = tabstop or 4
   local corr = 0
-  return (string.gsub(s, "()\t", function(p)
+  return (s:gsub("()\t", function(p)
           local sp = tab - (p - 1 + corr)%tab
           corr = corr - 1 + sp
-          return string.rep(" ",sp)
+          return rep(" ",sp)
         end))
 end
 
@@ -136,9 +146,9 @@ function M.get_input(inp, tabstop)
   local function addlines(iterator)
     for line in iterator do
       if tabstop then
-        table.insert(buffer, expand_tabs_in_line(line,tabstop))
+        insert(buffer, expand_tabs_in_line(line,tabstop))
       else
-        table.insert(buffer, line)
+        insert(buffer, line)
       end
     end
   end
@@ -154,7 +164,7 @@ function M.get_input(inp, tabstop)
     addlines(io.lines())
   end
   -- need blank line at end to emulate Markdown.pl
-  table.insert(buffer, "\n")
+  insert(buffer, "\n")
   return table.concat(buffer,"\n")
 end
 
