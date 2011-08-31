@@ -6,7 +6,7 @@ local M = {}
 local bit = require("bit32")
 local band, bor, rshift = bit.band, bit.bor, bit.arshift
 
-M.character_entities = {
+local character_entities = {
   ["quot"] = 0x0022,
   ["amp"] = 0x0026,
   ["apos"] = 0x0027,
@@ -298,8 +298,8 @@ function M.hex_entity(s)
 end
 
 function M.char_entity(s)
-  local n = M.character_entities[s]
-  return toutf8(n) 
+  local n = character_entities[s]
+  return toutf8(n)
 end
 
 return M
