@@ -1,3 +1,4 @@
+* note: get_input takes about 0.05 seconds out of 0.3
 * TODO add hooks for custom parsers to reader
 * TODO use these hooks to implement a link @mymodule#myfun syntax
   in lunadoc.
