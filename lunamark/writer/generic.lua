@@ -31,7 +31,7 @@ function M.new(options)
     return s
   end
 
-  return util.table_copy(W)
+  return util.extend(W)
 end
 
 return M
