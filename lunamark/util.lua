@@ -97,8 +97,7 @@ function M.fill_template(template, dict)
   return template:gsub("%$%[if%s+(%!?)(%a+)%]%s*(%b{})", conditional):gsub("%$%[for%s+(%a+)%s+in%s+(%a+)%](%b{})", forloop):gsub("%${(%a+)}", subvars)
 end
 
---[[
--- extend(t) returns a table that falls back to t for non-found values
+--- extend(t) returns a table that falls back to t for non-found values
 function M.extend(prototype)
   local newt = {}
   local metat = { __index = function(t,key)
@@ -107,7 +106,6 @@ function M.extend(prototype)
   setmetatable(newt, metat)
   return newt
 end
---]]
 
 --- Print error message and exit.
 function M.err(msg, exit_code)
