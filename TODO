@@ -1,10 +1,14 @@
 * note: get_input takes about 0.05 seconds out of 0.3
+  Can we remove the need for it?  Handle tabs in the parsers.
+  Option for line endings, so we don't need to check for both
+  at each newline?
 * TODO add hooks for custom parsers to reader
 * TODO use these hooks to implement a link @mymodule#myfun syntax
   in lunadoc.
 * TODO polish lunadoc, add to rock?
 * TODO document with lunadoc.
 * TODO in writers, construct table outside new function, more efficient?
+* TODO try using extend instead of table_copy, does it make a difference?
 * TODO profile
 * TODO footnote extension
 * TODO definition list extension
