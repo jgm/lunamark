@@ -130,7 +130,21 @@ for i=optind,#arg do
 end
 
 local parse = reader.new(writer,{ smart = extensions.smart })
-local body, metadata = parse(lunamark.util.get_input(args,4))
+
+local inp
+if #args == 0 then
+  inp = io.read("*all") .. "\n"
+else
+  inpt = {}
+  for _,f in ipairs(args) do
+    io.input(f)
+    table.insert(inpt, io.read("*all"))
+  end
+  inp = table.concat(inpt, "\n") .. "\n"
+end
+inp = inp:gsub("\r\n","\n") -- convert DOS line endings
+
+local body, metadata = parse(inp)
 
 local output = optarg.o
 io.output(output)
