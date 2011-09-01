@@ -42,8 +42,9 @@ EXTENSIONS is a comma-separated list of extensions, each optionally prefixed
 by + (enable) or - (disable).  The following extensions are defined,
 with the default setting given in parentheses:
   (-) containers    Put sections in containers (e.g. div or section tags)
-  (+) startnum      Start number of an ordered list is significant 
+  (+) startnum      Start number of an ordered list is significant
   (-) smart         Smart typography (quotes, dashes, ellipses)
+  (-) preservetabs  Don't expand tabs to spaces
 ]]
 
 local long_opts = {
@@ -94,6 +95,7 @@ local extensions = {  -- defaults
   containers = false,
   startnum = true,
   smart = false,
+  preservetabs = false,
 }
 
 if optarg["0"] then
@@ -129,7 +131,7 @@ for i=optind,#arg do
   table.insert(args,arg[i])
 end
 
-local parse = reader.new(writer,{ smart = extensions.smart })
+local parse = reader.new(writer, extensions)
 
 local inp
 if #args == 0 then
