@@ -1,16 +1,18 @@
 -- (c) 2009-2011 John MacFarlane, Hans Hagen.  Released under MIT license.
 -- See the file LICENSE in the source for details.
 
+local util = require("lunamark.util")
 local lpeg = require("lpeg")
 local entities = require("lunamark.entities")
 local lower, upper, gsub, rep, gmatch, format, length =
   string.lower, string.upper, string.gsub, string.rep, string.gmatch,
   string.format, string.len
 local concat = table.concat
-local P, R, S, V, C, Ct, Cg, Cb, Cmt, Cc, Cf, Cs =
+local P, R, S, V, C, Ct, Cg, Cb, Cmt, Cc, Cf, Cs, B =
   lpeg.P, lpeg.R, lpeg.S, lpeg.V, lpeg.C, lpeg.Ct, lpeg.Cg, lpeg.Cb,
-  lpeg.Cmt, lpeg.Cc, lpeg.Cf, lpeg.Cs
+  lpeg.Cmt, lpeg.Cc, lpeg.Cf, lpeg.Cs, lpeg.B
 local lpegmatch = lpeg.match
+local expand_tabs_in_line = util.expand_tabs_in_line
 
 local M = {}
 
@@ -19,6 +21,14 @@ local M = {}
 function M.new(writer, options)
 
   if not options then options = {} end
+
+  local function expandtabs(s)
+    if not options.preservetabs and s:find("\t") then
+      return s:gsub("[^\n]*",expand_tabs_in_line)
+    else
+      return s
+    end
+  end
 
   ------------------------------------------------------------------------------
 
@@ -111,7 +121,8 @@ function M.new(writer, options)
   local spaces                 = spacechar^1
   local eof                    = - any
   local nonindentspace         = space^-3 * - spacechar
-  local indent                 = fourspaces + (nonindentspace * tab) / ""
+  local indent                 = space^-3 * tab
+                               + fourspaces / ""
   local linechar               = P(1 - newline)
 
   local blankline              = optionalspace * newline / "\n"
@@ -145,17 +156,17 @@ function M.new(writer, options)
 
   local bulletchar = plus + asterisk + dash
 
-  local bullet     = ( bulletchar * #spacing * space^-3
-                     + space * bulletchar * #spacing * space^-2
-                     + space * space * bulletchar * #spacing * space^-1
+  local bullet     = ( bulletchar * #spacing * (tab + space^-3)
+                     + space * bulletchar * #spacing * (tab + space^-2)
+                     + space * space * bulletchar * #spacing * (tab + space^-1)
                      + space * space * space * bulletchar * #spacing
                      ) * -bulletchar
 
   local enumerator = digit^3 * period * #spacing
-                   + digit^2 * period * #spacing * space^1
-                   + digit * period * #spacing * space^-2
+                   + digit^2 * period * #spacing * (tab + space^1)
+                   + digit * period * #spacing * (tab + space^-2)
                    + space * digit^2 * period * #spacing
-                   + space * digit * period * #spacing * space^-1
+                   + space * digit * period * #spacing * (tab + space^-1)
                    + space * space * digit^1 * period * #spacing
 
   -----------------------------------------------------------------------------
@@ -399,19 +410,19 @@ function M.new(writer, options)
 
   local Dash      = P("---") * -dash / writer.mdash
                   + P("--") * -dash / writer.ndash
-                  + P("-") * #digit * lpeg.B(digit, 2) / writer.ndash
+                  + P("-") * #digit * B(digit, 2) / writer.ndash
 
   local DoubleQuoted = dquote * Cs((Inline - dquote)^1) * dquote
                      / writer.doublequoted
 
   local squote_start = squote * -spacing
 
-  local squote_end = squote * lpeg.B(nonspacechar, 2)
+  local squote_end = squote * B(nonspacechar, 2)
 
   local SingleQuoted = squote_start * Cs((Inline - squote_end)^1) * squote_end
                      / writer.singlequoted
 
-  local Apostrophe = squote * lpeg.B(nonspacechar, 2) / "’"
+  local Apostrophe = squote * B(nonspacechar, 2) / "’"
 
   local Smart
   if options.smart then
@@ -440,7 +451,7 @@ function M.new(writer, options)
 
   -- parse many p between starter and ender
   local function between(p, starter, ender)
-      local ender2 = lpeg.B(nonspacechar) * ender
+      local ender2 = B(nonspacechar) * ender
       return (starter * #nonspacechar * Cs(p * (p - ender2)^0) * ender2)
   end
 
@@ -498,10 +509,11 @@ function M.new(writer, options)
 
   local Block          = V("Block")
 
-  local DisplayHtml    = C(displayhtml) / writer.display_html
+  local DisplayHtml    = C(displayhtml) / expandtabs / writer.display_html
 
-  local Verbatim       = Cs((blanklines * (indentedline - blankline)^1)^1)
-                       / writer.verbatim
+  local Verbatim       = Cs( (blanklines
+                           * ((indentedline - blankline))^1)^1
+                           ) / expandtabs / writer.verbatim
 
   -- strip off leading > and indents, and run through docparser
   local Blockquote     = Cs((
