@@ -71,39 +71,4 @@ function M.expand_tabs_in_line(s, tabstop)
         end))
 end
 
---- Get input, converting line endings to LF and optionally expanding tabs.
--- (Tabs are expanded if the optional tabstop argument is provided.)
--- If inp is a string, input is a string.
--- If inp is a nonempty array, elements are assumed to be
--- filenames and input is taken from them in sequence.
--- Otherwise, the current input handle is used.
-function M.get_input(inp, tabstop)
-  local buffer = {}
-  local tabstop = 4
-  local inptype = type(inp)
-  local function addlines(iterator)
-    for line in iterator do
-      if tabstop then
-        insert(buffer, expand_tabs_in_line(line,tabstop))
-      else
-        insert(buffer, line)
-      end
-    end
-  end
-  if inptype == "table" and #inp > 0 then
-    for _,f in ipairs(inp) do
-      addlines(io.lines(f))
-    end
-  elseif inptype == "string" then
-    local s = inp
-    if not s:find("\n$") then s = s.."\n" end
-    addlines(s:gfind("([^\r\n]*)\r?\n"))
-  else
-    addlines(io.lines())
-  end
-  -- need blank line at end to emulate Markdown.pl
-  insert(buffer, "\n")
-  return table.concat(buffer,"\n")
-end
-
 return M
