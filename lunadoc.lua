@@ -9,7 +9,8 @@
 --
 -- Documentation is parsed as markdown.
 
-lunamark = require("lunamark")
+local lunamark = require("lunamark")
+local cosmo = require("cosmo")
 
 local destdir = "doc"
 
@@ -42,26 +43,26 @@ end
 local template = [[
 <html>
 <head>
-<title>${modname}</title>
+<title>$modname</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <link rel="stylesheet" href="lunadoc.css" type="text/css" />
 </head>
 <body>
 <div id="content">
-<h1 class="module">${modname}</h1>
-${contents}
+<h1 class="module">$modname</h1>
+$contents
 </div>
 <div id="index">
-${index}
+$index
 </div>
 </body>
 </html>
 ]]
 
 local funtemplate = [[
-<div id="${id}">
-<h2 class="function">${name}</h2>
-${contents}
+<div id="$id">
+<h2 class="function">$name</h2>
+$contents
 </div>
 ]]
 
@@ -97,13 +98,13 @@ for i=1,#arg do
     local funid = fun and fun:match("^[^%(]*")
     local inp = lunamark.util.get_input(chunk.contents)
     if fun then
-      local funtext = funtemplate:gsub("${(%w+)}", { name = fun, id = funid, contents = converter(inp) })
+      local funtext = cosmo.fill(funtemplate, { name = fun, id = funid, contents = converter(inp) })
       table.insert(funs, funtext)
     else
       table.insert(funs, converter(inp))
     end
   end
-  local page = template:gsub("${(%w+)}",{ modname = modname, index = index, contents = table.concat(funs) })
+  local page = cosmo.fill(template, { modname = modname, index = index, contents = table.concat(funs) })
   local file = io.open(destdir .. "/" .. modname .. ".html", "w")
   file:write(page)
   file:close()
