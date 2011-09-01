@@ -144,7 +144,7 @@ else
   end
   inp = table.concat(inpt, "\n") .. "\n"
 end
-if inp:find("\r") then
+if inp:find("\r",1,true) then
   inp = inp:gsub("\r\n","\n") -- convert DOS line endings
 end
 
