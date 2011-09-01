@@ -25,12 +25,12 @@
 \setlength{\emergencystretch}{3em}  % prevent overfull lines
 \setcounter{secnumdepth}{0}
 
-\title{${title}}
+\title{$title}
 
 \begin{document}
 
-$[if title]{\maketitle}
-
-${body}
+$if{ title }[[\maketitle
+]]
+$body
 
 \end{document}
