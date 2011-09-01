@@ -1,3 +1,5 @@
+#!/usr/bin/env lua
+
 --- This program reads a number of source files, scans them
 -- for special comment blocks beginning with '---', and writes
 -- an HTML file documenting each module to the doc directory.
