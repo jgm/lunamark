@@ -144,7 +144,9 @@ else
   end
   inp = table.concat(inpt, "\n") .. "\n"
 end
-inp = inp:gsub("\r\n","\n") -- convert DOS line endings
+if inp:find("\r") then
+  inp = inp:gsub("\r\n","\n") -- convert DOS line endings
+end
 
 local body, metadata = parse(inp)
 
