@@ -95,8 +95,7 @@ function M.new(writer, options)
   local spacechar              = S("\t ")
   local spacing                = S(" \n\r\t")
   local newline                = P("\n")
-  local spaceornewline         = spacechar + newline
-  local nonspacechar           = any - spaceornewline
+  local nonspacechar           = any - spacing
   local tightblocksep          = P("\001")
 
   local specialchar
@@ -107,7 +106,7 @@ function M.new(writer, options)
   end
 
   local normalchar             = any -
-                                 (specialchar + spaceornewline + tightblocksep)
+                                 (specialchar + spacing + tightblocksep)
   local optionalspace          = spacechar^0
   local spaces                 = spacechar^1
   local eof                    = - any
