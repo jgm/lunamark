@@ -2,7 +2,6 @@
 -- See the file LICENSE in the source for details.
 
 local M = {}
-
 local rep  = string.rep
 local insert = table.insert
 
@@ -62,7 +61,7 @@ function M.table_copy(t)
 end
 
 -- from Programming Lua
-local function expand_tabs_in_line(s, tabstop)
+function M.expand_tabs_in_line(s, tabstop)
   local tab = tabstop or 4
   local corr = 0
   return (s:gsub("()\t", function(p)
