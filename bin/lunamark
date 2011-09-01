@@ -3,6 +3,7 @@
 
 local lunamark = require("lunamark")
 local alt_getopt = require("alt_getopt")
+local cosmo = require("cosmo")
 
 local function ensure_one_of(optval,s,ary)
   for i=1,#ary do
@@ -148,7 +149,8 @@ if template then
   data.body = body
   data.timestamp = os.date("%Y-%m-%d %X")
   data.sources = args
-  local result = lunamark.util.fill_template(contents, data)
+  data["if"] = cosmo.cif  -- this activates the "if" keyword
+  local result = cosmo.fill(contents, data)
   io.write(result)
 else
   io.write(body)
