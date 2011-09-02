@@ -1,4 +1,3 @@
-* TODO add hooks for custom parsers to reader
 * TODO use these hooks to implement a link @mymodule#myfun syntax
   in lunadoc.
 * TODO polish lunadoc, add to rock?
