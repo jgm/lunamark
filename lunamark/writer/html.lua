@@ -20,7 +20,7 @@ function M.new(options)
 
   function Html.link(lab,src,tit)
     local titattr
-    if tit and string.len(tit) > 0
+    if type(tit) == "string" and #tit > 0
        then titattr = format(" title=\"%s\"", Html.string(tit))
        else titattr = ""
        end
@@ -29,7 +29,7 @@ function M.new(options)
 
   function Html.image(lab,src,tit)
     local titattr, altattr
-    if tit and string.len(tit) > 0
+    if type(tit) == "string" and #tit > 0
        then titattr = format(" title=\"%s\"", Html.string(tit))
        else titattr = ""
        end
