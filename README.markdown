@@ -19,6 +19,16 @@ The library is as portable as lua and has very good performance.
 It is slightly faster than the author's own C library
 [peg-markdown](http://github.com/jgm/peg-markdown).
 
+Benchmarks (converting a 685K test file consisting of 25 copies of
+the markdown syntax documentation concatenated together):
+
+* `discount` 0.082s
+* `lunamark` 0.254s
+* `peg-markdown` 0.321s
+* `pandoc --strict` 1.748s
+* `Markdown.pl` (1.0.2b8) 15.084s
+* `markdown.lua` 3m6.997s
+
 ## Installing
 
 Lunamark can be installed using [luarocks](http://www.luarocks.org):
