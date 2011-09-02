@@ -1,66 +1,44 @@
 * TODO use these hooks to implement a link @mymodule#myfun syntax
   in lunadoc.
-* TODO polish lunadoc, add to rock?
+* TODO add command-line arguments to lunadoc
+* TODO add templates for lunadoc (html, latex using cosmo)
+* TODO add documentation for lunadoc
+* TODO add lunadoc to rock?
 * TODO document with lunadoc.
+
 * TODO in writers, construct table outside new function, more efficient?
+
 * TODO footnote extension
 * TODO definition list extension
 * TODO fenced code block extension
 * TODO pandoc title block extension
 * TODO other metadata?
 * TODO math extension
+
+* TODO escaping in tex more complicated;
+  don't escape in code blocks;
+  urls
+
 * TODO add library documentation
   - all writers have common set of functions, which can be documented once
   - then we need a list of writers + descriptions + information on options
   - readers just export one function, which again can be documented once
     + info on options
   - lunamark.util exports several functions which need documentation
+* TODO add config file?
+* TODO add command line option to set metadata for template
+  like pandoc's --variable (perhaps -m author="Blah blah")
+* TODO add groff man writer and template
 * TODO add man page
+
 * TODO # in ordered lists extension
-* TODO gh-pages website
-* TODO indentation options?
+* TODO gh-pages website (at least README, library API, benchmarks)
+
+* TODO layout: indentation options?
 * TODO Add metadata, return table as second value
-* TODO escaping in tex more complicated;
-  don't escape in code blocks;
-  urls
 * TODO latex reader - write peg
 * TODO mathml - look at pandoc2?
-* TODO make parser user-modifiable (as in v1)
-  Good thought.  I've done something similar.  You can now pass in a
-  modify_syntax function as an option.  This is a function from a table
-  to a table, so you can perform arbitrary transformations on the input
-  format grammar.  A simple example:
-  
-      function capify(t)
-        t.Str = t.Str / string.upper
-        return t
-      end
-  
-      markdown2htmlCAPS = lunamark.converter("markdown", "html", { modify_syntax = capify })
-  
-  This gives you a markdown variant in which all strings are capitalized.
-  
-  Adding a handler for, say, wikilinks would be slightly more complicated.
-  You'd have to do two things to the grammar table:
-  (1) insert an entry for WikiLink
-  (2) register WikiLink as an Inline element by modifying Inline
-  
-  So, something like this:
-  
-      function add_wikilink(t)
-        t.WikiLink = --[[ whatever... ]] / write_wikilink
-        t.Inline = lpeg.V("WikiLink") + t.Inline
-        return t
-      end
-  
-      function write_wikilink(s)
-        -- code to write the wikilink as HTML
-      end
-  
-  I hope this is flexible enough.
 
-* TODO documentation w luadoc
-* TODO add groff man writer
 * TODO make epub tool
 * TODO make pdf tool
 * TODO documentation, including extending writer + parser
