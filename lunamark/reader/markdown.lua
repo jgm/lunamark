@@ -175,11 +175,12 @@ function M.new(writer, options)
 
   local openticks   = Cg(backtick^1, "ticks")
 
+  local function captures_equal_length(s,i,a,b)
+    return #a == #b and i
+  end
+
   local closeticks  = space^-1 *
-                      Cmt(C(backtick^1) * Cb("ticks"),
-                          function(s,i,a,b)
-                            return #a == #b and i
-                          end)
+                      Cmt(C(backtick^1) * Cb("ticks"), captures_equal_length)
 
   local intickschar = (any - S(" \n\r`"))
                     + (newline * -blankline)
