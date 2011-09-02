@@ -6,8 +6,6 @@
 * TODO add lunadoc to rock?
 * TODO document with lunadoc.
 
-* TODO in writers, construct table outside new function, more efficient?
-
 * TODO footnote extension
 * TODO definition list extension
 * TODO fenced code block extension
