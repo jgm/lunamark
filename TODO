@@ -15,10 +15,6 @@
 * TODO other metadata?
 * TODO math extension
 
-* TODO escaping in tex more complicated;
-  don't escape in code blocks;
-  urls
-
 * TODO add library documentation
   - all writers have common set of functions, which can be documented once
   - then we need a list of writers + descriptions + information on options
