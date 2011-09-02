@@ -13,6 +13,7 @@
 
 local lunamark = require("lunamark")
 local cosmo = require("cosmo")
+local lpeg = require("lpeg")
 
 local destdir = "doc"
 
@@ -86,9 +87,21 @@ end
 
 local index = table.concat(index_table,"\n")
 
-local writer = lunamark.writer.html.new()
-writer.link = new_link
-local converter = lunamark.reader.markdown.new(writer,{smart=true})
+writer = lunamark.writer.html.new()
+
+local identchar = lpeg.R("AZ","az","09") + lpeg.P("_")
+local modname = identchar^1 * (lpeg.P(".") * identchar^1)^0
+local funname = identchar^1
+local crossref = lpeg.P("@") * lpeg.C(modname) * lpeg.Cs((lpeg.P("#") / "" * funname)^-1)
+               / function(s,f)
+                   local lab = s
+                   if f then lab = lab .. "." .. f end
+                   local src = s .. ".html"
+                   if f then src = src .. "#" .. f end
+                   return writer.link(lab, src, "")
+                 end
+
+local converter = lunamark.reader.markdown.new(writer,{smart=true, inlineparsers = { crossref } })
 
 for i=1,#arg do
   local f = arg[i]
@@ -98,12 +111,11 @@ for i=1,#arg do
   for _,chunk in ipairs(chunks) do
     local fun = chunk.fun
     local funid = fun and fun:match("^[^%(]*")
-    local inp = lunamark.util.get_input(chunk.contents)
     if fun then
-      local funtext = cosmo.fill(funtemplate, { name = fun, id = funid, contents = converter(inp) })
+      local funtext = cosmo.fill(funtemplate, { name = fun, id = funid, contents = converter(chunk.contents) })
       table.insert(funs, funtext)
     else
-      table.insert(funs, converter(inp))
+      table.insert(funs, converter(chunk.contents))
     end
   end
   local page = cosmo.fill(template, { modname = modname, index = index, contents = table.concat(funs) })
