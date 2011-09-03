@@ -96,6 +96,8 @@ local function handle_nodes(writer, nodes, preserve_space)
         table.insert(output, writer.code(contents))
       elseif tag == "script" or tag == "style" then
         -- skip contents
+      elseif tag == "title" then
+        writer.set_metadata("title", writer.string(contents))
       else  --skip unknown tag
         if leavespace[tag] then
           preblockspace()
@@ -131,7 +133,7 @@ function M.new(writer, options)
   return function(inp)
     local parser = htmlparser.new(inp)
     local parsed = parser:parse()
-    return handle_nodes(writer, parsed)
+    return handle_nodes(writer, parsed), writer.get_metadata()
   end
 
 end
