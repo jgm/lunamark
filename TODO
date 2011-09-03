@@ -1,3 +1,5 @@
+* TODO change params on listitem so it can work with man and other writers
+
 * TODO in lunadoc, use metadata -- see luadoc for standard fields
     @author <text>
     An author of the module or file.
