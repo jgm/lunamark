@@ -50,7 +50,7 @@ function M.new(options)
 
   function Html.orderedlist(s,tight,startnum)
     local start = ""
-    if startnum and options.startnum and startnum ~= 1 then
+    if startnum and startnum ~= 1 then
       start = format(" start=\"%d\"",startnum)
     end
     return format("<ol%s>%s%s</ol>",start,Html.containersep,s)

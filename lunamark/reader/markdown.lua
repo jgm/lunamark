@@ -19,7 +19,7 @@ local M = {}
 --- Create a new markdown parser.
 -- @name new
 -- TODO: document the various options that are significant
--- so far, custom_inline, custom_block, preservetabs, smart
+-- so far, custom_inline, custom_block, preservetabs, smart, startnum
 function M.new(writer, options)
 
   if not options then options = {} end
@@ -578,12 +578,21 @@ function M.new(writer, options)
                      + Cs(LooseListItem(P(0)) * LooseListItem(bullet)^0)
                        * Cc(false) * skipblanklines ) / writer.bulletlist
 
-  local OrderedList = Cg(enumerator / tonumber, "startnum") *
+  local function ordered_list(s,tight,startnum)
+    if options.startnum then
+      startnum = tonumber(startnum)
+    else
+      startnum = nil
+    end
+    return writer.orderedlist(s,tight,startnum)
+  end
+
+  local OrderedList = Cg(enumerator, "startnum") *
                       ( Cs(TightListItem(P(0)) * TightListItem(enumerator)^0)
                         * Cc(true) * skipblanklines * -enumerator
                       + Cs(LooseListItem(P(0)) * LooseListItem(enumerator)^0)
                         * Cc(false) * skipblanklines
-                      ) * Cb("startnum") / writer.orderedlist
+                      ) * Cb("startnum") / ordered_list
 
   ------------------------------------------------------------------------------
   -- Headers
