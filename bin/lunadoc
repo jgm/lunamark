@@ -3,8 +3,8 @@
 --- This program reads a number of source files, scans them
 -- for special comment blocks beginning with '---', and writes
 -- an HTML file documenting each module to the doc directory.
--- If the comment block immediately precedes a function definition,
--- the name of the function is extracted automatically.
+-- If the comment block immediately precedes a declaration
+-- of a function or variable, the name is extracted automatically.
 --
 -- Each file is assumed to be a module.  The 'module' keyword need
 -- not be used.
@@ -21,7 +21,7 @@ local function extract_comments(f)
   local commentlines = {}
   local chunks = {}
   local collect = false
-  local fun
+  local decl
   io.input(f)
   for l in io.lines() do
     local m = l:match("^%-%-%-%s?(.*)")
@@ -34,8 +34,9 @@ local function extract_comments(f)
         table.insert(commentlines,n)
       else
         collect = false
-        fun = l:match("function [^%.]*%.([%a_]+%([^%)]*%))")
-        table.insert(chunks, { contents = table.concat(commentlines,"\n"), fun = fun })
+        decl = l:match("function%s+(.-%))") or l:match("([^%s%=]+)%s*=")
+        if decl then decl = string.gsub(decl,"[%w_]+%.","") end
+        table.insert(chunks, { contents = table.concat(commentlines,"\n"), decl = decl })
         commentlines = {}
       end
     end
@@ -62,14 +63,16 @@ $index
 </html>
 ]]
 
-local funtemplate = [[
+local decltemplate = [[
 <div id="$id">
-<h2 class="function">$name</h2>
+<h2 class="declaration">$name</h2>
 $contents
 </div>
 ]]
 
 local css = [[
+body { font-family: Arial, sans-serif; }
+code,pre { font-family: Andale Mono, monospace; }
 div#index { position: absolute; left: 1em; top: 1em; width:14em; border-right: 1px solid grey; }
 div#content { position: absolute; left: 15em; top: 0em; padding-left: 2em; max-width: 40em; }
 ]]
@@ -91,8 +94,8 @@ writer = lunamark.writer.html.new()
 
 local identchar = lpeg.R("AZ","az","09") + lpeg.P("_")
 local modname = identchar^1 * (lpeg.P(".") * identchar^1)^0
-local funname = identchar^1
-local crossref = lpeg.P("@") * lpeg.C(modname) * lpeg.Cs((lpeg.P("#") / "" * funname)^-1)
+local declname = identchar^1
+local crossref = lpeg.P("@") * lpeg.C(modname) * lpeg.Cs((lpeg.P("#") / "" * declname)^-1)
                / function(s,f)
                    local lab = s
                    if f then lab = lab .. "." .. f end
@@ -107,18 +110,18 @@ for i=1,#arg do
   local f = arg[i]
   local chunks = extract_comments(f)
   local modname = get_modname(f)
-  local funs = {}
+  local decls = {}
   for _,chunk in ipairs(chunks) do
-    local fun = chunk.fun
-    local funid = fun and fun:match("^[^%(]*")
-    if fun then
-      local funtext = cosmo.fill(funtemplate, { name = fun, id = funid, contents = converter(chunk.contents) })
-      table.insert(funs, funtext)
+    local decl = chunk.decl
+    local declid = decl and decl:match("^[^%(]*")
+    if decl then
+      local decltext = cosmo.fill(decltemplate, { name = decl, id = declid, contents = converter(chunk.contents) })
+      table.insert(decls, decltext)
     else
-      table.insert(funs, converter(chunk.contents))
+      table.insert(decls, converter(chunk.contents))
     end
   end
-  local page = cosmo.fill(template, { modname = modname, index = index, contents = table.concat(funs) })
+  local page = cosmo.fill(template, { modname = modname, index = index, contents = table.concat(decls) })
   local file = io.open(destdir .. "/" .. modname .. ".html", "w")
   file:write(page)
   file:close()
