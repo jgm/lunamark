@@ -34,7 +34,7 @@ Options:
   --help,-h                  This message
 
 FORMAT can be markdown or html for the source, and
-markdown, html, html5, docbook, latex, or context for the target.
+markdown, html, html5, docbook, latex, context, or man for the target.
 
 LAYOUT can be default, compact (no unnecessary blank lines), or
 minimize (no unnecessary blank space).
@@ -81,7 +81,7 @@ local to = optarg.t or "html"
 
 ensure_one_of("--from,-f", from, {"markdown","html"})
 ensure_one_of("--to,-t", to,
-  {"markdown","html","html5","docbook","latex","context"})
+  {"markdown","html","html5","docbook","latex","context","man"})
 
 local reader = lunamark.reader[from]
 if not reader then
