@@ -65,7 +65,7 @@ $index
 
 local decltemplate = [[
 <div id="$id">
-<h2 class="declaration">$name</h2>
+<h3 class="declaration">$name</h3>
 $contents
 </div>
 ]]
