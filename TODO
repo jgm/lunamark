@@ -1,5 +1,3 @@
-* TODO change listitem in other writers so it works as in markdown reader + html writer
-
 * TODO in lunadoc, use metadata -- see luadoc for standard fields
     @author <text>
     An author of the module or file.
