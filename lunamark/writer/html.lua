@@ -40,20 +40,30 @@ function M.new(options)
     return format("<p>%s</p>",s)
   end
 
-  function Html.listitem(s)
-    return format("<li>%s</li>%s", s, Html.containersep)
+  local function listitem(s)
+    return format("<li>%s</li>", s)
   end
 
-  function Html.bulletlist(s,tight)
-    return format("<ul>%s%s</ul>",Html.containersep,s)
+  function Html.bulletlist(items,tight)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      buffer[#buffer + 1] = listitem(item)
+    end
+    local contents = table.concat(buffer,Html.containersep)
+    return format("<ul>%s%s%s</ul>",Html.containersep,contents,Html.containersep)
   end
 
-  function Html.orderedlist(s,tight,startnum)
+  function Html.orderedlist(items,tight,startnum)
     local start = ""
     if startnum and startnum ~= 1 then
       start = format(" start=\"%d\"",startnum)
     end
-    return format("<ol%s>%s%s</ol>",start,Html.containersep,s)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      buffer[#buffer + 1] = listitem(item)
+    end
+    local contents = table.concat(buffer,Html.containersep)
+    return format("<ol%s>%s%s%s</ol>",start,Html.containersep,contents,Html.containersep)
   end
 
   function Html.inline_html(s)

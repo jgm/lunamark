@@ -30,8 +30,8 @@ function M.new(options)
   -- .PP
   -- cont
   -- .RE
-  function Man.listitem(s)
-
+  function Man.listitem(s, itemtype)
+   return format("%s %s\n", tostring(itemtype), s)
   end
 
   function Man.bulletlist(s)

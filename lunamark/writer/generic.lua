@@ -135,8 +135,10 @@ function M.new(options)
     return s
   end
 
-  --- A list item.
-  function W.listitem(s)
+  --- A list item.  `s` is the list item contents,
+  -- and `marker` is the list item marker
+  -- (`*` for bullet, `1.` for an enumerated list, etc.)
+  function W.listitem(s,marker)
     return s
   end
 

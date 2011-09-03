@@ -573,9 +573,9 @@ function M.new(writer, options)
                ) / docparser / writer.listitem
   end
 
-  local BulletList = ( Cs(TightListItem(bullet)^1)
+  local BulletList = ( Ct(TightListItem(bullet)^1)
                        * Cc(true) * skipblanklines * -bullet
-                     + Cs(LooseListItem(bullet)^1)
+                     + Ct(LooseListItem(bullet)^1)
                        * Cc(false) * skipblanklines ) / writer.bulletlist
 
   local function ordered_list(s,tight,startnum)
@@ -588,9 +588,9 @@ function M.new(writer, options)
   end
 
   local OrderedList = Cg(enumerator, "listtype") *
-                      ( Cs(TightListItem(Cb("listtype")) * TightListItem(enumerator)^0)
+                      ( Ct(TightListItem(Cb("listtype")) * TightListItem(enumerator)^0)
                         * Cc(true) * skipblanklines * -enumerator
-                      + Cs(LooseListItem(Cb("listtype")) * LooseListItem(enumerator)^0)
+                      + Ct(LooseListItem(Cb("listtype")) * LooseListItem(enumerator)^0)
                         * Cc(false) * skipblanklines
                       ) * Cb("listtype") / ordered_list
 
