@@ -36,21 +36,31 @@ function M.new(options)
     return format("\\externalfigure[%s]", ConTeXt.string(src))
   end
 
-  function ConTeXt.listitem(s)
+  local function listitem(s)
     return format("\\item %s\n",s)
   end
 
-  function ConTeXt.bulletlist(s,tight)
+  function ConTeXt.bulletlist(items,tight)
     local opt = ""
     if tight then opt = "[packed]" end
-    return format("\\startitemize%s\n%s\\stopitemize",opt,s)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      table.insert(buffer, listitem(item))
+    end
+    local contents = table.concat(buffer)
+    return format("\\startitemize%s\n%s\\stopitemize",opt,contents)
   end
 
-  function ConTeXt.orderedlist(s,tight,startnum)
+  function ConTeXt.orderedlist(items,tight,startnum)
     local tightstr = ""
     if tight then tightstr = ",packed" end
     local opt = string.format("[%d%s]", startnum or 1, tightstr)
-    return format("\\startitemize%s\n%s\\stopitemize",opt,s)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      table.insert(buffer, listitem(item))
+    end
+    local contents = table.concat(buffer)
+    return format("\\startitemize%s\n%s\\stopitemize",opt,contents)
   end
 
   function ConTeXt.emphasis(s)

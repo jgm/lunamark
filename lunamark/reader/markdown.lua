@@ -562,7 +562,7 @@ function M.new(writer, options)
   local ListContinuationBlock = blanklines * (indent / "") * ListBlock
 
   local function TightListItem(starter)
-      return (Cs(starter / "" * ListBlock * NestedList^-1) / docparser / writer.listitem)
+      return (Cs(starter / "" * ListBlock * NestedList^-1) / docparser)
              * -(blanklines * indent)
   end
 
@@ -570,7 +570,7 @@ function M.new(writer, options)
       return Cs( starter / "" * ListBlock * Cc("\n")
                * (NestedList + ListContinuationBlock^0)
                * (blanklines / "\n\n")
-               ) / docparser / writer.listitem
+               ) / docparser
   end
 
   local BulletList = ( Ct(TightListItem(bullet)^1)

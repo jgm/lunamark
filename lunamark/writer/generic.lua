@@ -135,29 +135,20 @@ function M.new(options)
     return s
   end
 
-  --- A list item.  `s` is the list item contents,
-  -- and `marker` is the list item marker
-  -- (`*` for bullet, `1.` for an enumerated list, etc.)
-  function W.listitem(s,marker)
-    return s
-  end
-
-  --- A bullet list with contents `s`
-  -- (which should be concatenated listitems).  If
+  --- A bullet list with contents `items` (an array).  If
   -- `tight` is true, returns a "tight" list (with
   -- minimal space between items).
-  function W.bulletlist(s,tight)
-    return s
+  function W.bulletlist(items,tight)
+    return items
   end
 
-  --- An ordered list with contents `s`
-  -- (which should be concatenated listitems).  If
+  --- An ordered list with contents `items` (an array). If
   -- `tight` is true, returns a "tight" list (with
   -- minimal space between items). If optional
   -- number `startnum` is present, use it as the
   -- number of the first list item.
-  function W.orderedlist(s,tight,startnum)
-    return s
+  function W.orderedlist(items,tight,startnum)
+    return items
   end
 
   --- Inline HTML.

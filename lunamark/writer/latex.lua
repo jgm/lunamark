@@ -23,16 +23,26 @@ function M.new(options)
     return format("\\includegraphics{%s}", LaTeX.string(src))
   end
 
-  function LaTeX.listitem(s)
-    return format("\\item %s\n",s)
+  local function listitem(s)
+    return format("\\item %s",s)
   end
 
-  function LaTeX.bulletlist(s)
-    return format("\\begin{itemize}\n%s\n\\end{itemize}",s)
+  function LaTeX.bulletlist(items)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      table.insert(buffer, listitem(item))
+    end
+    local contents = table.concat(buffer, "\n")
+    return format("\\begin{itemize}\n%s\n\\end{itemize}",contents)
   end
 
-  function LaTeX.orderedlist(s)
-    return format("\\begin{enumerate}\n%s\n\\end{enumerate}",s)
+  function LaTeX.orderedlist(items)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      table.insert(buffer, listitem(item))
+    end
+    local contents = table.concat(buffer, "\n")
+    return format("\\begin{enumerate}\n%s\n\\end{enumerate}",contents)
   end
 
   function LaTeX.emphasis(s)

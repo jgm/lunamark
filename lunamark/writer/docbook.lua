@@ -42,18 +42,28 @@ function M.new(options)
 
   Docbook.plain = Docbook.paragraph
 
-  function Docbook.listitem(s)
-    return format("<listitem>%s</listitem>%s",s,Docbook.containersep)
+  local function listitem(s)
+    return format("<listitem>%s</listitem>",s)
   end
 
-  function Docbook.bulletlist(s)
+  function Docbook.bulletlist(items)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      table.insert(buffer, listitem(item))
+    end
+    local contents = table.concat(buffer, Docbook.containersep)
     return format("<itemizedlist>%s%s%s</itemizedlist>",Docbook.containersep,
-            s, Docbook.containersep)
+            contents, Docbook.containersep)
   end
 
-  function Docbook.orderedlist(s)
+  function Docbook.orderedlist(items)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      table.insert(buffer, listitem(item))
+    end
+    local contents = table.concat(buffer, Docbook.containersep)
     return format("<orderedlist>%s%s%s</orderedlist>",Docbook.containersep,
-            s, Docbook.containersep)
+            contents, Docbook.containersep)
   end
 
   function Docbook.inline_html(s)
