@@ -28,6 +28,30 @@ function M.new(options)
 --- The table contains the following fields:
 
   options = options or {}
+  local metadata = {}
+
+  --- Set metadata field `key` to `val`.
+  function W.set_metadata(key, val)
+    metadata[key] = val
+    return ""
+  end
+
+  --- Add `val` to an array in metadata field `key`.
+  function W.add_metadata(key, val)
+    local cur = metadata[key]
+    if type(cur) == "table" then
+      table.insert(cur,val)
+    elseif cur then
+      metadata[key] = {cur, val}
+    else
+      metadata[key] = {val}
+    end
+  end
+
+  --- Return metadata table.
+  function W.get_metadata()
+    return metadata
+  end
 
   --- A space (string).
   W.space = " "

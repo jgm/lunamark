@@ -708,7 +708,7 @@ function M.new(writer, options)
       lpegmatch(referenceparser,inp)
       local result = writer.start_document() .. docparser(inp)
                        .. writer.stop_document()
-      return result
+      return result, writer.get_metadata()
   end
 
 end
