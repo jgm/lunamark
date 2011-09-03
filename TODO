@@ -1,11 +1,3 @@
-* TODO make writers more object-like (self on functions, so
-  we can keep internal state)
-* TODO in generic writer, include dummy functions for everything,
-  for documentation purposes (so we know what has to be implemented
-  in any writer)
-
-* TODO use these hooks to implement a link @mymodule#myfun syntax
-  in lunadoc.
 * TODO add command-line arguments to lunadoc
 * TODO add templates for lunadoc (html, latex using cosmo)
 * TODO add documentation for lunadoc
