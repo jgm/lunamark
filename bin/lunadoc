@@ -3,6 +3,10 @@
 --- This program reads a number of source files, scans them
 -- for special comment blocks beginning with '---', and writes
 -- an HTML file documenting each module to the doc directory.
+--
+-- There must be blank space between the opening dashes and
+-- any following text.
+--
 -- If the comment block immediately precedes a declaration
 -- of a function or variable, the name is extracted automatically.
 --
@@ -24,18 +28,18 @@ local function extract_comments(f)
   local decl
   io.input(f)
   for l in io.lines() do
-    local m = l:match("^%-%-%-%s?(.*)")
+    local m = l:match("^%s*%-%-%-%s(.*)")
     if m then
       collect = true
       table.insert(commentlines,m)
     elseif collect then
-      local n = l:match("^%-%-%s?(.*)")
+      local n = l:match("^%s*%-%-%-?%s?(.*)")
       if n then
         table.insert(commentlines,n)
       else
         collect = false
         decl = l:match("function%s+(.-%))") or l:match("([^%s%=]+)%s*=")
-        if decl then decl = string.gsub(decl,"[%w_]+%.","") end
+        if decl then decl = string.gsub(decl,"M%.","") end  -- strip off M. which puts declaration in module
         table.insert(chunks, { contents = table.concat(commentlines,"\n"), decl = decl })
         commentlines = {}
       end
@@ -72,9 +76,9 @@ $contents
 
 local css = [[
 body { font-family: Arial, sans-serif; }
-code,pre { font-family: Andale Mono, monospace; }
+code,pre { font-family: Monaco, monospace; }
 div#index { position: absolute; left: 1em; top: 1em; width:14em; border-right: 1px solid grey; }
-div#content { position: absolute; left: 15em; top: 0em; padding-left: 2em; max-width: 40em; }
+div#content { position: absolute; left: 15em; top: 0em; padding-left: 2em; max-width: 40em; padding-bottom: 1em; }
 ]]
 
 local index_table = {}
