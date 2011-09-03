@@ -45,7 +45,7 @@ function M.new(options)
     if tight then opt = "[packed]" end
     local buffer = {}
     for _,item in ipairs(items) do
-      table.insert(buffer, listitem(item))
+      buffer[#buffer + 1] = listitem(item)
     end
     local contents = table.concat(buffer)
     return format("\\startitemize%s\n%s\\stopitemize",opt,contents)
@@ -57,7 +57,7 @@ function M.new(options)
     local opt = string.format("[%d%s]", startnum or 1, tightstr)
     local buffer = {}
     for _,item in ipairs(items) do
-      table.insert(buffer, listitem(item))
+      buffer[#buffer + 1] = listitem(item)
     end
     local contents = table.concat(buffer)
     return format("\\startitemize%s\n%s\\stopitemize",opt,contents)

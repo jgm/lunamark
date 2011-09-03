@@ -49,7 +49,7 @@ function M.new(options)
   function Docbook.bulletlist(items)
     local buffer = {}
     for _,item in ipairs(items) do
-      table.insert(buffer, listitem(item))
+      buffer[#buffer + 1] = listitem(item)
     end
     local contents = table.concat(buffer, Docbook.containersep)
     return format("<itemizedlist>%s%s%s</itemizedlist>",Docbook.containersep,
@@ -59,7 +59,7 @@ function M.new(options)
   function Docbook.orderedlist(items)
     local buffer = {}
     for _,item in ipairs(items) do
-      table.insert(buffer, listitem(item))
+      buffer[#buffer + 1] = listitem(item)
     end
     local contents = table.concat(buffer, Docbook.containersep)
     return format("<orderedlist>%s%s%s</orderedlist>",Docbook.containersep,

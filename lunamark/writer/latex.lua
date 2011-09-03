@@ -30,7 +30,7 @@ function M.new(options)
   function LaTeX.bulletlist(items)
     local buffer = {}
     for _,item in ipairs(items) do
-      table.insert(buffer, listitem(item))
+      buffer[#buffer + 1] = listitem(item)
     end
     local contents = table.concat(buffer, "\n")
     return format("\\begin{itemize}\n%s\n\\end{itemize}",contents)
@@ -39,7 +39,7 @@ function M.new(options)
   function LaTeX.orderedlist(items)
     local buffer = {}
     for _,item in ipairs(items) do
-      table.insert(buffer, listitem(item))
+      buffer[#buffer + 1] = listitem(item)
     end
     local contents = table.concat(buffer, "\n")
     return format("\\begin{enumerate}\n%s\n\\end{enumerate}",contents)

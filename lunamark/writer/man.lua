@@ -19,27 +19,31 @@ function M.new(options)
     return format("[IMAGE (%s)]",lab)
   end
 
-  -- TODO need to add parameter for type (bullet, ordered, etc.)
-  -- man has
-  -- .IP "1." 3
-  -- .IP \[bu] 2
-  -- complication also for continuations:
+  -- TODO handle continuations properly.
+  -- pandoc does this:
   -- .IP \[bu] 2
   -- one
   -- .RS 2
   -- .PP
   -- cont
   -- .RE
-  function Man.listitem(s, itemtype)
-   return format("%s %s\n", tostring(itemtype), s)
+
+  function Man.bulletlist(items,tight)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      buffer[#buffer + 1] = format(".IP \[bu] 2\n%s",item)
+    end
+    return table.concat(buffer, Man.containersep)
   end
 
-  function Man.bulletlist(s)
-    return s
-  end
-
-  function Man.orderedlist(s)
-    return s
+  function Man.orderedlist(items,tight,startnum)
+    local buffer = {}
+    local num = startnum or 1
+    for _,item in ipairs(items) do
+      buffer[#buffer + 1] = format(".IP \"%d.\" 4\n%s",num,item)
+      num = num + 1
+    end
+    return table.concat(buffer, Man.containersep)
   end
 
   function Man.blockquote(s)

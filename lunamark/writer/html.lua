@@ -6,7 +6,6 @@ local M = {}
 local xml = require("lunamark.writer.xml")
 local util = require("lunamark.util")
 local format = string.format
-
 local gsub = string.gsub
 
 function M.new(options)
