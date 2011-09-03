@@ -18,54 +18,24 @@
 	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 	THE SOFTWARE.
-
-With minor fixes by John MacFarlane 2011 for lunamark:
-
-  * don't gobble space after tags
-  * make all tags lowercase
-  * made attribute names lowercase
-  * made strtil a bit faster
-  * supported compact attribute syntax
-  * fixed bug causing doubled letters in non-quoted attributes
-
 --]]
 
---[[
-format of htmlparser.parse(s):
-
-returns an indexed array of nodes representing the root nodes of a html tree
-
-these nodes can be of either type objects:
-
-	string:
-		strings represent text leaf nodes within the tree
-
-	table:
-		tables are composed of the following properties:
-
-			type: the type of the node.  could be one of the following:
-				'tag'
-				'cdata'
-				'comment'
-
-			str: if type is 'cdata', 'comment', or 'string' then this will hold the comment/cdata contents
-
-			tag: if type is 'tag' then this holds the tag name.
-			NOTE: tags with name 'script' or 'style' will only hold one child: a single string set to the script content
-
-			attrs: if type is 'tag' then this holds an indexed array of objects with properties 'name' and 'value' defined
-				if a html node has not attributes then this will be nil
-			
-			child: if type is 'tag' then this holds an indexed array of the child nodes of this node
-				if a html node has not child then this will be nil
-
---]]
+--- This is Christopher E. Moore's pure lua HTML parser, with minor fixes
+-- by John MacFarlane for use in lunamark:
+--
+--  * don't gobble space after tags
+--  * make all tags lowercase
+--  * made attribute names lowercase
+--  * made `strtil` a bit faster
+--  * support compact attribute syntax
+--  * fix bug causing doubled letters in non-quoted attributes
 
 local M = {}
 
 Parser = {}
 Parser.__index = Parser
 
+--- Return a new HTML parser with input `page`.
 function M.new(page)
 	local p = {
 		lasttoken = '';
@@ -462,7 +432,7 @@ function Parser:tagarray(parent)
 				--io.write('nodestack:')
 				--for _,v in ipairs(nodestack) do io.write('  '..v.tag) end
 				--io.write('\n')
-				
+
 				if closingindex then
 					-- if we did find the closing tag in the list then
 					-- if it was on top of the stack then return our children
@@ -491,7 +461,30 @@ function Parser:base()
 	return self:tagarray()
 end
 
--- usage: Parser.new(_page):parse()
+--- Parse the parser's input, returning an indexed array of nodes
+-- representing the root nodes of an HTML tree.
+--
+-- These nodes can be of the following types:
+--
+--  * string: strings represent text leaf nodes within the tree
+--
+--  * table: tables are composed of the following properties:
+--      + type: the type of the node.  could be one of the following:
+--	  `tag`, `cdata`, `comment`
+--      + str: if type is `cdata`, `comment`, or `string`,
+--        then this will hold the comment/cdata contents
+--
+--  * tag: if type is `tag` then this holds the tag name.
+--    NOTE: tags with name `script` or `style` will only
+--    hold one child: a single string set to the script content
+--
+--  * attrs: if type is `tag` then this holds an indexed array
+--  of objects with properties `name` and `value` defined.
+--  If a html node has not attributes then this will be nil.
+--
+--  * child: if type is `tag` then this holds an indexed array
+--  of the child nodes of this node. If a html node has no child
+--  then this will be nil.
 function Parser:parse()
 	-- populate 'thistoken'
 	self:nexttoken()
