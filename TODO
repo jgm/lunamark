@@ -1,3 +1,8 @@
+* TODO should startnum be a reader option, not a writer?
+  ie. just don't set startnum if it's not set?
+* TODO make it easy/standard for writers to add to metadata.
+* TODO in lunadoc, use metadata
+
 * TODO add documentation for lunadoc
 * TODO add lunadoc to rock?
 * TODO document with lunadoc.
