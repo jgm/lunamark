@@ -1,6 +1,9 @@
 -- (c) 2009-2011 John MacFarlane. Released under MIT license.
 -- See the file LICENSE in the source for details.
 
+--- Generic instructions here about how to create a new writer,
+-- with examples.
+
 local util = require("lunamark.util")
 local M = {}
 local W = {}
@@ -13,25 +16,46 @@ meta.__index =
   end
 setmetatable(W, meta)
 
+--- Returns a table with functions defining a generic lunamark writer,
+-- which outputs plain text with no formatting.  `options` is an optional
+-- table with the following fields:
+--
+-- + `layout`:  `minimize` (no space between blocks), `compact` (no
+--   extra blank lines between blocks), `default` (blank line between
+--   blocks).
 function M.new(options)
+
+--- The table contains the following fields:
 
   options = options or {}
 
+  --- A space (string).
   W.space = " "
 
+  --- Setup tasks at beginning of document.
   function W.start_document()
     return ""
   end
 
+  --- Finalization tasks at end of document.
   function W.stop_document()
     return ""
   end
 
+  --- Plain text block (not formatted as a pragraph).
   function W.plain(s)
     return s
   end
 
+  --- A line break (string).
   W.linebreak = "\n"
+
+  --- Line breaks to use between block elements.
+  W.interblocksep = "\n\n"
+
+  --- Line breaks to use between a container (like a `<div>`
+  -- tag) and the adjacent block element.
+  W.containersep = "\n"
 
   if options.layout == "minimize" then
     W.interblocksep = ""
@@ -39,89 +63,118 @@ function M.new(options)
   elseif options.layout == "compact" then
     W.interblocksep = "\n"
     W.containersep = "\n"
-  else
-    W.interblocksep = "\n\n"
-    W.containersep = "\n"
   end
 
+  --- Ellipsis (string).
   W.ellipsis = "…"
 
+  --- Em dash (string).
   W.mdash = "—"
 
+  --- En dash (string).
   W.ndash = "–"
 
+  --- String in curly single quotes.
   function W.singlequoted(s)
     return string.format("‘%s’",s)
   end
 
+  --- String in curly double quotes.
   function W.doublequoted(s)
     return string.format("“%s”",s)
   end
 
+  --- String, escaped as needed for the output format.
   function W.string(s)
     return s
   end
 
+  --- Inline (verbatim) code.
   function W.code(s)
     return s
   end
 
-  function W.link(lab,src,tit)
+  --- A link with link text `label`, uri `uri`,
+  -- and title `title`.
+  function W.link(label, uri, title)
     return lab
   end
 
-  function W.image(lab,src,tit)
+  --- An image link with alt text `label`,
+  -- source `src`, and title `title`.
+  function W.image(label, src, title)
     return lab
   end
 
+  --- A paragraph.
   function W.paragraph(s)
     return s
   end
 
+  --- A list item.
   function W.listitem(s)
     return s
   end
 
+  --- A bullet list with contents `s`
+  -- (which should be concatenated listitems).  If
+  -- `tight` is true, returns a "tight" list (with
+  -- minimal space between items).
   function W.bulletlist(s,tight)
     return s
   end
 
+  --- An ordered list with contents `s`
+  -- (which should be concatenated listitems).  If
+  -- `tight` is true, returns a "tight" list (with
+  -- minimal space between items). If optional
+  -- number `startnum` is present, use it as the
+  -- number of the first list item.
   function W.orderedlist(s,tight,startnum)
     return s
   end
 
+  --- Inline HTML.
   function W.inline_html(s)
     return ""
   end
 
+  --- Display HTML (HTML block).
   function W.display_html(s)
     return ""
   end
 
+  --- Emphasized text.
   function W.emphasis(s)
     return s
   end
 
+  --- Strongly emphasized text.
   function W.strong(s)
     return s
   end
 
+  --- Block quotation.
   function W.blockquote(s)
     return s
   end
 
+  --- Verbatim block.
   function W.verbatim(s)
     return s
   end
 
-  function W.section(s,level,contents)
+  --- Section of level `level`, with `header` and optionally
+  -- contents `contents`.
+  function W.section(header, level, contents)
     if contents then
-      return s .. W.interblocksep .. contents
+      return header .. W.interblocksep .. contents
     else
-      return s
+      return header
     end
   end
 
+  --- Horizontal rule.
   W.hrule = ""
 
   return util.table_copy(W)
