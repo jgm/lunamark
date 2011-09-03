@@ -1,6 +1,8 @@
 -- (c) 2009-2011 John MacFarlane.  Released under MIT license.
 -- See the file LICENSE in the source for details.
 
+--- Functions for dealing with HTML/XML entities.
+
 local M = {}
 
 local bit = require("bit32")
@@ -289,14 +291,20 @@ local function toutf8(n)
   end
 end
 
+--- Given a string of decimal digits, returns a UTF-8 encoded
+-- string encoding a unicode character.
 function M.dec_entity(s)
   return toutf8(tonumber(s))
 end
 
+--- Given a string of hexadecimal digits, returns a UTF-8 encoded
+-- string encoding a unicode character.
 function M.hex_entity(s)
   return toutf8(tonumber("0x"..s))
 end
 
+--- Given a character entity name (like `ouml`), returns a UTF-8 encoded
+-- string encoding a unicode character.
 function M.char_entity(s)
   local n = character_entities[s]
   return toutf8(n)
