@@ -101,7 +101,7 @@ local crossref = lpeg.P("@") * lpeg.C(modname) * lpeg.Cs((lpeg.P("#") / "" * fun
                    return writer.link(lab, src, "")
                  end
 
-local converter = lunamark.reader.markdown.new(writer,{smart=true, inlineparsers = { crossref } })
+local converter = lunamark.reader.markdown.new(writer,{smart=true, custom_inline = crossref})
 
 for i=1,#arg do
   local f = arg[i]

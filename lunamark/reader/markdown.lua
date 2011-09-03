@@ -19,7 +19,7 @@ local M = {}
 --- Create a new markdown parser.
 -- @name new
 -- TODO: document the various options that are significant
--- so far, inlineparsers, blockparsers, preservetabs, smart
+-- so far, custom_inline, custom_block, preservetabs, smart
 function M.new(writer, options)
 
   if not options then options = {} end
@@ -683,16 +683,12 @@ function M.new(writer, options)
 
   -- Add in custom inline and block parsers
 
-  if options.inlineparsers then
-    for _,parser in ipairs(options.inlineparsers) do
-      syntax.Inline = parser + syntax.Inline
-    end
+  if options.custom_inline then
+      syntax.Inline = options.custom_inline + syntax.Inline
   end
 
-  if options.blockparsers then
-    for _,parser in ipairs(options.blockparsers) do
-      syntax.Block = parser + syntax.Block
-    end
+  if options.custom_block then
+      syntax.Block = options.custom_block + syntax.Block
   end
 
   docsyntax = Cs(syntax)
