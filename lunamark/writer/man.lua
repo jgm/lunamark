@@ -47,7 +47,7 @@ function M.new(options)
   end
 
   function Man.verbatim(s)
-    return format(".IP\n.nf\n\\f[C]\n%s\n.fi",s)
+    return format(".IP\n.nf\n\\f[C]\n%s.fi",s)
   end
 
   function Man.section(s,level,contents)
