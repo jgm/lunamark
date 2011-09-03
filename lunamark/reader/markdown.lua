@@ -562,37 +562,37 @@ function M.new(writer, options)
   local ListContinuationBlock = blanklines * (indent / "") * ListBlock
 
   local function TightListItem(starter)
-      return (starter * Cs(ListBlock * NestedList^-1)
-              * -(blanklines * indent) / docparser / writer.listitem)
+      return (Cs(starter / "" * ListBlock * NestedList^-1) / docparser / writer.listitem)
+             * -(blanklines * indent)
   end
 
   local function LooseListItem(starter)
-      return (starter * Cs(ListBlock * Cc("\n")
-             * (NestedList + ListContinuationBlock^0)
-             * (blanklines / "\n\n")) / docparser / writer.listitem)
+      return Cs( starter / "" * ListBlock * Cc("\n")
+               * (NestedList + ListContinuationBlock^0)
+               * (blanklines / "\n\n")
+               ) / docparser / writer.listitem
   end
 
-  local BulletList = bullet *
-                     ( Cs(TightListItem(P(0)) * TightListItem(bullet)^0)
+  local BulletList = ( Cs(TightListItem(bullet)^1)
                        * Cc(true) * skipblanklines * -bullet
-                     + Cs(LooseListItem(P(0)) * LooseListItem(bullet)^0)
+                     + Cs(LooseListItem(bullet)^1)
                        * Cc(false) * skipblanklines ) / writer.bulletlist
 
   local function ordered_list(s,tight,startnum)
     if options.startnum then
-      startnum = tonumber(startnum)
+      startnum = tonumber(listtype)
     else
       startnum = nil
     end
     return writer.orderedlist(s,tight,startnum)
   end
 
-  local OrderedList = Cg(enumerator, "startnum") *
-                      ( Cs(TightListItem(P(0)) * TightListItem(enumerator)^0)
+  local OrderedList = Cg(enumerator, "listtype") *
+                      ( Cs(TightListItem(Cb("listtype")) * TightListItem(enumerator)^0)
                         * Cc(true) * skipblanklines * -enumerator
-                      + Cs(LooseListItem(P(0)) * LooseListItem(enumerator)^0)
+                      + Cs(LooseListItem(Cb("listtype")) * LooseListItem(enumerator)^0)
                         * Cc(false) * skipblanklines
-                      ) * Cb("startnum") / ordered_list
+                      ) * Cb("listtype") / ordered_list
 
   ------------------------------------------------------------------------------
   -- Headers
