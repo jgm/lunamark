@@ -1,4 +1,4 @@
-* TODO change params on listitem so it can work with man and other writers
+* TODO change listitem in other writers so it works as in markdown reader + html writer
 
 * TODO in lunadoc, use metadata -- see luadoc for standard fields
     @author <text>
