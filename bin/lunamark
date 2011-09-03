@@ -86,11 +86,6 @@ if not reader then
   lunamark.util.err("Unknown reader: " .. tostring(from), 3)
 end
 
-local writer = lunamark.writer[to].new()
-if not writer then
-  lunamark.util.err("Unknown writer: " .. tostring(to), 5)
-end
-
 local extensions = {  -- defaults
   containers = false,
   startnum = true,
@@ -119,19 +114,24 @@ for x in extensions_opt:gmatch("[%+%-]?[%a]+") do
   end
 end
 
-writer.options = extensions
+local writer_options = extensions
 
 local layout = optarg["l"] or "default"
 ensure_one_of("--layout,-l",layout,{"default","compact","minimize"})
-writer.containersep = writer.sep.container[layout]
-writer.interblocksep = writer.sep.interblock[layout]
+writer_options.layout = layout
+
+local writer = lunamark.writer[to].new(writer_options)
+if not writer then
+  lunamark.util.err("Unknown writer: " .. tostring(to), 5)
+end
 
 local args = {}
 for i=optind,#arg do
   table.insert(args,arg[i])
 end
 
-local parse = reader.new(writer, extensions)
+local reader_options = extensions
+local parse = reader.new(writer, reader_options)
 
 local inp
 if #args == 0 then

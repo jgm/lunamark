@@ -10,13 +10,9 @@ local entities = require("lunamark.entities")
 function M.new(options)
   local TeX = generic.new(options)
 
-  TeX.sep = { interblock = {compact = "\n\n", default = "\n\n", minimal = "\n\n"},
-               container = { compact = "\n", default = "\n", minimal = "\n"}
-            }
+  TeX.interblocksep = "\n\n"  -- insensitive to layout
 
-  TeX.interblocksep = TeX.sep.interblock.default
-
-  TeX.containersep = TeX.sep.container.default
+  TeX.containersep = "\n"
 
   TeX.linebreak = "\\\\"
 

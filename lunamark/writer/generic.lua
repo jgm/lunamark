@@ -15,7 +15,7 @@ setmetatable(W, meta)
 
 function M.new(options)
 
-  W.options = options or {}
+  options = options or {}
 
   W.space = " "
 
@@ -33,13 +33,16 @@ function M.new(options)
 
   W.linebreak = "\n"
 
-  W.sep = { interblock = {compact = "\n", default = "\n\n", minimal = ""},
-            container = { compact = "\n", default = "\n", minimal = ""}
-          }
-
-  W.interblocksep = W.sep.interblock.default
-
-  W.containersep = W.sep.container.default
+  if options.layout == "minimize" then
+    W.interblocksep = ""
+    W.containersep = ""
+  elseif options.layout == "compact" then
+    W.interblocksep = "\n"
+    W.containersep = "\n"
+  else
+    W.interblocksep = "\n\n"
+    W.containersep = "\n"
+  end
 
   W.ellipsis = "…"
 

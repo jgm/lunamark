@@ -50,7 +50,7 @@ function M.new(options)
 
   function Html.orderedlist(s,tight,startnum)
     local start = ""
-    if startnum and Html.options.startnum and startnum ~= 1 then
+    if startnum and options.startnum and startnum ~= 1 then
       start = format(" start=\"%d\"",startnum)
     end
     return format("<ol%s>%s%s</ol>",start,Html.containersep,s)
@@ -82,7 +82,7 @@ function M.new(options)
   end
 
   function Html.section(s,level,contents)
-    if Html.options.containers then
+    if options.containers then
       return format("<div>%s<h%d>%s</h%d>%s%s%s</div>", Html.containersep,
            level, s, level, Html.interblocksep, contents, Html.containersep)
     else

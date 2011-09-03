@@ -49,7 +49,7 @@ function M.new(options)
   function ConTeXt.orderedlist(s,tight,startnum)
     local tightstr = ""
     if tight then tightstr = ",packed" end
-    local opt = string.format("[%d%s]",(ConTeXt.options.startnum and startnum) or 1, tightstr)
+    local opt = string.format("[%d%s]",(options.startnum and startnum) or 1, tightstr)
     return format("\\startitemize%s\n%s\\stopitemize",opt,s)
   end
 
