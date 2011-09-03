@@ -162,14 +162,14 @@ function M.new(writer, options)
                      + space * bulletchar * #spacing * (tab + space^-2)
                      + space * space * bulletchar * #spacing * (tab + space^-1)
                      + space * space * space * bulletchar * #spacing
-                     ) * -bulletchar
+                     ) * -bulletchar / "*"
 
-  local enumerator = digit^3 * period * #spacing
-                   + digit^2 * period * #spacing * (tab + space^1)
-                   + digit * period * #spacing * (tab + space^-2)
-                   + space * digit^2 * period * #spacing
-                   + space * digit * period * #spacing * (tab + space^-1)
-                   + space * space * digit^1 * period * #spacing
+  local enumerator = C(digit^3 * period) * #spacing
+                   + C(digit^2 * period) * #spacing * (tab + space^1)
+                   + C(digit * period) * #spacing * (tab + space^-2)
+                   + space * C(digit^2 * period) * #spacing
+                   + space * C(digit * period) * #spacing * (tab + space^-1)
+                   + space * space * C(digit^1 * period) * #spacing
 
   -----------------------------------------------------------------------------
   -- Parsers used for markdown code spans
