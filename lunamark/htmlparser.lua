@@ -25,8 +25,8 @@
 --
 --  * don't gobble space after tags
 --  * make all tags lowercase
---  * made attribute names lowercase
---  * made `strtil` a bit faster
+--  * make attribute names lowercase
+--  * make `strtil` a bit faster
 --  * support compact attribute syntax
 --  * fix bug causing doubled letters in non-quoted attributes
 
