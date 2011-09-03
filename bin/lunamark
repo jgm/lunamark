@@ -28,7 +28,8 @@ Options:
   --output,-o FILE           Output file
   --standalone,-s            Add header and footer
   --template,-T FILE         Insert output into template
-  --strict,-0                Disable markdown extensions 
+  --data,-d K=V[,K=V..]      Set metadata to be passed to template
+  --strict,-0                Disable markdown extensions
   --version,-V               Version information
   --help,-h                  This message
 
@@ -55,12 +56,13 @@ local long_opts = {
   output = "o",
   standalone = "s",
   template = "T",
+  data = "d",
   strict = "0",
   version = "V",
   help = "h"
 }
 
-local short_opts = "t:f:l:X:o:sT:0Vh"
+local short_opts = "t:f:l:X:o:sT:d:0Vh"
 
 local optarg,optind = alt_getopt.get_opts(arg, short_opts, long_opts)
 
@@ -163,6 +165,12 @@ end
 if template then
   local contents = lunamark.util.find_template(template, to)
   local data = {}
+  if optarg.d then
+    for x in string.gmatch(optarg.d, "[%w_]+=[^,]+") do
+      local k,v = string.match(x, "([^=]*)=(.*)")
+      data[k] = v
+    end
+  end
   if metadata then data = metadata end
   data.body = body
   data.timestamp = os.date("%Y-%m-%d %X")
