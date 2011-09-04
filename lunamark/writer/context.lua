@@ -99,6 +99,10 @@ function M.new(options)
 
   ConTeXt.hrule = "\\hairline"
 
+  function ConTeXt.note(contents)
+    return format("\\footnote{%s}", contents)
+  end
+
   return ConTeXt
 end
 
