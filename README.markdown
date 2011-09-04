@@ -43,6 +43,28 @@ Lunamark can be installed using [luarocks](http://www.luarocks.org):
 The library comes with an executable, lunamark.  For usage
 instructions, do `lunamark --help`.
 
+Usage examples:
+
+    lunamark
+
+reads markdown from stdin and writes html to stdout.
+
+    lunamark -t man -s -o prog.1 -Xsmart,notes prog.txt
+
+converts `prog.txt` from markdown to groff man (`-t man`),
+producing a standalone file with header and footer (`-s`)
+called `prog.1` (`-o prog.1`), and enabling the
+smart typography and notes extensions `-Xsmart,notes`.
+
+    lunamark -t man -o prog.1 --template custom \
+      -d section=1,date="July 2011" -Xsmart,notes prog.txt
+
+As before, but uses the custom template `custom.man`
+(which it will seek first in the working directory,
+then in `templates`, then in `~/.lunamark/templates`),
+setting the `section` variable to `1` and the
+`date` variable to `July 2011`.
+
 ## Using the library
 
 Simple usage example:
