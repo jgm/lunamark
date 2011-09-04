@@ -11,6 +11,8 @@ local format = string.format
 function M.new(options)
   local Man = groff.new(options)
 
+  local endnotes = {}
+
   function Man.link(lab,src,tit)
     return format("%s (%s)",lab,src)
   end
@@ -27,6 +29,10 @@ function M.new(options)
   -- .PP
   -- cont
   -- .RE
+
+  function Man.paragraph(contents)
+    return format(".PP\n%s", contents)
+  end
 
   function Man.bulletlist(items,tight)
     local buffer = {}
@@ -61,6 +67,21 @@ function M.new(options)
   end
 
   Man.hrule = ".PP\n * * * * *"
+
+  function Man.note(contents)
+    local num = #endnotes + 1
+    endnotes[num] = format('.SS [%d]\n%s', num, contents)
+    return format('[%d]', num)
+  end
+
+  function Man.start_document()
+    endnotes = {}
+    return ""
+  end
+
+  function Man.stop_document()
+    return format('\n.SH NOTES\n%s', table.concat(endnotes, "\n"))
+  end
 
   return Man
 end
