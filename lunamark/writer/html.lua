@@ -111,6 +111,11 @@ function M.new(options)
     return format('<sup><a href="#fn%d" class="footnoteRef" id="fnref%d">%d</a></sup>',num,num,num)
   end
 
+  function Html.start_document()
+    endnotes = {}
+    return ""
+  end
+
   function Html.stop_document()
     return format('%s<ol class="notes">%s%s%s</ol>', Html.interblocksep, Html.containersep,
        table.concat(endnotes, Html.interblocksep), Html.containersep)
