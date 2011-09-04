@@ -117,8 +117,12 @@ function M.new(options)
   end
 
   function Html.stop_document()
-    return format('%s<ol class="notes">%s%s%s</ol>', Html.interblocksep, Html.containersep,
-       table.concat(endnotes, Html.interblocksep), Html.containersep)
+    if #endnotes == 0 then
+      return ""
+    else
+      return format('%s<ol class="notes">%s%s%s</ol>', Html.interblocksep, Html.containersep,
+         table.concat(endnotes, Html.interblocksep), Html.containersep)
+    end
   end
 
   return Html

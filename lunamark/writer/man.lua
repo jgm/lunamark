@@ -80,7 +80,11 @@ function M.new(options)
   end
 
   function Man.stop_document()
-    return format('\n.SH NOTES\n%s', table.concat(endnotes, "\n"))
+    if #endnotes == 0 then
+      return ""
+    else
+      return format('\n.SH NOTES\n%s', table.concat(endnotes, "\n"))
+    end
   end
 
   return Man
