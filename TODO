@@ -1,3 +1,7 @@
+* TODO definition list extension (read term as raw, parse later)
+* TODO fenced code block extension
+* TODO pandoc title block extension
+
 * TODO in lunadoc, use metadata -- see luadoc for standard fields
     @author <text>
     An author of the module or file.
@@ -28,9 +32,17 @@
 * TODO add lunadoc to rock?
 * TODO document with lunadoc.
 
-* TODO definition list extension (read term as raw, parse later)
-* TODO fenced code block extension
-* TODO pandoc title block extension
+* TODO alternative indented block with metadata?
+
+  This is text.
+
+     code {
+       in indented = block
+       }
+  (haskell)
+
+  More text.
+
 * TODO other metadata?
 * TODO math extension
 
