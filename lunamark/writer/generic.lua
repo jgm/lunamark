@@ -194,6 +194,11 @@ function M.new(options)
   --- Horizontal rule.
   W.hrule = ""
 
+  --- A footnote or endnote.
+  function W.note(contents)
+    return contents
+  end
+
   return util.table_copy(W)
 end
 
