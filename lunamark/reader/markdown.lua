@@ -521,7 +521,7 @@ function M.new(writer, options)
   -- strip off leading > and indents, and run through docparser
   local Blockquote     = Cs((
             ((nonindentspace * more * space^-1)/"" * linechar^0 * newline)^1
-          * ((linechar - blankline)^1 * newline)^0
+          * (-blankline * linechar^1 * newline)^0
           * blankline^0
           )^1) / docparser / writer.blockquote
 
