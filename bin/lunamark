@@ -43,7 +43,7 @@ EXTENSIONS is a comma-separated list of extensions, each optionally prefixed
 by + (enable) or - (disable).  The following extensions are defined,
 with the default setting given in parentheses:
   (-) containers    Put sections in containers (e.g. div or section tags)
-  (+) startnum      Start number of an ordered list is significant
+  (-) startnum      Start number of an ordered list is significant
   (-) smart         Smart typography (quotes, dashes, ellipses)
   (-) preservetabs  Don't expand tabs to spaces
   (-) notes         Footnotes
@@ -92,7 +92,7 @@ end
 
 local extensions = {  -- defaults
   containers = false,
-  startnum = true,
+  startnum = false,
   smart = false,
   preservetabs = false,
   notes = false,
