@@ -47,6 +47,7 @@ with the default setting given in parentheses:
   (-) smart         Smart typography (quotes, dashes, ellipses)
   (-) preservetabs  Don't expand tabs to spaces
   (-) notes         Footnotes
+The keyword 'all' may also be used, to set all extensions simultaneously.
 ]]
 
 local long_opts = {
@@ -111,7 +112,11 @@ for x in extensions_opt:gmatch("[%+%-]?[%a]+") do
     val = false
     x = x:sub(2)
   end
-  if type(extensions[x]) ~= "boolean" then
+  if x == "all" then
+    for k,_ in pairs(extensions) do
+      extensions[k] = val
+    end
+  elseif type(extensions[x]) ~= "boolean" then
     lunamark.util.err("Unrecognized extension: ", x)
   else
     extensions[x] = val
