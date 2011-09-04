@@ -1,4 +1,13 @@
 * TODO definition list extension (read term as raw, parse later)
+  x html writer
+  x generic writer
+  _ man writer
+  _ context writer
+  _ latex writer
+  _ docbook writer
+* TODO fix lists in html reader (since we went to arrays and nixed listitem)
+* TODO add definitionlist to html reader
+
 * TODO fenced code block extension
 * TODO pandoc title block extension
 
