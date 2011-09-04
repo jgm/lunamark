@@ -81,6 +81,10 @@ function M.new(options)
 
   LaTeX.hrule = "\\hspace{\\fill}\\rule{.6\\linewidth}{0.4pt}\\hspace{\\fill}"
 
+  function LaTeX.note(contents)
+    return format("\\footnote{%s}", contents)
+  end
+
   return LaTeX
 end
 
