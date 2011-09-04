@@ -1,6 +1,6 @@
 * TODO footnote extension - implement in writers
-  _ docbook
-  _ man
+  x docbook
+  x man
   _ html
 
 * TODO in lunadoc, use metadata -- see luadoc for standard fields

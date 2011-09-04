@@ -11,6 +11,8 @@ local gsub = string.gsub
 function M.new(options)
   local Html = xml.new(options)
 
+  local endnotes = {}
+
   Html.linebreak = "<br/>"
 
   function Html.code(s)
@@ -100,6 +102,19 @@ function M.new(options)
   end
 
   Html.hrule = "<hr />"
+
+  function Html.note(contents)
+    local num = #endnotes + 1
+    local backref = format(' <a href="#fnref%d" class="footnoteBackLink">↩</a>', num)
+    local adjusted = gsub(contents, "()</p>$", backref)
+    endnotes[num] = format('<li id="fn%d">%s</li>', num, adjusted)
+    return format('<sup><a href="#fn%d" class="footnoteRef" id="fnref%d">%d</a></sup>',num,num,num)
+  end
+
+  function Html.stop_document()
+    return format('%s<ol class="notes">%s%s%s</ol>', Html.interblocksep, Html.containersep,
+       table.concat(endnotes, Html.interblocksep), Html.containersep)
+  end
 
   return Html
 end
