@@ -32,7 +32,6 @@ function M.new(options)
   end
 
   Groff.escaped = {
-     ["'"] = "\\[aq]",
      ["@"] = "\\@",
      ["\\"] = "\\\\",
    }
