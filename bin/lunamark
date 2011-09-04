@@ -46,6 +46,7 @@ with the default setting given in parentheses:
   (+) startnum      Start number of an ordered list is significant
   (-) smart         Smart typography (quotes, dashes, ellipses)
   (-) preservetabs  Don't expand tabs to spaces
+  (-) notes         Footnotes
 ]]
 
 local long_opts = {
@@ -93,6 +94,7 @@ local extensions = {  -- defaults
   startnum = true,
   smart = false,
   preservetabs = false,
+  notes = false,
 }
 
 if optarg["0"] then

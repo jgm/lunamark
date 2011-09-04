@@ -79,6 +79,7 @@ function M.new(writer, options)
   local rparent                = P(")")
   local lbracket               = P("[")
   local rbracket               = P("]")
+  local circumflex             = P("^")
   local slash                  = P("/")
   local equal                  = P("=")
   local colon                  = P(":")
@@ -241,16 +242,63 @@ function M.new(writer, options)
                       + Cc("")
 
   ------------------------------------------------------------------------------
-  -- Helpers for links and references
+  -- Footnotes
   ------------------------------------------------------------------------------
-
-  -- List of references defined in the document
-  local references = {}
 
   -- markdown reference tags are case-insensitive
   local function normalize_tag(tag)
       return lower(gsub(tag, "[ \n\r\t]+", " "))
   end
+
+  local rawnotes = {}
+
+  local function strip_first_char(s)
+    return s:sub(2)
+  end
+
+  -- like indirect_link
+  local function lookup_note(ref)
+    local found = rawnotes[normalize_tag(ref)]
+    if found then
+      return writer.note(docparser(found))
+    else
+      return "[^" .. ref .. "]"
+    end
+  end
+
+  local function register_note(ref,rawnote)
+    rawnotes[normalize_tag(ref)] = rawnote
+  end
+
+  local RawNoteRef = #(lbracket * circumflex) * tag / strip_first_char
+
+  local chunk = Cs( line
+                  * (optionallyindentedline - blankline)^0
+                  )
+
+  local NoteRef
+  local NoteBlock
+
+  if options.notes then
+    NoteRef    = RawNoteRef / lookup_note
+
+    NoteBlock = nonindentspace * RawNoteRef * colon * spnl *
+                Cs( chunk
+                  * (blankline^1 * indent * -blankline * chunk)^0
+                  * blankline^1
+                  )
+
+  else
+    NoteRef    = none
+    NoteBlock  = none
+  end
+
+  ------------------------------------------------------------------------------
+  -- Helpers for links and references
+  ------------------------------------------------------------------------------
+
+  -- List of references defined in the document
+  local references = {}
 
   -- add a reference to the list
   local function register_link(tag,url,title)
@@ -263,7 +311,10 @@ function M.new(writer, options)
 
   local referenceparser =
     -- need the Ct or we get a stack overflow
-    Ct((define_reference_parser / register_link + nonemptyline^1 + blankline^1)^0)
+    Ct(( NoteBlock / register_note
+       + define_reference_parser / register_link
+       + nonemptyline^1
+       + blankline^1)^0)
 
   -- lookup link reference and return either a link or image.
   -- if the reference is not found, return the bracketed label.
@@ -536,8 +587,6 @@ function M.new(writer, options)
 
   local Reference      = define_reference_parser / ""
 
-  local Blank          = blankline + Reference + (tightblocksep / "\n")
-
   local Paragraph      = nonindentspace * Cs(Inline^1) * newline * blankline^1
                        / writer.paragraph
 
@@ -593,6 +642,13 @@ function M.new(writer, options)
                       + Ct(LooseListItem(Cb("listtype")) * LooseListItem(enumerator)^0)
                         * Cc(false) * skipblanklines
                       ) * Cb("listtype") / ordered_list
+
+
+  ------------------------------------------------------------------------------
+  -- Blank
+  ------------------------------------------------------------------------------
+
+  local Blank          = blankline + NoteBlock + Reference + (tightblocksep / "\n")
 
   ------------------------------------------------------------------------------
   -- Headers
@@ -679,6 +735,7 @@ function M.new(writer, options)
                             + UlOrStarLine
                             + Strong
                             + Emph
+                            + NoteRef
                             + Link
                             + Code
                             + AutoLinkUrl
