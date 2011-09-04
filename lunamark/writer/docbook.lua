@@ -94,10 +94,15 @@ function M.new(options)
   function Docbook.section(s,level,contents)
     return format("<section>%s<title>%s</title>%s%s%s</section>",
                 Docbook.containersep, s, Docbook.containersep, contents,
-                Docbook.containersep )
+                Docbook.containersep)
   end
 
   Docbook.hrule = ""
+
+  function Docbook.note(contents)
+    return format("<footnote>%s%s%s</footnote>", Docbook.containersep, contents,
+                Docbook.containersep)
+  end
 
   return Docbook
 end
