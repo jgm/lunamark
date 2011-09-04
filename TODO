@@ -1,3 +1,5 @@
+* TODO footnote extension - implement in writers
+
 * TODO in lunadoc, use metadata -- see luadoc for standard fields
     @author <text>
     An author of the module or file.
@@ -28,7 +30,6 @@
 * TODO add lunadoc to rock?
 * TODO document with lunadoc.
 
-* TODO footnote extension (store notes as raw in references pass)
 * TODO definition list extension (read term as raw, parse later)
 * TODO fenced code block extension
 * TODO pandoc title block extension
