@@ -6,6 +6,7 @@ local M = {}
 local gsub = string.gsub
 local generic = require("lunamark.writer.generic")
 local entities = require("lunamark.entities")
+local format = string.format
 
 function M.new(options)
   local TeX = generic.new(options)
