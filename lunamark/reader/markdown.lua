@@ -139,9 +139,15 @@ function M.new(writer, options)
                                + (any - newline)^1 * eof
   local nonemptyline           = line - blankline
 
-  -- parser succeeds if condition evaluates to true
-  local function guard(condition)
-    return Cmt(P(0), function(s,pos) return condition and pos end) end
+  -- parser if condition holds, else fail
+  local function when(cond, parser)
+    if cond then
+      return parser
+    else
+      return none
+    end
+  end
+
 
   -----------------------------------------------------------------------------
   -- Parsers used for markdown lists
@@ -276,22 +282,13 @@ function M.new(writer, options)
                   * (optionallyindentedline - blankline)^0
                   )
 
-  local NoteRef
-  local NoteBlock
+  local NoteRef    = RawNoteRef / lookup_note
 
-  if options.notes then
-    NoteRef    = RawNoteRef / lookup_note
-
-    NoteBlock = nonindentspace * RawNoteRef * colon * spnl *
-                Cs( chunk
-                  * (blankline^1 * indent * -blankline * chunk)^0
-                  * blankline^1
-                  )
-
-  else
-    NoteRef    = none
-    NoteBlock  = none
-  end
+  local NoteBlock = nonindentspace * RawNoteRef * colon * spnl *
+                  Cs( chunk
+                    * (blankline^1 * indent * -blankline * chunk)^0
+                    * blankline^1
+                    )
 
   ------------------------------------------------------------------------------
   -- Helpers for links and references
@@ -311,7 +308,7 @@ function M.new(writer, options)
 
   local referenceparser =
     -- need the Ct or we get a stack overflow
-    Ct(( NoteBlock / register_note
+    Ct(( when(options.notes, NoteBlock) / register_note
        + define_reference_parser / register_link
        + nonemptyline^1
        + blankline^1)^0)
@@ -478,12 +475,7 @@ function M.new(writer, options)
 
   local Apostrophe = squote * B(nonspacechar, 2) / "’"
 
-  local Smart
-  if options.smart then
-    Smart         = Ellipsis + Dash + SingleQuoted + DoubleQuoted + Apostrophe
-  else
-    Smart         = none
-  end
+  local Smart      = Ellipsis + Dash + SingleQuoted + DoubleQuoted + Apostrophe
 
   local Symbol    = (specialchar - tightblocksep) / writer.string
 
@@ -648,7 +640,10 @@ function M.new(writer, options)
   -- Blank
   ------------------------------------------------------------------------------
 
-  local Blank          = blankline + NoteBlock + Reference + (tightblocksep / "\n")
+  local Blank          = blankline
+                       + when(options.notes, NoteBlock)
+                       + Reference
+                       + (tightblocksep / "\n")
 
   ------------------------------------------------------------------------------
   -- Headers
@@ -735,7 +730,7 @@ function M.new(writer, options)
                             + UlOrStarLine
                             + Strong
                             + Emph
-                            + NoteRef
+                            + when(options.notes, NoteRef)
                             + Link
                             + Code
                             + AutoLinkUrl
@@ -743,7 +738,7 @@ function M.new(writer, options)
                             + InlineHtml
                             + HtmlEntity
                             + EscapedChar
-                            + Smart
+                            + when(options.smart, Smart)
                             + Symbol,
     }
 
