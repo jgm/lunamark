@@ -118,11 +118,12 @@ for i=1,#arg do
   for _,chunk in ipairs(chunks) do
     local decl = chunk.decl
     local declid = decl and decl:match("^[^%(]*")
+    local result = converter(chunk.contents)
     if decl then
-      local decltext = cosmo.fill(decltemplate, { name = decl, id = declid, contents = converter(chunk.contents) })
+      local decltext = cosmo.fill(decltemplate, { name = decl, id = declid, contents = result })
       table.insert(decls, decltext)
     else
-      table.insert(decls, converter(chunk.contents))
+      table.insert(decls, result)
     end
   end
   local page = cosmo.fill(template, { modname = modname, index = index, contents = table.concat(decls) })
