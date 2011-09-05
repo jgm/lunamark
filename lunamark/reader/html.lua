@@ -28,6 +28,10 @@ local leavespace = { address = true, center = true, dir = true, div = true,
 local function handle_nodes(writer, nodes, preserve_space)
   local output = {}
   local firstblock = true
+  local function getcontents(node)
+    return handle_nodes(writer, node.child,
+          preserve_space or node.tag == "pre" or node.tag == "code")
+  end
   local function preblockspace()
     if firstblock then
       firstblock = false
@@ -49,18 +53,14 @@ local function handle_nodes(writer, nodes, preserve_space)
       table.insert(output, contents)
     elseif node.tag and node.child then -- tag with contents
       local tag = node.tag
-      local function getcontents()
-        return handle_nodes(writer, node.child,
-              preserve_space or tag == "pre" or tag == "code")
-      end
       if tag == "p" then
         preblockspace()
-        table.insert(output, writer.paragraph(getcontents()))
+        table.insert(output, writer.paragraph(getcontents(node)))
       elseif tag == "blockquote" then
         preblockspace()
-        table.insert(output, writer.blockquote(getcontents()))
+        table.insert(output, writer.blockquote(getcontents(node)))
       elseif tag == "li" then
-        table.insert(output, getcontents())
+        table.insert(output, getcontents(node))
       elseif tag == "ul" then
         preblockspace()
         local items = {}
@@ -108,7 +108,7 @@ local function handle_nodes(writer, nodes, preserve_space)
         table.insert(output, writer.definitionlist(items))
       elseif tag == "pre" then
         preblockspace()
-        table.insert(output, writer.verbatim(getcontents()))
+        table.insert(output, writer.verbatim(getcontents(node)))
       elseif tag:match("^h[123456]$") then
         local lev = tonumber(tag:sub(2,2))
         preblockspace()
@@ -124,26 +124,30 @@ local function handle_nodes(writer, nodes, preserve_space)
           i = i + 1
         end
         local body = handle_nodes(writer, bodynodes, preserve_space)
-        table.insert(output, writer.section(getcontents(), lev, body))
+        table.insert(output, writer.section(getcontents(node), lev, body))
       elseif tag == "a" then
         local src = lookup_attr(node, "href") or ""
         local tit = lookup_attr(node, "title")
-        table.insert(output, writer.link(getcontents(),src,tit))
+        table.insert(output, writer.link(getcontents(node),src,tit))
       elseif tag == "em" or tag == "i" then
-        table.insert(output, writer.emphasis(getcontents()))
+        table.insert(output, writer.emphasis(getcontents(node)))
       elseif tag == "strong" or tag == "b" then
-        table.insert(output, writer.strong(getcontents()))
+        table.insert(output, writer.strong(getcontents(node)))
       elseif tag == "code" then
-        table.insert(output, writer.code(getcontents()))
+        if preserve_space then -- we're inside a pre tag
+          table.insert(output, getcontents(node))
+        else
+          table.insert(output, writer.code(getcontents(node)))
+        end
       elseif tag == "script" or tag == "style" then
-        -- skip getcontents()
+        -- skip getcontents(node)
       elseif tag == "title" then
-        writer.set_metadata("title", writer.string(getcontents()))
+        writer.set_metadata("title", writer.string(getcontents(node)))
       else  --skip unknown tag
         if leavespace[tag] then
           preblockspace()
         end
-        table.insert(output, getcontents())
+        table.insert(output, getcontents(node))
       end
     elseif node.tag then  -- self-closing tag
       local tag = node.tag
