@@ -74,6 +74,16 @@ function M.new(options)
     return format('[%d]', num)
   end
 
+  function Man.definitionlist(items)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      buffer[#buffer + 1] = format(".TP\n.B %s\n%s\n.RS\n.RE",
+        item.term, table.concat(item.definitions, "\n.RS\n.RE\n"))
+    end
+    local contents = table.concat(buffer, "\n")
+    return contents
+  end
+
   function Man.start_document()
     endnotes = {}
     return ""

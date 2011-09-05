@@ -1,7 +1,7 @@
 * TODO definition list extension
   x html writer
   x generic writer
-  _ man writer
+  x man writer
   x context writer
   x latex writer
   _ docbook writer
