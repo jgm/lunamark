@@ -85,6 +85,16 @@ function M.new(options)
     return format("\\footnote{%s}", contents)
   end
 
+  function LaTeX.definitionlist(items)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      buffer[#buffer + 1] = format("\\item[%s]\n%s",
+        item.term, table.concat(item.definitions, LaTeX.interblocksep))
+    end
+    local contents = table.concat(buffer, LaTeX.containersep)
+    return format("\\begin{description}\n%s\n\\end{description}",contents)
+  end
+
   return LaTeX
 end
 
