@@ -82,6 +82,7 @@ orange
 
 >>>
 <p>Tight using spaces:</p>
+
 <dl>
 <dt>apple</dt>
 <dd>red fruit</dd>
@@ -90,7 +91,9 @@ orange
 <dt>banana</dt>
 <dd>yellow fruit</dd>
 </dl>
+
 <p>Tight using tabs:</p>
+
 <dl>
 <dt>apple</dt>
 <dd>red fruit</dd>
@@ -99,7 +102,9 @@ orange
 <dt>banana</dt>
 <dd>yellow fruit</dd>
 </dl>
+
 <p>Loose:</p>
+
 <dl>
 <dt>apple</dt>
 <dd>
@@ -111,7 +116,9 @@ orange
 </dd>
 <dt>banana</dt>
 <dd>
+
 <p>yellow fruit</p>
+
 </dd>
 </dl>
 <p>Multiple blocks with italics:</p>
@@ -119,19 +126,24 @@ orange
 <dt><em>apple</em></dt>
 <dd>
 <p>red fruit</p>
+
 <p>contains seeds, crisp, pleasant to taste</p>
 </dd>
 <dt><em>orange</em></dt>
 <dd>
 <p>orange fruit</p>
+
 <pre><code>{ orange code block }
 </code></pre>
+
 <blockquote>
 <p>orange block quote</p>
 </blockquote>
 </dd>
 </dl>
+
 <p>Multiple definitions, tight:</p>
+
 <dl>
 <dt>apple</dt>
 <dd>red fruit</dd>
@@ -140,7 +152,9 @@ orange
 <dd>orange fruit</dd>
 <dd>bank</dd>
 </dl>
+
 <p>Multiple definitions, loose:</p>
+
 <dl>
 <dt>apple</dt>
 <dd><p>red fruit</p></dd>
@@ -153,7 +167,9 @@ orange
 <p>bank</p>
 </dd>
 </dl>
+
 <p>Blank line after term, indented marker, alternate markers:</p>
+
 <dl>
 <dt>apple</dt>
 <dd>
@@ -165,10 +181,10 @@ orange
 <dt>orange</dt>
 <dd>
 <p>orange fruit</p>
+
 <ol>
 <li>sublist</li>
 <li>sublist</li>
 </ol>
 </dd>
 </dl>
-

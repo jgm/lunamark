@@ -4,7 +4,7 @@ Here is a footnote reference,[^1] and another.[^longnote]
 This should *not* be a footnote reference, because it
 contains a space.[^my note]
 
-[^longnote]: Here's the long note.  This one contains multiple
+[^longnote]: Here&#39;s the long note.  This one contains multiple
 blocks.
 
     Subsequent blocks are indented to show that they belong to the
@@ -22,13 +22,20 @@ This paragraph should not be part of the note, as it is not indented.
 
 >>>
 <p>Here is a footnote reference,<sup><a href="#fn1" class="footnoteRef" id="fnref1">1</a></sup> and another.<sup><a href="#fn2" class="footnoteRef" id="fnref2">2</a></sup> This should <em>not</em> be a footnote reference, because it contains a space.[^my note]</p>
+
 <p>This paragraph should not be part of the note, as it is not indented.</p>
+
 <hr />
+
 <ol class="notes">
 <li id="fn1"><p>Here is the footnote. It can go anywhere after the footnote reference. It need not be placed at the end of the document. <a href="#fnref1" class="footnoteBackLink">↩</a></p></li>
-<li id="fn2"><p>Here's the long note. This one contains multiple blocks.</p>
+
+<li id="fn2"><p>Here&#39;s the long note. This one contains multiple blocks.</p>
+
 <p>Subsequent blocks are indented to show that they belong to the footnote (as with list items).</p>
+
 <pre><code>  { &lt;code&gt; }
 </code></pre>
+
 <p>If you want, you can indent every line, but you can also be lazy and just indent the first line of each block. <a href="#fnref2" class="footnoteBackLink">↩</a></p></li>
 </ol>
