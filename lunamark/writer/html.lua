@@ -120,8 +120,8 @@ function M.new(options)
     if #endnotes == 0 then
       return ""
     else
-      return format('%s<ol class="notes">%s%s%s</ol>', Html.interblocksep, Html.containersep,
-         table.concat(endnotes, Html.interblocksep), Html.containersep)
+      return format('%s<hr />%s<ol class="notes">%s%s%s</ol>', Html.interblocksep, Html.interblocksep,
+         Html.containersep, table.concat(endnotes, Html.interblocksep), Html.containersep)
     end
   end
 
