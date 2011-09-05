@@ -1,17 +1,14 @@
-* TODO definition list extension
-  x html writer
-  x generic writer
-  x man writer
-  x context writer
-  x latex writer
-  x docbook writer
-  _ markdown reader (read term as raw + parse later)
+* TODO tight/loose distinction in markdown definition lists
+  (see test failure)
 
 * TODO make writers more object-like? with self?
   that would allow abbreviations etc., but perhaps
   have some performance cost
 
+* TODO put -d values through writer.string?
+
 * TODO fenced code block extension
+
 * TODO pandoc title block extension
 
 * TODO in lunadoc, use metadata -- see luadoc for standard fields
