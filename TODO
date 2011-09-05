@@ -35,6 +35,7 @@
     @name <word>
     The name of the function or table definition. This is usually infered from the code analysis, and the programmer does not need to define it. If LuaDoc can infer the name of the function automatically it's even not recomended to define the name explicitly, to avoid redundancy.
 
+* TODO man page for lunamark, lunadoc (shells already exist)
 * TODO add documentation for lunadoc
 * TODO add lunadoc to rock?
 * TODO document with lunadoc.
@@ -60,7 +61,6 @@
     + info on options
   - lunamark.util exports several functions which need documentation
 * TODO add config file?
-* TODO add groff man writer and template
 * TODO add man page
 
 * TODO # in ordered lists extension

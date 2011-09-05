@@ -2,4 +2,6 @@
 rm -rf doc
 mkdir doc
 bin/lunadoc lunamark.lua lunamark/*.lua lunamark/*/*.lua
-bin/lunamark -t man -s -Xall -dtitle=LUNAMARK,section=1,date="`date`",description="Lunamark" lunamark.1.txt > lunamark.1
+for prog in lunamark lunadoc; do
+  bin/lunamark -t man -s -Xall -dtitle=$prog,section=1,date="`date`",description="$prog" $prog.1.txt > $prog.1
+done
