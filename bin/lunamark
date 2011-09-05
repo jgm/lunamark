@@ -174,13 +174,13 @@ end
 if template then
   local contents = lunamark.util.find_template(template, to)
   local data = {}
+  if metadata then data = metadata end
   if optarg.d then
     for x in string.gmatch(optarg.d, "[%w_]+=[^,]+") do
       local k,v = string.match(x, "([^=]*)=(.*)")
-      data[k] = v
+      data[k] = writer.string(v)
     end
   end
-  if metadata then data = metadata end
   data.body = body
   data.timestamp = os.date("%Y-%m-%d %X")
   data.sources = args

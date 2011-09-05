@@ -5,8 +5,6 @@
   that would allow abbreviations etc., but perhaps
   have some performance cost
 
-* TODO put -d values through writer.string?
-
 * TODO fenced code block extension
 
 * TODO pandoc title block extension
