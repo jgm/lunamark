@@ -5,7 +5,6 @@
   _ context writer
   _ latex writer
   _ docbook writer
-* TODO fix lists in html reader (since we went to arrays and nixed listitem)
 * TODO add definitionlist to html reader
 
 * TODO fenced code block extension
