@@ -106,7 +106,7 @@ function M.new(options)
   function Html.note(contents)
     local num = #endnotes + 1
     local backref = format(' <a href="#fnref%d" class="footnoteBackLink">↩</a>', num)
-    local adjusted = gsub(contents, "()</p>$", backref)
+    local adjusted = gsub(contents, "</p>$", backref .. "</p>")
     endnotes[num] = format('<li id="fn%d">%s</li>', num, adjusted)
     return format('<sup><a href="#fn%d" class="footnoteRef" id="fnref%d">%d</a></sup>',num,num,num)
   end
