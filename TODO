@@ -1,6 +1,3 @@
-* TODO tight/loose distinction in markdown definition lists
-  (see test failure)
-
 * TODO make writers more object-like? with self?
   that would allow abbreviations etc., but perhaps
   have some performance cost

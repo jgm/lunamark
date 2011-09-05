@@ -116,12 +116,12 @@ orange
 </dd>
 <dt>banana</dt>
 <dd>
-
 <p>yellow fruit</p>
-
 </dd>
 </dl>
+
 <p>Multiple blocks with italics:</p>
+
 <dl>
 <dt><em>apple</em></dt>
 <dd>
@@ -157,8 +157,12 @@ orange
 
 <dl>
 <dt>apple</dt>
-<dd><p>red fruit</p></dd>
-<dd><p>computer</p></dd>
+<dd>
+<p>red fruit</p>
+</dd>
+<dd>
+<p>computer</p>
+</dd>
 <dt>orange</dt>
 <dd>
 <p>orange fruit</p>

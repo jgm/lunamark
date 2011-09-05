@@ -200,10 +200,10 @@ function M.new(options)
   end
 
   --- A definition list. `items` is an array of tables,
-  -- each of the form `{ term = t, definitions = defs }`,
-  -- where `t` is a string and `defs` is an array of
-  -- strings.
-  function W.definitionlist(items)
+  -- each of the form `{ term = t, definitions = defs, tight = tight }`,
+  -- where `t` is a string and `defs` is an array of strings.
+  -- `tight` is a boolean, true if it is a tight list.
+  function W.definitionlist(items, tight)
     local buffer = {}
     for _,item in ipairs(items) do
       buffer[#buffer + 1] = item.t

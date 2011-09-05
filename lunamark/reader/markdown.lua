@@ -146,7 +146,7 @@ function M.new(writer, options)
   local function indented_blocks(bl)
     return Cs( bl
              * (blankline^1 * indent * -blankline * bl)^0
-             * blankline^0 )
+             * blankline^1 )
   end
 
   -- parser if condition holds, else fail
@@ -643,15 +643,26 @@ function M.new(writer, options)
                      + space * space * space * defstartchar * #spacing
                      )
 
-  local dlchunk = line * (indentedline - defstart - blankline)^0
+  local dlchunk = Cs(line * (indentedline - blankline)^0)
 
-  local DefinitionListItem = C(line) * skipblanklines
+  local function definition_list_item(term, defs, tight)
+    return { term = inlinesparser(term), definitions = defs }
+  end
+
+  local DefinitionListItemLoose = C(line) * skipblanklines
                            * Ct((defstart * indented_blocks(dlchunk) / docparser)^1)
-                           / function(a,b)
-                               return { term = inlinesparser(a), definitions = b }
-                             end
+                           * Cc(false)
+                           / definition_list_item
 
-  local DefinitionList = Ct(DefinitionListItem^1) / writer.definitionlist
+  local DefinitionListItemTight = C(line)
+                           * Ct((defstart * dlchunk / docparser)^1)
+                           * Cc(true)
+                           / definition_list_item
+
+  local DefinitionList =  ( Ct(DefinitionListItemLoose^1) * Cc(false)
+                          +  Ct(DefinitionListItemTight^1)
+                             * (skipblanklines * -DefinitionListItemLoose * Cc(true))
+                          ) / writer.definitionlist
 
   ------------------------------------------------------------------------------
   -- Blank

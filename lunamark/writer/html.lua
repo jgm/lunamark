@@ -125,14 +125,16 @@ function M.new(options)
     end
   end
 
-  function Html.definitionlist(items)
+  function Html.definitionlist(items, tight)
     local buffer = {}
+    local sep
+    if tight then sep = "" else sep = Html.containersep end
     for _,item in ipairs(items) do
       local defs = {}
       for _,def in ipairs(item.definitions) do
-        defs[#defs + 1] = format("<dd>%s%s%s</dd>", Html.containersep, def, Html.containersep)
+        defs[#defs + 1] = format("<dd>%s%s%s</dd>", sep, def, sep)
       end
-      buffer[#buffer + 1] = format("<dt>%s</dt>%s%s", item.term, Html.containersep, table.concat(defs, Html.interblocksep))
+      buffer[#buffer + 1] = format("<dt>%s</dt>%s%s", item.term, Html.containersep, table.concat(defs, Html.containersep))
     end
     local contents = table.concat(buffer, Html.containersep)
     return format("<dl>%s%s%s</dl>",Html.containersep, contents, Html.containersep)
