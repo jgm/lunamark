@@ -3,7 +3,7 @@
   x generic writer
   _ man writer
   x context writer
-  _ latex writer
+  x latex writer
   _ docbook writer
 
 * TODO fenced code block extension

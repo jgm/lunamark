@@ -44,8 +44,8 @@ local function handle_nodes(writer, nodes, preserve_space)
     local node = nodes[i]
     if type(node) == "string" then -- text node
       local contents
-      if preserve_space then
-        contents = writer.string(convert_entities(node))
+      if preserve_space then -- literal, so we don't escape
+        contents = convert_entities(node)
       else
         local s = convert_entities(node)
         contents = s:gsub("%s+", writer.space):gsub("%S+", writer.string)
