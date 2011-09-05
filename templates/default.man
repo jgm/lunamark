@@ -1,7 +1,3 @@
 $if{ has_tables }[[.\"t]]
 .TH $title $section "$date" $description
 $body
-$if{ author }[[.SS AUTHORS
-$author[==[$it
-]==]
-]]

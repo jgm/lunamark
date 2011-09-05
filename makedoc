@@ -2,3 +2,4 @@
 rm -rf doc
 mkdir doc
 bin/lunadoc lunamark.lua lunamark/*.lua lunamark/*/*.lua
+bin/lunamark -t man -s -Xall -dtitle=LUNAMARK,section=1,date="`date`",description="Lunamark" lunamark.1.txt > lunamark.1
