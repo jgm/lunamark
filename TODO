@@ -7,6 +7,10 @@
   _ docbook writer
   _ markdown reader (read term as raw + parse later)
 
+* TODO make writers more object-like? with self?
+  that would allow abbreviations etc., but perhaps
+  have some performance cost
+
 * TODO fenced code block extension
 * TODO pandoc title block extension
 
