@@ -645,7 +645,8 @@ function M.new(writer, options)
 
   local dlchunk = line * (indentedline - defstart - blankline)^0
 
-  local DefinitionListItem = C(line) * Ct((defstart * indented_blocks(dlchunk) / docparser)^1)
+  local DefinitionListItem = C(line) * skipblanklines
+                           * Ct((defstart * indented_blocks(dlchunk) / docparser)^1)
                            / function(a,b)
                                return { term = inlinesparser(a), definitions = b }
                              end
