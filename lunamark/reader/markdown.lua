@@ -19,13 +19,13 @@ local M = {}
 --- Create a new markdown parser.
 -- @name new
 -- TODO: document the various options that are significant
--- so far, custom_inline, custom_block, preservetabs, smart, startnum
+-- so far, custom_inline, custom_block, preserve_tabs, smart, startnum, notes, definition_lists
 function M.new(writer, options)
 
   if not options then options = {} end
 
   local function expandtabs(s)
-    if not options.preservetabs and s:find("\t") then
+    if not options.preserve_tabs and s:find("\t") then
       return s:gsub("[^\n]*",expand_tabs_in_line)
     else
       return s
@@ -97,7 +97,7 @@ function M.new(writer, options)
   local fourspaces             = P("    ")
 
   local any                    = P(1)
-  local none                   = any - 1
+  local fail                   = any - 1
   local always                 = P("")
 
   local escapable              = S("\\`*_{}[]()+_.!<>#-")
@@ -144,7 +144,7 @@ function M.new(writer, options)
     if cond then
       return parser
     else
-      return none
+      return fail
     end
   end
 
@@ -635,6 +635,7 @@ function M.new(writer, options)
                         * Cc(false) * skipblanklines
                       ) * Cb("listtype") / ordered_list
 
+  local DefinitionList = fail -- TODO
 
   ------------------------------------------------------------------------------
   -- Blank
@@ -720,6 +721,7 @@ function M.new(writer, options)
                             + BulletList
                             + OrderedList
                             + Section
+                            + when(options.definition_lists, DefinitionList)
                             + DisplayHtml
                             + Paragraph
                             + Plain,

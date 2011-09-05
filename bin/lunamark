@@ -42,11 +42,12 @@ minimize (no unnecessary blank space).
 EXTENSIONS is a comma-separated list of extensions, each optionally prefixed
 by + (enable) or - (disable).  The following extensions are defined,
 with the default setting given in parentheses:
-  (-) containers    Put sections in containers (e.g. div or section tags)
-  (-) startnum      Start number of an ordered list is significant
-  (-) smart         Smart typography (quotes, dashes, ellipses)
-  (-) preservetabs  Don't expand tabs to spaces
-  (-) notes         Footnotes
+  (-) containers        Put sections in containers (e.g. div or section tags)
+  (-) startnum          Start number of an ordered list is significant
+  (-) smart             Smart typography (quotes, dashes, ellipses)
+  (-) preserve_tabs     Don't expand tabs to spaces
+  (-) notes             Footnotes
+  (-) definition_lists  Definition lists
 The keyword 'all' may also be used, to set all extensions simultaneously.
 ]]
 
@@ -94,8 +95,9 @@ local extensions = {  -- defaults
   containers = false,
   startnum = false,
   smart = false,
-  preservetabs = false,
+  preserve_tabs = false,
   notes = false,
+  definition_lists = false,
 }
 
 if optarg["0"] then
