@@ -139,9 +139,13 @@ function M.new(writer, options)
                                + (any - newline)^1 * eof
   local nonemptyline           = line - blankline
 
-  local chunk = Cs( line
-                  * (optionallyindentedline - blankline)^0
-                  )
+  local chunk = line * (optionallyindentedline - blankline)^0
+
+  -- optionally indented block followed by 0 or more optionally
+  -- indented blocks with first line indented
+  local chunks = Cs( chunk
+                   * (blankline^1 * indent * -blankline * chunk)^0
+                   * blankline^1 )
 
   -- parser if condition holds, else fail
   local function when(cond, parser)
@@ -283,11 +287,7 @@ function M.new(writer, options)
 
   local NoteRef    = RawNoteRef / lookup_note
 
-  local NoteBlock = nonindentspace * RawNoteRef * colon * spnl *
-                  Cs( chunk
-                    * (blankline^1 * indent * -blankline * chunk)^0
-                    * blankline^1
-                    )
+  local NoteBlock = nonindentspace * RawNoteRef * colon * spnl * chunks
 
   ------------------------------------------------------------------------------
   -- Helpers for links and references
@@ -634,7 +634,20 @@ function M.new(writer, options)
                         * Cc(false) * skipblanklines
                       ) * Cb("listtype") / ordered_list
 
-  local DefinitionList = fail -- TODO
+  local defstartchar = S("~:")
+  local defstart     = ( defstartchar * #spacing * (tab + space^-3)
+                     + space * defstartchar * #spacing * (tab + space^-2)
+                     + space * space * defstartchar * #spacing * (tab + space^-1)
+                     + space * space * space * defstartchar * #spacing
+                     )
+
+
+  local DefinitionListItem = C(line) * Ct((defstart * chunks)^1)
+                           / function(a,b)
+                               return { term = inlinesparser(a), definitions = b }
+                             end
+
+  local DefinitionList = Ct(DefinitionListItem^1) / writer.definitionlist
 
   ------------------------------------------------------------------------------
   -- Blank
