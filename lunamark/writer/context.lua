@@ -76,7 +76,7 @@ function M.new(options)
   end
 
   function ConTeXt.verbatim(s)
-    return format("\\starttyping\n%s\\stoptyping", s)  -- escape here?
+    return format("\\starttyping\n%s\\stoptyping", s)
   end
 
   function ConTeXt.section(s,level,contents)
