@@ -5,7 +5,6 @@
   _ context writer
   _ latex writer
   _ docbook writer
-* TODO add definitionlist to html reader
 
 * TODO fenced code block extension
 * TODO pandoc title block extension

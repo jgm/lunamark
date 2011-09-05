@@ -79,6 +79,33 @@ local function handle_nodes(writer, nodes, preserve_space)
           end
         end
         table.insert(output, writer.orderedlist(items))
+      elseif tag == "dl" then
+        preblockspace()
+        local items = {}
+        local pending = {}
+        for _,x in ipairs(node.child) do
+          if x.tag == "dt" then
+            if pending.definitions then
+              items[#items + 1] = pending
+              pending = {}
+            end
+            local newterm = handle_nodes(writer, x.child, false)
+            if pending.term then
+              pending.term = pending.term .. ", " .. newterm
+            else
+              pending.term = newterm
+            end
+          elseif x.tag == "dd" then
+            local newdef = handle_nodes(writer, x.child, false)
+            if pending.definitions then
+              table.insert(pending.definitions, newdef)
+            else
+              pending.definitions = { newdef }
+            end
+          end
+        end
+        items[#items + 1] = pending
+        table.insert(output, writer.definitionlist(items))
       elseif tag == "pre" then
         preblockspace()
         table.insert(output, writer.verbatim(getcontents()))

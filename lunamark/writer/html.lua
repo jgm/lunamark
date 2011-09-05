@@ -129,10 +129,10 @@ function M.new(options)
     local buffer = {}
     for _,item in ipairs(items) do
       local defs = {}
-      for _,def in ipairs(item.defs) do
+      for _,def in ipairs(item.definitions) do
         defs[#defs + 1] = format("<dd>%s%s%s</dd>", Html.containersep, def, Html.containersep)
       end
-      return format("<dt>%s</dt>%s%s", item.term, Html.containersep, table.concat(defs, Html.interblocksep))
+      buffer[#buffer + 1] = format("<dt>%s</dt>%s%s", item.term, Html.containersep, table.concat(defs, Html.interblocksep))
     end
     local contents = table.concat(buffer, Html.containersep)
     return format("<dl>%s%s%s</dl>",Html.containersep, contents, Html.containersep)
