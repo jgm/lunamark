@@ -139,6 +139,10 @@ function M.new(writer, options)
                                + (any - newline)^1 * eof
   local nonemptyline           = line - blankline
 
+  local chunk = Cs( line
+                  * (optionallyindentedline - blankline)^0
+                  )
+
   -- parser if condition holds, else fail
   local function when(cond, parser)
     if cond then
@@ -147,7 +151,6 @@ function M.new(writer, options)
       return fail
     end
   end
-
 
   -----------------------------------------------------------------------------
   -- Parsers used for markdown lists
@@ -277,10 +280,6 @@ function M.new(writer, options)
   end
 
   local RawNoteRef = #(lbracket * circumflex) * tag / strip_first_char
-
-  local chunk = Cs( line
-                  * (optionallyindentedline - blankline)^0
-                  )
 
   local NoteRef    = RawNoteRef / lookup_note
 
