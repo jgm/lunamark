@@ -1,10 +1,11 @@
-* TODO definition list extension (read term as raw, parse later)
+* TODO definition list extension
   x html writer
   x generic writer
   _ man writer
   x context writer
   x latex writer
   _ docbook writer
+  _ markdown reader (read term as raw + parse later)
 
 * TODO fenced code block extension
 * TODO pandoc title block extension
