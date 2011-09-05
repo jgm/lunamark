@@ -2,7 +2,7 @@
   x html writer
   x generic writer
   _ man writer
-  _ context writer
+  x context writer
   _ latex writer
   _ docbook writer
 

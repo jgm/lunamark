@@ -103,6 +103,16 @@ function M.new(options)
     return format("\\footnote{%s}", contents)
   end
 
+  function ConTeXt.definitionlist(items)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      buffer[#buffer + 1] = format("\\startdescription{%s}\n%s\n\\stopdescription",
+        item.term, table.concat(item.definitions, ConTeXt.interblocksep))
+    end
+    local contents = table.concat(buffer, ConTeXt.containersep)
+    return contents
+  end
+
   return ConTeXt
 end
 
