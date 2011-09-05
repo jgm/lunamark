@@ -105,7 +105,7 @@ if optarg["0"] then
 end
 
 local extensions_opt = optarg.X or ""
-for x in extensions_opt:gmatch("[%+%-]?[%a]+") do
+for x in extensions_opt:gmatch("[%+%-]?[%a_]+") do
   local val = true
   if x:sub(1,1) == "+" then
     val = true

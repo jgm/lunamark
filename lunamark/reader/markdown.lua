@@ -141,11 +141,13 @@ function M.new(writer, options)
 
   local chunk = line * (optionallyindentedline - blankline)^0
 
-  -- optionally indented block followed by 0 or more optionally
-  -- indented blocks with first line indented
-  local chunks = Cs( chunk
-                   * (blankline^1 * indent * -blankline * chunk)^0
-                   * blankline^1 )
+  -- block followed by 0 or more optionally
+  -- indented blocks with first line indented.
+  local function indented_blocks(bl)
+    return Cs( bl
+             * (blankline^1 * indent * -blankline * bl)^0
+             * blankline^0 )
+  end
 
   -- parser if condition holds, else fail
   local function when(cond, parser)
@@ -287,7 +289,7 @@ function M.new(writer, options)
 
   local NoteRef    = RawNoteRef / lookup_note
 
-  local NoteBlock = nonindentspace * RawNoteRef * colon * spnl * chunks
+  local NoteBlock = nonindentspace * RawNoteRef * colon * spnl * indented_blocks(chunk)
 
   ------------------------------------------------------------------------------
   -- Helpers for links and references
@@ -641,8 +643,9 @@ function M.new(writer, options)
                      + space * space * space * defstartchar * #spacing
                      )
 
+  local dlchunk = line * (indentedline - defstart - blankline)^0
 
-  local DefinitionListItem = C(line) * Ct((defstart * chunks)^1)
+  local DefinitionListItem = C(line) * Ct((defstart * indented_blocks(dlchunk) / docparser)^1)
                            / function(a,b)
                                return { term = inlinesparser(a), definitions = b }
                              end
