@@ -4,7 +4,7 @@
   x man writer
   x context writer
   x latex writer
-  _ docbook writer
+  x docbook writer
   _ markdown reader (read term as raw + parse later)
 
 * TODO make writers more object-like? with self?

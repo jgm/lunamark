@@ -104,6 +104,20 @@ function M.new(options)
                 Docbook.containersep)
   end
 
+  function Docbook.definitionlist(items)
+    local buffer = {}
+    for _,item in ipairs(items) do
+      local defs = {}
+      for _,def in ipairs(item.definitions) do
+        defs[#defs + 1] = format("<listitem>%s%s%s</listitem>", Docbook.containersep, def, Docbook.containersep)
+      end
+      buffer[#buffer + 1] = format("<varlistentry>%s<term>%s</term>%s%s%s</varlistentry>", Docbook.containersep,
+         item.term, Docbook.containersep, table.concat(defs, Docbook.containersep), Docbook.containersep)
+    end
+    local contents = table.concat(buffer, Docbook.containersep)
+    return format("<variablelist>%s%s%s</variablelist>",Docbook.containersep, contents, Docbook.containersep)
+  end
+
   return Docbook
 end
 
