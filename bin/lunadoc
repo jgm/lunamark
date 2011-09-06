@@ -17,7 +17,6 @@
 
 local lunamark = require("lunamark")
 local cosmo = require("cosmo")
-local lpeg = require("lpeg")
 
 local destdir = "doc"
 
@@ -40,7 +39,28 @@ local function extract_comments(f)
         collect = false
         decl = l:match("function%s+(.-%))") or l:match("([^%s%=]+)%s*=")
         if decl then decl = string.gsub(decl,"M%.","") end  -- strip off M. which puts declaration in module
-        table.insert(chunks, { contents = table.concat(commentlines,"\n"), decl = decl })
+        -- extract metadata lines
+        local thischunk = { lines = {}, author = {}, param = {}, returns = {}, see = {}, name = decl }
+        thischunk.lines = {}
+        for _,line in ipairs(commentlines) do
+          local m, val = line:match("^ ? ? ?@(%a+)[ \t]*(.*)$")
+          if m == "author" then
+            table.insert(thischunk.author, val)
+          elseif m == "param" then
+            table.insert(thischunk.param, val)
+          elseif m == "returns" then
+            table.insert(thischunk.returns, val)
+          elseif m == "see" then
+            table.insert(thischunk.see, val)
+          elseif m then
+            thischunk[m] = val
+          else
+            table.insert(thischunk.lines, line)
+          end
+        end
+        thischunk.contents = table.concat(thischunk.lines, "\n")
+        thischunk.lines = nil
+        table.insert(chunks, thischunk)
         commentlines = {}
       end
     end
@@ -96,19 +116,7 @@ local index = table.concat(index_table,"\n")
 
 writer = lunamark.writer.html.new()
 
-local identchar = lpeg.R("AZ","az","09") + lpeg.P("_")
-local modname = identchar^1 * (lpeg.P(".") * identchar^1)^0
-local declname = identchar^1
-local crossref = lpeg.P("@") * lpeg.C(modname) * lpeg.Cs((lpeg.P("#") / "" * declname)^-1)
-               / function(s,f)
-                   local lab = s
-                   if f then lab = lab .. "." .. f end
-                   local src = s .. ".html"
-                   if f then src = src .. "#" .. f end
-                   return writer.link(lab, src, "")
-                 end
-
-local converter = lunamark.reader.markdown.new(writer,{smart=true, custom_inline = crossref})
+local converter = lunamark.reader.markdown.new(writer,{smart=true})
 
 for i=1,#arg do
   local f = arg[i]
@@ -116,11 +124,11 @@ for i=1,#arg do
   local modname = get_modname(f)
   local decls = {}
   for _,chunk in ipairs(chunks) do
-    local decl = chunk.decl
-    local declid = decl and decl:match("^[^%(]*")
+    local name = chunk.name
+    local nameid = name and name:match("^[^%(]*")
     local result = converter(chunk.contents)
-    if decl then
-      local decltext = cosmo.fill(decltemplate, { name = decl, id = declid, contents = result })
+    if name then
+      local decltext = cosmo.fill(decltemplate, { name = name, id = nameid, contents = result })
       table.insert(decls, decltext)
     else
       table.insert(decls, result)
