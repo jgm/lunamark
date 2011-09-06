@@ -46,7 +46,6 @@ local function extract_comments(f)
         if decl then decl = string.gsub(decl,"M%.","") end  -- strip off M. which puts declaration in module
         -- extract metadata lines
         local thischunk = { lines = {}, author = {}, param = {}, returns = {}, see = {}, name = decl }
-        -- thischunk["if"] = cosmo.cif  -- this activates the "if" keyword
         for _,line in ipairs(commentlines) do
           local m, val = line:match("^ ? ? ?@(%a+)[ \t]*(.*)$")
           if m == "author" then
@@ -98,16 +97,9 @@ $index
 </html>
 ]]
 
-local chunktemplate = [[
-<div id="$id">
-<h3 class="declaration">$name</h3>
-$contents
-</div>
-]]
-
 local css = [[
-body { font-family: Arial, sans-serif; }
-code,pre { font-family: Monaco, monospace; }
+body { font-family: Georgia, serif; }
+code,pre { font-family: Courier, monospace; }
 div#index { position: absolute; left: 1em; top: 1em; width:14em; border-right: 1px solid grey; }
 div#content { position: absolute; left: 15em; top: 0em; padding-left: 2em; max-width: 40em; padding-bottom: 1em; }
 ]]
@@ -132,12 +124,7 @@ for i=1,#arg do
   data.chunks = extract_comments(f)
   data.index = index
   data.modname = get_modname(f)
-  --local buffer = {}
-  --for _,chunk in ipairs(chunks) do
-  --  table.insert(buffer, cosmo.fill(chunktemplate, chunk))
-  --end
   local page = cosmo.fill(template, data)
-  --  { modname = modname, index = index, contents = table.concat(decls) })
   local file = io.open(destdir .. "/" .. data.modname .. ".html", "w")
   file:write(page)
   file:close()
