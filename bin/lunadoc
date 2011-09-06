@@ -20,6 +20,11 @@ local cosmo = require("cosmo")
 
 local destdir = "doc"
 
+local writer = lunamark.writer.html.new()
+
+local converter = lunamark.reader.markdown.new(writer,{smart=true})
+
+
 local function extract_comments(f)
   local commentlines = {}
   local chunks = {}
@@ -41,7 +46,7 @@ local function extract_comments(f)
         if decl then decl = string.gsub(decl,"M%.","") end  -- strip off M. which puts declaration in module
         -- extract metadata lines
         local thischunk = { lines = {}, author = {}, param = {}, returns = {}, see = {}, name = decl }
-        thischunk.lines = {}
+        -- thischunk["if"] = cosmo.cif  -- this activates the "if" keyword
         for _,line in ipairs(commentlines) do
           local m, val = line:match("^ ? ? ?@(%a+)[ \t]*(.*)$")
           if m == "author" then
@@ -58,7 +63,8 @@ local function extract_comments(f)
             table.insert(thischunk.lines, line)
           end
         end
-        thischunk.contents = table.concat(thischunk.lines, "\n")
+        thischunk.contents = converter(table.concat(thischunk.lines, "\n"))
+        thischunk.id = thischunk.name and thischunk.name:match("^[^%( \t]*")
         thischunk.lines = nil
         table.insert(chunks, thischunk)
         commentlines = {}
@@ -78,7 +84,12 @@ local template = [[
 <body>
 <div id="content">
 <h1 class="module">$modname</h1>
+$chunks[=[
+<div id="$id">
+<h3 class="declaration">$name</h3>
 $contents
+</div>
+]=]
 </div>
 <div id="index">
 $index
@@ -87,7 +98,7 @@ $index
 </html>
 ]]
 
-local decltemplate = [[
+local chunktemplate = [[
 <div id="$id">
 <h3 class="declaration">$name</h3>
 $contents
@@ -114,28 +125,20 @@ end
 
 local index = table.concat(index_table,"\n")
 
-writer = lunamark.writer.html.new()
-
-local converter = lunamark.reader.markdown.new(writer,{smart=true})
-
 for i=1,#arg do
   local f = arg[i]
-  local chunks = extract_comments(f)
-  local modname = get_modname(f)
-  local decls = {}
-  for _,chunk in ipairs(chunks) do
-    local name = chunk.name
-    local nameid = name and name:match("^[^%(]*")
-    local result = converter(chunk.contents)
-    if name then
-      local decltext = cosmo.fill(decltemplate, { name = name, id = nameid, contents = result })
-      table.insert(decls, decltext)
-    else
-      table.insert(decls, result)
-    end
-  end
-  local page = cosmo.fill(template, { modname = modname, index = index, contents = table.concat(decls) })
-  local file = io.open(destdir .. "/" .. modname .. ".html", "w")
+  local data = {}
+  data["if"] = cosmo.cif  -- this activates the "if" keyword
+  data.chunks = extract_comments(f)
+  data.index = index
+  data.modname = get_modname(f)
+  --local buffer = {}
+  --for _,chunk in ipairs(chunks) do
+  --  table.insert(buffer, cosmo.fill(chunktemplate, chunk))
+  --end
+  local page = cosmo.fill(template, data)
+  --  { modname = modname, index = index, contents = table.concat(decls) })
+  local file = io.open(destdir .. "/" .. data.modname .. ".html", "w")
   file:write(page)
   file:close()
 end
