@@ -48,10 +48,12 @@ local function extract_comments(f)
         local thischunk = { lines = {}, author = {}, param = {}, returns = {}, see = {}, name = decl }
         for _,line in ipairs(commentlines) do
           local m, val = line:match("^ ? ? ?@(%a+)[ \t]*(.*)$")
+          val = val and writer.string(val)
           if m == "author" then
             table.insert(thischunk.author, val)
           elseif m == "param" then
-            table.insert(thischunk.param, val)
+            local paramname, paramdescr = val:match("(%S*)%s*(.*)")
+            table.insert(thischunk.param, { name = paramname, description = paramdescr })
           elseif m == "returns" then
             table.insert(thischunk.returns, val)
           elseif m == "see" then
@@ -87,6 +89,14 @@ $chunks[=[
 <div id="$id">
 <h3 class="declaration">$name</h3>
 $contents
+$if{ param }[==[
+<dl class="param">
+$param[===[
+<dt>$name</dt>
+<dd>$description</dt>
+]===]
+</dl>
+]==]
 </div>
 ]=]
 </div>
@@ -102,6 +112,33 @@ body { font-family: Georgia, serif; }
 code,pre { font-family: Courier, monospace; }
 div#index { position: absolute; left: 1em; top: 1em; width:14em; border-right: 1px solid grey; }
 div#content { position: absolute; left: 15em; top: 0em; padding-left: 2em; max-width: 40em; padding-bottom: 1em; }
+dl.param
+{
+        float: left;
+        margin: 1em 0;
+        padding: 0;
+        border-bottom: 1px solid gray;
+}
+
+.param dt
+{
+        clear: left;
+        float: left;
+        width: 10em;
+        margin: 0;
+        padding: 5px;
+        border-top: 1px solid gray;
+        font-weight: bold;
+}
+
+.param dd
+{
+        float: left;
+        width: 20em;
+        margin: 0;
+        padding: 5px;
+        border-top: 1px solid #999;
+}
 ]]
 
 local index_table = {}
