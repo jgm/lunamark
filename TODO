@@ -1,3 +1,18 @@
+* TODO lunadoc:  do something in templates with all the metadata
+
+* TODO API documentation for all modules
+
+* TODO code comments/cleanup for lunadoc
+
+* TODO man pages for lunamark, lunadoc
+  (use existing shells)
+
+* TODO add lunadoc to rock?
+
+* TODO gh-pages website (at least README, library API, benchmarks)
+
+* TODO release
+
 * TODO fenced code block extension
 
 * TODO pandoc title block extension
@@ -28,11 +43,6 @@
     @name <word>
     The name of the function or table definition. This is usually infered from the code analysis, and the programmer does not need to define it. If LuaDoc can infer the name of the function automatically it's even not recomended to define the name explicitly, to avoid redundancy.
 
-* TODO man page for lunamark, lunadoc (shells already exist)
-* TODO add documentation for lunadoc
-* TODO add lunadoc to rock?
-* TODO document with lunadoc.
-
 * TODO alternative indented block with metadata?
 
   This is text.
@@ -57,7 +67,6 @@
 * TODO add man page
 
 * TODO # in ordered lists extension
-* TODO gh-pages website (at least README, library API, benchmarks)
 
 * TODO layout: indentation options?
 * TODO Add metadata, return table as second value
