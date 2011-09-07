@@ -72,7 +72,7 @@ function M.new(options)
   end
 
   function Html.display_html(s)
-    return format("%s",s)
+    return s
   end
 
   function Html.emphasis(s)
