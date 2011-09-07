@@ -13,6 +13,7 @@ extensions (which can be turned on or off individually):
   - Smart typography (fancy quotes, dashes, ellipses)
   - Significant start numbers in ordered lists
   - Footnotes
+  - Definition lists
 
 More extensions will be supported in later versions.
 

@@ -10,9 +10,9 @@ description = {
    detailed = [[
       lunamark is a lua library for converting between markup
       formats.  Currently markdown and HTML are the supported input formats,
-      and HTML, HTML5, LaTeX, ConTeXt, and DocBook the supported output formats,
-      but lunamark's modular structure makes it easy to add new parsers
-      and writers.  Parsers are written using a PEG grammar.
+      and HTML, HTML5, LaTeX, ConTeXt, DocBook, and groff man are
+      the supported output formats.  Adding new output formats is
+      easy. Parsers are written using a PEG grammar.
    ]],
    homepage = "http://github.com/jgm/lunamark",
    license = "MIT/X11",
