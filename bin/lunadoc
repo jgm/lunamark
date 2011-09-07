@@ -27,6 +27,7 @@ local converter = lunamark.reader.markdown.new(writer,{smart=true})
 
 local function extract_comments(f)
   local commentlines = {}
+  local metadata = { author = {} }
   local chunks = {}
   local collect = false
   local decl
@@ -50,19 +51,32 @@ local function extract_comments(f)
           local m, val = line:match("^ ? ? ?@(%a+)[ \t]*(.*)$")
           val = val and writer.string(val)
           if m == "author" then
-            table.insert(thischunk.author, val)
+            table.insert(metadata.author, val)
+          elseif m == "copyright" then
+            metadata.copyright = val
+          elseif m == "release" then
+            metadata.release = val
+          elseif m == "usage" then
+            table.insert(thischunk.lines, val)
+          elseif m == "description" then
+            table.insert(thischunk.lines, val)
           elseif m == "param" then
             local paramname, paramdescr = val:match("(%S*)%s*(.*)")
             table.insert(thischunk.param, { name = paramname, description = paramdescr })
           elseif m == "returns" then
             table.insert(thischunk.returns, val)
           elseif m == "see" then
-            table.insert(thischunk.see, val)
+            table.insert(thischunk.see, { name = val, url = val:gsub("([^#]*)(.*)","%1%.html%2") })
           elseif m then
             thischunk[m] = val
           else
             table.insert(thischunk.lines, line)
           end
+        end
+        for i,x in ipairs(thischunk.returns) do
+          local n
+          if i == 1 then n = "⇒" else n = "," end
+          table.insert(thischunk.param, { name = n, description = x })
         end
         thischunk.contents = converter(table.concat(thischunk.lines, "\n"))
         thischunk.id = thischunk.name and thischunk.name:match("^[^%( \t]*")
@@ -72,10 +86,10 @@ local function extract_comments(f)
       end
     end
   end
-  return chunks
+  return metadata, chunks
 end
 
-local template = [[
+local template = [===[
 <html>
 <head>
 <title>$modname</title>
@@ -85,17 +99,21 @@ local template = [[
 <body>
 <div id="content">
 <h1 class="module">$modname</h1>
+$if{ #author > 0 }[[<p><b>Author:</b> $author</p>]]
+$if{ copyright }[[<p><b>Copyright:</b> &copy; $copyright</p>]]
+$if{ release }[[<p><b>Release:</b> $release</p>]]
 $chunks[=[
-<div id="$id">
-<h3 class="declaration">$name</h3>
+<div class="section" $if{ id }[[ id="$id"]]>
+<h3 class="declaration"><code>$name</code></h3>
 $contents
-$if{ param }[==[
 <dl class="param">
-$param[===[
-<dt>$name</dt>
+$param[[
+<dt><code>$name</code></dt>
 <dd>$description</dt>
-]===]
+]]
 </dl>
+$if{ see }[==[
+$see[[<p><b>See also:</b> <a href="$url">$name</a>.</p>]]
 ]==]
 </div>
 ]=]
@@ -105,19 +123,20 @@ $index
 </div>
 </body>
 </html>
-]]
+]===]
 
 local css = [[
 body { font-family: Georgia, serif; }
+h3.declaration { margin-bottom: 0.5em; }
+div.section { clear: both; border-top: 2px solid #eee; }
 code,pre { font-family: Courier, monospace; }
-div#index { position: absolute; left: 1em; top: 1em; width:14em; border-right: 1px solid grey; }
-div#content { position: absolute; left: 15em; top: 0em; padding-left: 2em; max-width: 40em; padding-bottom: 1em; }
+div#index { position: absolute; left: 1em; top: 1em; width:14em; }
+div#content { position: absolute; left: 15em; top: 0.5em; padding-left: 2em; max-width: 40em; padding-bottom: 1em; border-left: 1px solid #555; }
 dl.param
 {
         float: left;
         margin: 1em 0;
         padding: 0;
-        border-bottom: 1px solid gray;
 }
 
 .param dt
@@ -126,8 +145,7 @@ dl.param
         float: left;
         width: 10em;
         margin: 0;
-        padding: 5px;
-        border-top: 1px solid gray;
+        padding: 2px;
         font-weight: bold;
 }
 
@@ -136,8 +154,7 @@ dl.param
         float: left;
         width: 20em;
         margin: 0;
-        padding: 5px;
-        border-top: 1px solid #999;
+        padding: 2px;
 }
 ]]
 
@@ -157,8 +174,12 @@ local index = table.concat(index_table,"\n")
 for i=1,#arg do
   local f = arg[i]
   local data = {}
+  local metadata
   data["if"] = cosmo.cif  -- this activates the "if" keyword
-  data.chunks = extract_comments(f)
+  metadata, data.chunks = extract_comments(f)
+  data.author = table.concat(metadata.author, "; ")
+  data.copyright = metadata.copyright
+  data.release = metadata.release
   data.index = index
   data.modname = get_modname(f)
   local page = cosmo.fill(template, data)

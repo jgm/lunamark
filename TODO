@@ -17,32 +17,6 @@
 
 * TODO pandoc title block extension
 
-* TODO in lunadoc, use metadata -- see luadoc for standard fields
-    @author <text>
-    An author of the module or file.
-    @copyright <text>
-    The copyright notice of the module or file. LuaDoc adds a © sign between the label (Copyright) and the given text (e.g. 2004-2007 Kepler Project).
-    @field
-    Describe a table field definition.
-    @param <word> <text>
-    Describe function parameters. It requires the name of the parameter and its description.
-    @release <text>
-    Free format string to describe the module or file release.
-    @return <text>
-    Describe a returning value of the function. Since Lua can return multiple values, this tag should appear more than once.
-    @see <text>
-    Refers to other descriptions of functions or tables.
-    @usage <text>
-    Describe the usage of the function or variable.
-    Infered Tags
-    The following tags would be normally infered by LuaDoc, but they can be used to override the infered value.
-    @class <word>
-    If LuaDoc cannot infer the type of documentation (function, table or module definition), the programmer can specify it explicitly.
-    @description
-    The description of the function or table. This is usually infered automatically.
-    @name <word>
-    The name of the function or table definition. This is usually infered from the code analysis, and the programmer does not need to define it. If LuaDoc can infer the name of the function automatically it's even not recomended to define the name explicitly, to avoid redundancy.
-
 * TODO alternative indented block with metadata?
 
   This is text.
