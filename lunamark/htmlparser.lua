@@ -469,7 +469,7 @@ end
 --  * string: strings represent text leaf nodes within the tree
 --
 --  * table: tables are composed of the following properties:
---      + type: the type of the node.  could be one of the following:
+--      + type: the type of the node could be one of the following:
 --	  `tag`, `cdata`, `comment`
 --      + str: if type is `cdata`, `comment`, or `string`,
 --        then this will hold the comment/cdata contents

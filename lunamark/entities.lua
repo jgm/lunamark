@@ -293,18 +293,24 @@ end
 
 --- Given a string of decimal digits, returns a UTF-8 encoded
 -- string encoding a unicode character.
+-- @param s A string of decimal digits representing a unicode code point.
+-- @returns The character encoded as a UTF-8 string.
 function M.dec_entity(s)
   return toutf8(tonumber(s))
 end
 
 --- Given a string of hexadecimal digits, returns a UTF-8 encoded
 -- string encoding a unicode character.
+-- @param s A string of hexadecimal digits representing a unicode code point.
+-- @returns The character encoded as a UTF-8 string.
 function M.hex_entity(s)
   return toutf8(tonumber("0x"..s))
 end
 
 --- Given a character entity name (like `ouml`), returns a UTF-8 encoded
 -- string encoding a unicode character.
+-- @param s Character entity name.
+-- @returns The character encoded as a UTF-8 string.
 function M.char_entity(s)
   local n = character_entities[s]
   return toutf8(n)
