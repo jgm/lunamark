@@ -78,7 +78,7 @@ local function extract_comments(f)
           if i == 1 then n = "⇒" else n = "," end
           table.insert(thischunk.param, { name = n, description = x })
         end
-        thischunk.contents = converter(table.concat(thischunk.lines, "\n"))
+        thischunk.contents = converter(table.concat(thischunk.lines, "\n") .. "\n\n")
         thischunk.id = thischunk.name and thischunk.name:match("^[^%( \t]*")
         thischunk.lines = nil
         table.insert(chunks, thischunk)
@@ -135,15 +135,16 @@ div#content { position: absolute; left: 15em; top: 0.5em; padding-left: 2em; max
 dl.param
 {
         float: left;
-        margin: 1em 0;
+        margin: 0;
         padding: 0;
+        padding-bottom: 0.5em;
 }
 
 .param dt
 {
         clear: left;
         float: left;
-        width: 10em;
+        width: 8em;
         margin: 0;
         padding: 2px;
         font-weight: bold;
@@ -152,7 +153,6 @@ dl.param
 .param dd
 {
         float: left;
-        width: 20em;
         margin: 0;
         padding: 2px;
 }
