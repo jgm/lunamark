@@ -7,13 +7,14 @@ local M = {}
 local rep  = string.rep
 local insert = table.insert
 
---- Find a template called `name` for the format `format`
--- and return its string contents.
--- If the template has no extension, `format` will be used
--- as the extension. The template is sought first in the
+--- Find a template and return its contents.
+-- @param name Name of the template.
+-- @returns String contents of template file.
+-- The template is sought first in the
 -- working directory, then in `templates`, then in
--- `$HOME/.lunamark/templates`, then in `APPDATA`.
-function M.find_template(name, format)
+-- `$HOME/.lunamark/templates`, then in the Windows
+-- `APPDATA` directory.
+function M.find_template(name)
   if not name then name = "default" end
   local base, ext = name:match("([^%.]*)(.*)")
   if (not ext or ext == "") and format then ext = "." .. format end
@@ -54,20 +55,26 @@ end
 --]]
 
 --- Print error message and exit.
+-- @param msg Error message to print.
+-- @param exit_code Exit code to return on exit.
 function M.err(msg, exit_code)
   io.stderr:write("lunamark: " .. msg .. "\n")
   os.exit(exit_code or 1)
 end
 
 --- Shallow table copy including metatables.
+-- @param t Table to copy.
+-- @returns Copy of table.
 function M.table_copy(t)
   local u = { }
   for k, v in pairs(t) do u[k] = v end
   return setmetatable(u, getmetatable(t))
 end
 
---- Expand tabs in a line of text, using `tabstop`.
+--- Expand tabs in a line of text.
 -- From *Programming Lua*.
+-- @param s String, assumed to be a single line of text.
+-- @param tabstop Number of spaces per tabstop.
 function M.expand_tabs_in_line(s, tabstop)
   local tab = tabstop or 4
   local corr = 0

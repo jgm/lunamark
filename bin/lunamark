@@ -172,7 +172,12 @@ if standalone and not template then
 end
 
 if template then
-  local contents = lunamark.util.find_template(template, to)
+  local template_name = template
+  -- use writer name as extension if none provided
+  if not template_name:match("%..+$") then
+    template_name = template_name .. "." .. to
+  end
+  local contents = lunamark.util.find_template(template_name)
   local data = {}
   if metadata then data = metadata end
   if optarg.d then
