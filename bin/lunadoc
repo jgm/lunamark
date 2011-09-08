@@ -27,7 +27,7 @@ local destdir = "doc"
 
 local writer = lunamark.writer.html.new()
 
-local converter = lunamark.reader.markdown.new(writer,{smart=true})
+local converter = lunamark.reader.markdown.new(writer,{smart=true, definition_lists=true})
 
 
 local function extract_comments(f)
@@ -71,7 +71,7 @@ local function extract_comments(f)
           elseif m == "returns" then
             table.insert(thischunk.returns, val)
           elseif m == "see" then
-            table.insert(thischunk.see, { name = val, url = val:gsub("([^#]*)(.*)","%1%.html%2") })
+            table.insert(thischunk.see, { name = val, url = val:gsub("([^#]+)","%1%.html") })
           elseif m then
             thischunk[m] = val
           else
