@@ -48,8 +48,16 @@ local function extract_comments(f)
         table.insert(commentlines,n)
       else
         collect = false
-        decl = l:match("function%s+(.-%))") or l:match("([^%s%=]+)%s*=")
-        if decl then decl = string.gsub(decl,"M%.","") end  -- strip off M. which puts declaration in module
+        local declname, decargs = nil, nil
+        declname, decargs = l:match("([^%s%=]+)%s*=%s*function%s*(%b())")
+        if not declname then
+          declname, decargs = l:match("function%s*([^%s%(]+)%s*(%b())")
+        end
+        if not declname then
+          declname = l:match("([^%s=]+)%s*=")
+        end
+        if declname then declname = string.gsub(declname,"^M%.","") end  -- strip off M. which puts declaration in module
+        decl = (declname or "") .. ((declname and decargs) or "")
         -- extract metadata lines
         local thischunk = { lines = {}, author = {}, param = {}, returns = {}, see = {}, name = decl }
         for _,line in ipairs(commentlines) do
