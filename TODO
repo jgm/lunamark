@@ -1,3 +1,7 @@
+* TODO Use leg for lunadoc
+  /Users/jgm/Downloads/leg/doc/grammar.html 
+  and also consider leg's method of making the grammar modifiable
+
 * TODO API documentation for all modules
   [x] lunamark/entities.lua
   [ ] lunamark/writer.lua
