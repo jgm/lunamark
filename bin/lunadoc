@@ -1,5 +1,8 @@
 #!/usr/bin/env lua
 
+-- (c) 2011 John MacFarlane
+-- Released under the MIT license.
+
 --- This program reads a number of source files, scans them
 -- for special comment blocks beginning with '---', and writes
 -- an HTML file documenting each module to the doc directory.
@@ -13,7 +16,9 @@
 -- Each file is assumed to be a module.  The 'module' keyword need
 -- not be used.
 --
--- Documentation is parsed as markdown.
+-- Documentation is parsed as markdown.  A number of luadoc directives
+-- beginning with `@` are recognized, including `@copyright`,
+-- `@release`, `@author`, `@name`, `@param`, `@returns`.
 
 local lunamark = require("lunamark")
 local cosmo = require("cosmo")
