@@ -1,6 +1,10 @@
 -- (c) 2009-2011 John MacFarlane. Released under MIT license.
 -- See the file LICENSE in the source for details.
 
+--- Generic groff writer for lunamark.
+-- The groff man writer extends this writer.
+-- @see lunamark.writer.generic
+
 local M = {}
 
 local format = string.format
@@ -8,6 +12,8 @@ local gsub = string.gsub
 local generic = require("lunamark.writer.generic")
 local entities = require("lunamark.entities")
 
+--- Returns a new Groff writer.
+-- @see lunamark.writer.generic
 function M.new(options)
   local Groff = generic.new(options)
 

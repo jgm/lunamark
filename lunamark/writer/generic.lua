@@ -1,8 +1,27 @@
 -- (c) 2009-2011 John MacFarlane. Released under MIT license.
 -- See the file LICENSE in the source for details.
 
---- Generic instructions here about how to create a new writer,
--- with examples.
+--- Generic writer for lunamark.
+-- This serves as generic documentation for lunamark writers,
+-- which all export a table with the same functions defined.
+--
+-- New writers can simply modify the generic writer: for example,
+--
+--     local Xml = generic.new(options)
+--
+--     Xml.linebreak = "<linebreak />"
+--
+--     local escaped = {
+--          ["<" ] = "&lt;",
+--          [">" ] = "&gt;",
+--          ["&" ] = "&amp;",
+--          ["\"" ] = "&quot;",
+--          ["'" ] = "&#39;"
+--     }
+--
+--     function Xml.string(s)
+--       return s:gsub(".",escaped)
+--     end
 
 local util = require("lunamark.util")
 local M = {}
@@ -20,9 +39,10 @@ setmetatable(W, meta)
 -- which outputs plain text with no formatting.  `options` is an optional
 -- table with the following fields:
 --
--- + `layout`:  `minimize` (no space between blocks), `compact` (no
---   extra blank lines between blocks), `default` (blank line between
---   blocks).
+-- `layout`
+-- :   `minimize` (no space between blocks)
+-- :   `compact` (no extra blank lines between blocks)
+-- :   `default` (blank line between blocks)
 function M.new(options)
 
 --- The table contains the following fields:

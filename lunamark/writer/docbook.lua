@@ -1,6 +1,10 @@
 -- (c) 2009-2011 John MacFarlane. Released under MIT license.
 -- See the file LICENSE in the source for details.
 
+--- DocBook writer for lunamark.
+-- Extends XML writer.
+-- @see lunamark.writer.xml
+
 local M = {}
 
 local xml = require("lunamark.writer.xml")
@@ -8,6 +12,8 @@ local util = require("lunamark.util")
 local gsub = string.gsub
 local format = string.format
 
+--- Returns a new DocBook writer.
+-- @see lunamark.writer.generic
 function M.new(options)
   local Docbook = xml.new(options)
 

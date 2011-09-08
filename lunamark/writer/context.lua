@@ -1,6 +1,10 @@
 -- (c) 2009-2011 John MacFarlane, Khaled Hosny, Hans Hagen.
 -- Released under MIT license. See the file LICENSE in the source for details.
 
+--- ConTeXt writer for lunamark.
+-- Extends the TeX writer.
+-- @see lunamark.writer.tex
+
 local M = {}
 
 local tex = require("lunamark.writer.tex")
@@ -8,6 +12,8 @@ local util = require("lunamark.util")
 local gsub = string.gsub
 local format = string.format
 
+--- Returns a new ConTeXt writer
+-- @see lunamark.writer.generic
 function M.new(options)
   local ConTeXt = tex.new(options)
 

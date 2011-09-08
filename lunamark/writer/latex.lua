@@ -1,6 +1,10 @@
 -- (c) 2009-2011 John MacFarlane. Released under MIT license.
 -- See the file LICENSE in the source for details.
 
+--- LaTeX writer for lunamark.
+-- Extends the TeX writer.
+-- @see lunamark.writer.tex
+
 local M = {}
 
 local tex = require("lunamark.writer.tex")
@@ -8,6 +12,8 @@ local util = require("lunamark.util")
 local gsub = string.gsub
 local format = string.format
 
+--- Returns a new LaTeX writer.
+-- @see lunamark.writer.generic
 function M.new(options)
   local LaTeX = tex.new(options)
 
