@@ -91,7 +91,8 @@ local function extract_comments(f)
           if i == 1 then n = "⇒" else n = "," end
           table.insert(thischunk.param, { name = n, description = x })
         end
-        thischunk.contents = converter(table.concat(thischunk.lines, "\n") .. "\n\n")
+        local rawcontents = string.gsub(table.concat(thischunk.lines, "\n") .. "\n\n", "\r", "")
+        thischunk.contents = converter(rawcontents)
         thischunk.id = thischunk.name and thischunk.name:match("^[^%( \t]*")
         thischunk.lines = nil
         table.insert(chunks, thischunk)
