@@ -39,8 +39,7 @@ local M = {}
 -- `definition_lists`
 -- :    Enable definition lists as in pandoc.
 function M.new(writer, options)
-
-  if not options then options = {} end
+  local options = options or {}
 
   local function expandtabs(s)
     if not options.preserve_tabs and s:find("\t") then

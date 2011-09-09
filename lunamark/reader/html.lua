@@ -177,7 +177,7 @@ end
 -- @param options Table of options (currently ignored)
 -- @returns Function that converts an HTML string using `writer`
 function M.new(writer, options)
-
+  local options = options or {}
   return function(inp)
     local parser = htmlparser.new(inp)
     local parsed = parser:parse()
