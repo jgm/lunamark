@@ -100,7 +100,7 @@ function M.new(writer, options)
   local fail                   = any - 1
   local always                 = P("")
 
-  local escapable              = S("\\`*_{}[]()+_.!<>#-")
+  local escapable              = S("\\`*_{}[]()+_.!<>#-~:^")
   local anyescaped             = P("\\") / "" * escapable
                                + any
 
