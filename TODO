@@ -1,11 +1,11 @@
 * TODO API documentation for all modules
   [x] lunamark/entities.lua
-  [ ] lunamark/writer.lua
+  [x] lunamark/writer.lua
   [x] lunamark/writer/html5.lua
   [x] lunamark/htmlparser.lua
   [x] lunamark/writer/context.lua
   [x] lunamark/writer/latex.lua
-  [ ] lunamark/reader.lua
+  [x] lunamark/reader.lua
   [x] lunamark/writer/docbook.lua
   [x] lunamark/writer/man.lua
   [ ] lunamark/reader/html.lua
