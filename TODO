@@ -3,26 +3,11 @@
   export syntax too?
 
 * TODO API documentation for all modules
-  [x] lunamark/entities.lua
-  [x] lunamark/writer.lua
-  [x] lunamark/writer/html5.lua
-  [x] lunamark/htmlparser.lua
-  [x] lunamark/writer/context.lua
-  [x] lunamark/writer/latex.lua
-  [x] lunamark/reader.lua
-  [x] lunamark/writer/docbook.lua
-  [x] lunamark/writer/man.lua
-  [x] lunamark/reader/html.lua
-  [x] lunamark/writer/generic.lua
-  [x] lunamark/writer/tex.lua
-  [x] lunamark/reader/markdown.lua
-  [x] lunamark/writer/groff.lua
-  [x] lunamark/writer/xml.lua
-  [x] lunamark/util.lua
-  [x] lunamark/writer/html.lua
+  [ ] lunamark.reader.markdown - include assumps about line endings
   [ ] lunamark.lua
 
 * TODO code comments/cleanup for lunadoc
+  factor index into template
 
 * TODO man pages for lunamark, lunadoc
   (use existing shells)
