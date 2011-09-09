@@ -1,3 +1,7 @@
+* TODO markdown, html readers: -- see example.lua
+  export table, functions for both inlines and blocks
+  export syntax too?
+
 * TODO API documentation for all modules
   [x] lunamark/entities.lua
   [x] lunamark/writer.lua
