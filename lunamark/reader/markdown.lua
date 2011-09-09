@@ -17,9 +17,27 @@ local expand_tabs_in_line = util.expand_tabs_in_line
 local M = {}
 
 --- Create a new markdown parser.
--- @name new
--- TODO: document the various options that are significant
--- so far, custom_inline, custom_block, preserve_tabs, smart, startnum, notes, definition_lists
+-- @param writer Table with writer functions
+-- @param options Table with parsing options
+-- @returns A function that converts a markdown string using `writer`
+-- @see lunamark.writer.generic
+--
+-- `options` can include the following fields:
+--
+-- `custom_inline`
+-- :    A custom inline parser (tried before any of the standard ones)
+-- `custom_block`
+-- :    A custom block parser (tried before any of the standard ones)
+-- `preserve_tabs`
+-- :    Preserve tabs instead of converting to spaces
+-- `smart`
+-- :    Parse quotation marks, dashes, ellipses intelligently.
+-- `startnum`
+-- :    Make the opening number in an ordered list significant.
+-- `notes`
+-- :    Enable footnotes as in pandoc.
+-- `definition_lists`
+-- :    Enable definition lists as in pandoc.
 function M.new(writer, options)
 
   if not options then options = {} end

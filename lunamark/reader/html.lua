@@ -173,6 +173,9 @@ local function handle_nodes(writer, nodes, preserve_space)
 end
 
 --- Create a new html parser.
+-- @param writer Writer to use.
+-- @param options Table of options (currently ignored)
+-- @returns Function that converts an HTML string using `writer`
 function M.new(writer, options)
 
   return function(inp)

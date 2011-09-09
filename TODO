@@ -8,14 +8,15 @@
   [x] lunamark/reader.lua
   [x] lunamark/writer/docbook.lua
   [x] lunamark/writer/man.lua
-  [ ] lunamark/reader/html.lua
+  [x] lunamark/reader/html.lua
   [x] lunamark/writer/generic.lua
   [x] lunamark/writer/tex.lua
-  [ ] lunamark/reader/markdown.lua
+  [x] lunamark/reader/markdown.lua
   [x] lunamark/writer/groff.lua
   [x] lunamark/writer/xml.lua
   [x] lunamark/util.lua
   [x] lunamark/writer/html.lua
+  [ ] lunamark.lua
 
 * TODO code comments/cleanup for lunadoc
 
