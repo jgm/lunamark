@@ -1,6 +1,10 @@
 -- (c) 2009-2011 John MacFarlane.  Released under MIT license.
 -- See the file LICENSE in the source for details.
 
+--- @copyright 2009-2011 John MacFarlane
+-- Released under the MIT license. See LICENSE in the source
+-- directory for details.
+
 --- ## Description
 --
 -- Lunamark is a lua library for conversion between markup
