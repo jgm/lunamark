@@ -114,7 +114,7 @@ local template = [===[
 </head>
 <body>
 <div id="content">
-<h1 class="module">$modname</h1>
+<h1 class="module"><code>$modname</code></h1>
 $if{ #author > 0 }[[<p><b>Author:</b> $author</p>]]
 $if{ copyright }[[<p><b>Copyright:</b> &copy; $copyright</p>]]
 $if{ release }[[<p><b>Release:</b> $release</p>]]
@@ -183,7 +183,7 @@ end
 
 for i=1,#arg do
   local modname = get_modname(arg[i])
-  table.insert(index_table, "<p><a href=\"" .. modname .. ".html\">" .. modname .. "</a></p>")
+  table.insert(index_table, "<p><a href=\"" .. modname .. ".html\"><code>" .. modname .. "</code></a></p>")
 end
 
 local index = table.concat(index_table,"\n")
