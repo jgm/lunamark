@@ -15,6 +15,7 @@ local format = string.format
 --- Returns a new DocBook writer.
 -- @see lunamark.writer.generic
 function M.new(options)
+  local options = options or {}
   local Docbook = xml.new(options)
 
   Docbook.linebreak = "<literallayout>&#xA;</literallayout>"

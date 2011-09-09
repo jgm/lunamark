@@ -18,6 +18,7 @@ local format = string.format
 --- Returns a new groff writer.
 -- @see lunamark.writer.generic
 function M.new(options)
+  local options = options or {}
   local Man = groff.new(options)
 
   local endnotes = {}

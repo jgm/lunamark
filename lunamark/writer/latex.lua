@@ -15,6 +15,7 @@ local format = string.format
 --- Returns a new LaTeX writer.
 -- @see lunamark.writer.generic
 function M.new(options)
+  local options = options or {}
   local LaTeX = tex.new(options)
 
   function LaTeX.code(s)

@@ -24,7 +24,9 @@ local gsub = string.gsub
 --
 -- @see lunamark.writer.generic
 function M.new(options)
+  local options = options or {}
   local Html = xml.new(options)
+  local options = options or {}
 
   local endnotes = {}
 

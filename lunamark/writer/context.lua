@@ -15,6 +15,7 @@ local format = string.format
 --- Returns a new ConTeXt writer
 -- @see lunamark.writer.generic
 function M.new(options)
+  local options = options or {}
   local ConTeXt = tex.new(options)
 
   -- we don't try to escape utf-8 characters in context

@@ -18,6 +18,7 @@ local format = string.format
 --- Returns a new TeX writer.
 -- @see lunamark.writer.generic
 function M.new(options)
+  local options = options or {}
   local TeX = generic.new(options)
 
   TeX.interblocksep = "\n\n"  -- insensitive to layout

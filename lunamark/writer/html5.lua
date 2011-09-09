@@ -17,6 +17,7 @@ local format = string.format
 -- @see lunamark.writer.html
 -- @see lunamark.writer.generic
 function M.new(options)
+  local options = options or {}
   local Html5 = html.new(options)
 
   function Html5.section(s,level,contents)

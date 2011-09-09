@@ -15,6 +15,7 @@ local entities = require("lunamark.entities")
 --- Returns a new Groff writer.
 -- @see lunamark.writer.generic
 function M.new(options)
+  local options = options or {}
   local Groff = generic.new(options)
 
   Groff.interblocksep = "\n\n"  -- insensitive to layout

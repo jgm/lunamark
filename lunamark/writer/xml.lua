@@ -16,6 +16,7 @@ local generic = require("lunamark.writer.generic")
 --- Returns a new XML writer.
 -- @see lunamark.writer.generic
 function M.new(options)
+  local options = options or {}
   local Xml = generic.new(options)
 
   Xml.linebreak = "<linebreak />"
