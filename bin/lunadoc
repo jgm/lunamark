@@ -17,7 +17,7 @@
 -- not be used.
 --
 -- Documentation is parsed as markdown.  A number of luadoc directives
--- beginning with `@` are recognized, including `@copyright`,
+-- beginning with `@` are recognized, including `@copyright`, `@license`,
 -- `@release`, `@author`, `@name`, `@param`, `@returns`.
 
 local lunamark = require("lunamark")
@@ -67,6 +67,8 @@ local function extract_comments(f)
             table.insert(metadata.author, val)
           elseif m == "copyright" then
             metadata.copyright = val
+          elseif m == "license" then
+            metadata.license = val
           elseif m == "release" then
             metadata.release = val
           elseif m == "usage" then
@@ -116,6 +118,7 @@ local template = [===[
 $if{ #author > 0 }[[<p><b>Author:</b> $author</p>]]
 $if{ copyright }[[<p><b>Copyright:</b> &copy; $copyright</p>]]
 $if{ release }[[<p><b>Release:</b> $release</p>]]
+$if{ license }[[<p><b>License:</b> $license</p>]]
 $chunks[=[
 <div class="section" $if{ id }[[ id="$id"]]>
 <h3 class="declaration"><code>$name</code></h3>
@@ -193,6 +196,7 @@ for i=1,#arg do
   metadata, data.chunks = extract_comments(f)
   data.author = table.concat(metadata.author, "; ")
   data.copyright = metadata.copyright
+  data.license = metadata.license
   data.release = metadata.release
   data.index = index
   data.modname = get_modname(f)
