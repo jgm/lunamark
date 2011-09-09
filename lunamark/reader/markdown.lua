@@ -131,12 +131,12 @@ function M.new(writer, options)
   local blankline              = optionalspace * newline / "\n"
   local blanklines             = blankline^0
   local skipblanklines         = (optionalspace * newline)^0
-  local indentedline           = indent    /"" * C(linechar^1 * (newline + eof))
-  local optionallyindentedline = indent^-1 /"" * C(linechar^1 * (newline + eof))
+  local indentedline           = indent    /"" * C(linechar^1 * newline^-1)
+  local optionallyindentedline = indent^-1 /"" * C(linechar^1 * newline^-1)
   local sp                     = spacing^0
   local spnl                   = optionalspace * (newline * optionalspace)^-1
-  local line                   = (any - newline)^0 * newline
-                               + (any - newline)^1 * eof
+  local line                   = linechar^0 * newline
+                               + linechar^1 * eof
   local nonemptyline           = line - blankline
 
   local chunk = line * (optionallyindentedline - blankline)^0
