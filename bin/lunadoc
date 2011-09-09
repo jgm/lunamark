@@ -146,7 +146,7 @@ local css = [[
 body { font-family: Georgia, serif; }
 h3.declaration { margin-bottom: 0.5em; }
 div.section { clear: both; border-top: 2px solid #eee; }
-code,pre { font-family: Courier, monospace; }
+code,pre { font-family: Courier, monospace; font-size: 90%; }
 div#index { position: absolute; left: 1em; top: 1em; width:14em; }
 div#content { position: absolute; left: 15em; top: 0.5em; padding-left: 2em; max-width: 40em; padding-bottom: 1em; border-left: 1px solid #555; }
 dl.param
