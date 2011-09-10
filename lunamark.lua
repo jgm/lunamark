@@ -31,23 +31,21 @@
 -- ## Simple usage example
 --
 --     local lunamark = require("lunamark")
---     local options = { smart = true, compact = true }
+--     local options = { smart = true }
 --     local writer = lunamark.writer.html.new(options)
 --     local parse = lunamark.reader.markdown.new(writer, opts)
---     local result, metadata = parse("Here's my *text*")
+--     local result, metadata = parse("Here's 'my *text*'...")
 --     print(result)
---
--- Note that `require("lunamark")` does not actually load any of
--- the reader or writer modules; these are loaded only when required.
--- So it is safe to `require("lunamark")` without worrying about
--- performance implications.
 --
 -- ## Customizing the writer
 --
+-- Suppose we want emphasized text to be in ALL CAPS,
+-- rather than italics:
+--
 --     local mywriter = lunamark.writer.html.new(options)
 --     local oldstring = mywriter.string
---     function mywriter.string(s)
---       return string.upper(oldstring(s))
+--     function mywriter.emphasis(s)
+--       return string.upper(s)
 --     end
 --     local myparse = lunamark.reader.markdown.new(mywriter, opts)
 --     local result, metadata = myparse("Here's my *text*")
@@ -55,13 +53,16 @@
 --
 -- ## Customizing the parser
 --
+-- Suppose we want to make CamelCase words into wikilinks:
+--
 --     lpeg = require("lpeg")
 --     function add_wikilinks(syntax, writer, options)
 --       local capword = lpeg.R("AZ") * lpeg.R("az")^1
 --       local parse_wikilink = lpeg.C(capword^2)
 --                            / function(wikipage)
 --                                return writer.link(writer.string(wikipage),
---                                                   "/" .. wikipage, "Go to " .. wikipage)
+--                                                   "/" .. wikipage,
+--                                                   "Go to " .. wikipage)
 --                              end
 --       syntax.Inline = parse_wikilink + syntax.Inline
 --       return syntax
