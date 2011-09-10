@@ -366,7 +366,8 @@ function M.new(writer, options)
   end
 
   -- parse an exclamation mark and return true, or return false
-  local image_marker = (exclamation / function() return true end) + Cc(false)
+  local image_marker = Cc(true) * exclamation
+                     + Cc(false)
 
   ------------------------------------------------------------------------------
   -- HTML
