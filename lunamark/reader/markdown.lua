@@ -166,15 +166,6 @@ function M.new(writer, options)
              * blankline^1 )
   end
 
-  -- parser if condition holds, else fail
-  local function when(cond, parser)
-    if cond then
-      return parser
-    else
-      return fail
-    end
-  end
-
   -----------------------------------------------------------------------------
   -- Parsers used for markdown lists
   -----------------------------------------------------------------------------
@@ -306,7 +297,13 @@ function M.new(writer, options)
 
   local NoteRef    = RawNoteRef / lookup_note
 
-  local NoteBlock = nonindentspace * RawNoteRef * colon * spnl * indented_blocks(chunk)
+  local NoteBlock
+
+  if options.notes then
+    NoteBlock = nonindentspace * RawNoteRef * colon * spnl * indented_blocks(chunk)
+  else
+    NoteBlock = fail
+  end
 
   ------------------------------------------------------------------------------
   -- Helpers for links and references
@@ -326,7 +323,7 @@ function M.new(writer, options)
 
   local referenceparser =
     -- need the Ct or we get a stack overflow
-    Ct(( when(options.notes, NoteBlock) / register_note
+    Ct(( NoteBlock / register_note
        + define_reference_parser / register_link
        + nonemptyline^1
        + blankline^1)^0)
@@ -687,7 +684,7 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   local Blank          = blankline
-                       + when(options.notes, NoteBlock)
+                       + NoteBlock
                        + Reference
                        + (tightblocksep / "\n")
 
@@ -766,7 +763,7 @@ function M.new(writer, options)
                             + V("BulletList")
                             + V("OrderedList")
                             + V("Section")
-                            + when(options.definition_lists, V("DefinitionList"))
+                            + V("DefinitionList")
                             + V("DisplayHtml")
                             + V("Paragraph")
                             + V("Plain"),
@@ -788,7 +785,7 @@ function M.new(writer, options)
                             + V("UlOrStarLine")
                             + V("Strong")
                             + V("Emph")
-                            + when(options.notes, V("NoteRef"))
+                            + V("NoteRef")
                             + V("Link")
                             + V("Code")
                             + V("AutoLinkUrl")
@@ -796,7 +793,7 @@ function M.new(writer, options)
                             + V("InlineHtml")
                             + V("HtmlEntity")
                             + V("EscapedChar")
-                            + when(options.smart, V("Smart"))
+                            + V("Smart")
                             + V("Symbol"),
 
       Str                   = Str,
@@ -825,6 +822,18 @@ function M.new(writer, options)
 
   if options.custom_block then
       syntax.Block = options.custom_block + syntax.Block
+  end
+
+  if not options.definition_lists then
+    syntax.DefinitionList = fail
+  end
+
+  if not options.notes then
+    syntax.NoteRef = fail
+  end
+
+  if not options.smart then
+    syntax.Smart = fail
   end
 
   docsyntax = Cs(syntax)
