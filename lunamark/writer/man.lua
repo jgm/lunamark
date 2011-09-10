@@ -107,7 +107,6 @@ function M.new(options)
   end
 
   Man.template = [===[
-$if{ has_tables }[[.\"t]]
 .TH $title $section "$date" $description
 $body
 ]===]
