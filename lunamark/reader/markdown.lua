@@ -760,6 +760,8 @@ function M.new(writer, options)
                               Block^-1 *
                               (Blank^0 / writer.interblocksep * Block)^0,
 
+      Blank                 = Blank,
+
       Block                 = V("Blockquote")
                             + V("Verbatim")
                             + V("HorizontalRule")
