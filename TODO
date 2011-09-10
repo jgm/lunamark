@@ -1,3 +1,7 @@
+* TODO markdown reader:
+  doc, blocks, inlines
+  better names for inlines_syntax & inlinessyntax!
+
 * TODO markdown, html readers: -- see example.lua
   export table, functions for both inlines and blocks
   export syntax too?

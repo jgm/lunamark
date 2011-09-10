@@ -760,33 +760,61 @@ function M.new(writer, options)
                               Block^-1 *
                               (Blank^0 / writer.interblocksep * Block)^0,
 
-      Block                 = Blockquote
-                            + Verbatim
-                            + HorizontalRule
-                            + BulletList
-                            + OrderedList
-                            + Section
-                            + when(options.definition_lists, DefinitionList)
-                            + DisplayHtml
-                            + Paragraph
-                            + Plain,
+      Block                 = V("Blockquote")
+                            + V("Verbatim")
+                            + V("HorizontalRule")
+                            + V("BulletList")
+                            + V("OrderedList")
+                            + V("Section")
+                            + when(options.definition_lists, V("DefinitionList"))
+                            + V("DisplayHtml")
+                            + V("Paragraph")
+                            + V("Plain"),
 
-      Inline                = Str
-                            + Space
-                            + Endline
-                            + UlOrStarLine
-                            + Strong
-                            + Emph
-                            + when(options.notes, NoteRef)
-                            + Link
-                            + Code
-                            + AutoLinkUrl
-                            + AutoLinkEmail
-                            + InlineHtml
-                            + HtmlEntity
-                            + EscapedChar
-                            + when(options.smart, Smart)
-                            + Symbol,
+      Blockquote            = Blockquote,
+      Verbatim              = Verbatim,
+      HorizontalRule        = HorizontalRule,
+      BulletList            = BulletList,
+      OrderedList           = OrderedList,
+      Section               = Section,
+      DefinitionList        = DefinitionList,
+      DisplayHtml           = DisplayHtml,
+      Paragraph             = Paragraph,
+      Plain                 = Plain,
+
+      Inline                = V("Str")
+                            + V("Space")
+                            + V("Endline")
+                            + V("UlOrStarLine")
+                            + V("Strong")
+                            + V("Emph")
+                            + when(options.notes, V("NoteRef"))
+                            + V("Link")
+                            + V("Code")
+                            + V("AutoLinkUrl")
+                            + V("AutoLinkEmail")
+                            + V("InlineHtml")
+                            + V("HtmlEntity")
+                            + V("EscapedChar")
+                            + when(options.smart, V("Smart"))
+                            + V("Symbol"),
+
+      Str                   = Str,
+      Space                 = Space,
+      Endline               = Endline,
+      UlOrStarLine          = UlOrStarLine,
+      Strong                = Strong,
+      Emph                  = Emph,
+      NoteRef               = NoteRef,
+      Link                  = Link,
+      Code                  = Code,
+      AutoLinkUrl           = AutoLinkUrl,
+      AutoLinkEmail         = AutoLinkEmail,
+      InlineHtml            = InlineHtml,
+      HtmlEntity            = HtmlEntity,
+      EscapedChar           = EscapedChar,
+      Smart                 = Smart,
+      Symbol                = Symbol,
     }
 
   -- Add in custom inline and block parsers
@@ -801,9 +829,10 @@ function M.new(writer, options)
 
   docsyntax = Cs(syntax)
 
-  inlinessyntax = Cs({ "Inlines",
-                       Inlines = Inline^0,
-                       Inline = syntax.Inline })
+  local inlines_syntax = util.table_copy(syntax)
+  inlines_syntax[1] = "Inlines"
+  inlines_syntax.Inlines = Inline^0
+  inlinessyntax = Cs(inlines_syntax)
 
   ------------------------------------------------------------------------------
   -- Exported conversion function
