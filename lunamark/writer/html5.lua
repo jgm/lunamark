@@ -2,9 +2,8 @@
 -- See the file LICENSE in the source for details.
 
 --- HTML 5 writer for lunamark.
--- Extends HTML writer, but uses `<section>` tags for sections
+-- Extends [lunamark.writer.html], but uses `<section>` tags for sections
 -- if `options.containers` is true.
--- @see lunamark.writer.html
 
 local M = {}
 
@@ -14,8 +13,7 @@ local format = string.format
 
 --- Returns a new HTML 5 writer.
 -- `options` is as in `lunamark.writer.html`.
--- @see lunamark.writer.html
--- @see lunamark.writer.generic
+-- For a list of fields, see [lunamark.writer.generic].
 function M.new(options)
   local options = options or {}
   local Html5 = html.new(options)

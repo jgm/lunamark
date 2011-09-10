@@ -2,8 +2,7 @@
 -- See the file LICENSE in the source for details.
 
 --- LaTeX writer for lunamark.
--- Extends the TeX writer.
--- @see lunamark.writer.tex
+-- Extends the [lunamark.writer.tex].
 
 local M = {}
 
@@ -13,7 +12,7 @@ local gsub = string.gsub
 local format = string.format
 
 --- Returns a new LaTeX writer.
--- @see lunamark.writer.generic
+-- For a list of fields in the writer, see [lunamark.writer.generic].
 function M.new(options)
   local options = options or {}
   local LaTeX = tex.new(options)

@@ -2,8 +2,7 @@
 -- See the file LICENSE in the source for details.
 
 --- HTML writer for lunamark.
--- @see lunamark.writer.xml
--- @see lunamark.writer.generic
+-- Extends [lunamark.writer.xml].
 
 local M = {}
 
@@ -12,8 +11,10 @@ local util = require("lunamark.util")
 local format = string.format
 local gsub = string.gsub
 
---- Return a new HTML writer.  `options` is a table that can contain
--- the following fields:
+--- Return a new HTML writer.
+-- For a list of all fields in the writer, see [lunamark.writer.generic].
+--
+--`options` is a table that can contain the following fields:
 --
 -- `containers`
 -- :    Put sections in `<div>` tags.
@@ -21,8 +22,6 @@ local gsub = string.gsub
 -- :    `minimize` removes semantically insignificant white space.
 -- :    `compact` removes unneeded blank lines.
 -- :    `default` puts blank lines between block elements.
---
--- @see lunamark.writer.generic
 function M.new(options)
   local options = options or {}
   local Html = xml.new(options)

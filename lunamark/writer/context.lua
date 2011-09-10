@@ -2,8 +2,7 @@
 -- Released under MIT license. See the file LICENSE in the source for details.
 
 --- ConTeXt writer for lunamark.
--- Extends the TeX writer.
--- @see lunamark.writer.tex
+-- Extends [lunamark.writer.tex].
 
 local M = {}
 
@@ -13,7 +12,7 @@ local gsub = string.gsub
 local format = string.format
 
 --- Returns a new ConTeXt writer
--- @see lunamark.writer.generic
+-- For a list of all the fields, see [lunamark.writer.generic].
 function M.new(options)
   local options = options or {}
   local ConTeXt = tex.new(options)

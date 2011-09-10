@@ -2,11 +2,8 @@
 -- See the file LICENSE in the source for details.
 
 --- Generic TeX writer for lunamark.
--- This is the basis of the LaTeX and ConTeXt writers.
--- It extends the generic writer.
--- @see lunamark.writer.generic
--- @see lunamark.writer.latex
--- @see lunamark.writer.context
+-- It extends [lunamark.writer.generic] and is extended by
+-- [lunamark.writer.latex] and [lunamark.writer.context].
 
 local M = {}
 
@@ -16,7 +13,7 @@ local entities = require("lunamark.entities")
 local format = string.format
 
 --- Returns a new TeX writer.
--- @see lunamark.writer.generic
+-- For a list ofy fields, see [lunamark.writer.generic].
 function M.new(options)
   local options = options or {}
   local TeX = generic.new(options)

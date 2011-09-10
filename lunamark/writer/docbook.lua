@@ -2,8 +2,7 @@
 -- See the file LICENSE in the source for details.
 
 --- DocBook writer for lunamark.
--- Extends XML writer.
--- @see lunamark.writer.xml
+-- Extends [lunamark.writer.xml].
 
 local M = {}
 
@@ -13,7 +12,7 @@ local gsub = string.gsub
 local format = string.format
 
 --- Returns a new DocBook writer.
--- @see lunamark.writer.generic
+-- For a list of all the fields, see [lunamark.writer.generic].
 function M.new(options)
   local options = options or {}
   local Docbook = xml.new(options)

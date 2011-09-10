@@ -2,8 +2,8 @@
 -- See the file LICENSE in the source for details.
 
 --- Generic groff writer for lunamark.
--- The groff man writer extends this writer.
--- @see lunamark.writer.generic
+-- This is currently used as the basis for [lunamark.writer.man].
+-- In principle other groff-based writers could also extend it.
 
 local M = {}
 
@@ -13,7 +13,7 @@ local generic = require("lunamark.writer.generic")
 local entities = require("lunamark.entities")
 
 --- Returns a new Groff writer.
--- @see lunamark.writer.generic
+-- For a list of all fields, see [lunamark.writer.generic].
 function M.new(options)
   local options = options or {}
   local Groff = generic.new(options)

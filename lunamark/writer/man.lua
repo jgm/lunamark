@@ -2,8 +2,7 @@
 -- See the file LICENSE in the source for details.
 
 --- Groff man writer for lunamark.
--- Extends the groff writer.
--- @see lunamark.writer.groff
+-- Extends [lunamark.writer.groff].
 --
 -- Note: continuation paragraphs in lists are not
 -- handled properly.
@@ -16,7 +15,7 @@ local gsub = string.gsub
 local format = string.format
 
 --- Returns a new groff writer.
--- @see lunamark.writer.generic
+-- For a list of fields, see [lunamark.writer.generic].
 function M.new(options)
   local options = options or {}
   local Man = groff.new(options)

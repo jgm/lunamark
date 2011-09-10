@@ -57,7 +57,7 @@
 --
 --     lpeg = require("lpeg")
 --     function add_wikilinks(syntax)
---       local capword = lpeg.R("AZ") * lpeg.R("az")^1
+--       local capword = lpeg.R("AZ")^1 * lpeg.R("az")^1
 --       local parse_wikilink = lpeg.C(capword^2)
 --                            / function(wikipage)
 --                                return writer.link(writer.string(wikipage),

@@ -17,10 +17,10 @@ local expand_tabs_in_line = util.expand_tabs_in_line
 local M = {}
 
 --- Create a new markdown parser.
--- @param writer Table with writer functions
+-- @param writer A writer (see [lunamark.writer.generic])
 -- @param options Table with parsing options
 -- @returns A function that converts a markdown string using `writer`
--- @see lunamark.writer.generic
+--
 -- The converter assumes that the input has unix
 -- line endings (newline).  If the input might have DOS
 -- line endings, a simple `gsub("\r","")` should take care of them.
