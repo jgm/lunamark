@@ -18,13 +18,12 @@ lunamark 0.2 (c) 2009-2011 John MacFarlane
 ]]
 
 local usage = [[
-Usage: lunamark [options] [file..] - convert text between formats
+Usage: lunamark [options] [file..] - convert markdown to other formats
 
 Options:
-  --to,-t FORMAT             Target format (see --help-formats)
-  --from,-f FORMAT           Source format (see --help-formats)
+  --to,-t FORMAT             Target format
   --layout,-l LAYOUT         Whitespace in output (default|compact|minimize)
-  --extensions,-X EXTENSIONS Syntax extensions to use (see --help-extensions)
+  --extensions,-X EXTENSIONS Syntax extensions to use
   --output,-o FILE           Output file
   --standalone,-s            Add header and footer
   --template,-T FILE         Insert output into template
@@ -33,8 +32,7 @@ Options:
   --version,-V               Version information
   --help,-h                  This message
 
-FORMAT can be markdown or html for the source, and
-markdown, html, html5, docbook, latex, context, or man for the target.
+FORMAT can be html, html5, docbook, latex, context, or man.
 
 LAYOUT can be default, compact (no unnecessary blank lines), or
 minimize (no unnecessary blank space).
@@ -82,7 +80,7 @@ end
 local from = optarg.f or "markdown"
 local to = optarg.t or "html"
 
-ensure_one_of("--from,-f", from, {"markdown","html"})
+ensure_one_of("--from,-f", from, {"markdown"})
 ensure_one_of("--to,-t", to,
   {"markdown","html","html5","docbook","latex","context","man"})
 
