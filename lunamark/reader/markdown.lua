@@ -21,12 +21,16 @@ local M = {}
 -- @param options Table with parsing options
 -- @returns A function that converts a markdown string using `writer`
 -- @see lunamark.writer.generic
+-- The converter assumes that the input has unix
+-- line endings (newline).  If the input might have DOS
+-- line endings, a simple `gsub("\r","")` should take care of them.
 --
 -- `options` can include the following fields:
 --
 -- `alter_syntax`
--- :   Function from syntax table to syntax table, allowing
---     the user to change or extend the markdown syntax.
+-- :   Function from syntax table, writer, and options to a syntax
+--     table, allowing the user to change or extend the markdown syntax.
+--     For an example, see the documentation for `lunamark`.
 -- `preserve_tabs`
 -- :   Preserve tabs instead of converting to spaces.
 -- `smart`
@@ -826,7 +830,7 @@ function M.new(writer, options)
   end
 
   if options.alter_syntax and type(options.alter_syntax) == "function" then
-    syntax = options.alter_syntax(syntax)
+    syntax = options.alter_syntax(syntax, writer, options)
   end
 
   docsyntax = Cs(syntax)

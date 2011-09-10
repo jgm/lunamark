@@ -7,14 +7,14 @@
 --
 -- ## Description
 --
--- Lunamark is a lua library for conversion between markup
--- formats. Currently Markdown and HTML are the only supported input
--- formats, and HTML, Docbook, ConTeXt, LaTeX, and Groff man
--- are the supported output formats, but lunamark's modular
--- architecture makes it easy to add new parsers and writers.
--- Parsers are written using a PEG grammar.
+-- Lunamark is a lua library for conversion of markdown to
+-- other textual formats. Currently HTML, Docbook, ConTeXt,
+-- LaTeX, and Groff man are the supported output formats,
+-- but lunamark's modular architecture makes it easy to add
+-- writers and modify the markdown parser (written with a PEG
+-- grammar).
 --
--- Lunamark's Markdown parser currently supports the following
+-- Lunamark's markdown parser currently supports the following
 -- extensions (which can be turned on or off individually):
 --
 --   - Smart typography (fancy quotes, dashes, ellipses)
@@ -53,13 +53,22 @@
 --     local result, metadata = myparse("Here's my *text*")
 --     print(result)
 --
--- ## Customizing the reader
+-- ## Customizing the parser
 --
 --     lpeg = require("lpeg")
---     local caps_header = C(lpeg.R("AZ ")^2) * optionalspace * newline * blankline
---                         / function(hdr) return writer.section(hdr,1) end
---     local myparse = lunamark.reader.markdown.new(mywriter, { custom_block = caps_header })
---     local result, metadata = myparse("SECTION ONE\n\nMy text\n")
+--     function add_wikilinks(syntax, writer, options)
+--       local capword = lpeg.R("AZ") * lpeg.R("az")^1
+--       local parse_wikilink = lpeg.C(capword^2)
+--                            / function(wikipage)
+--                                return writer.link(writer.string(wikipage),
+--                                                   "/" .. wikipage, "Go to " .. wikipage)
+--                              end
+--       syntax.Inline = parse_wikilink + syntax.Inline
+--       return syntax
+--     end
+--
+--     local myparse = lunamark.reader.markdown.new(writer, { alter_syntax = add_wikilinks })
+--     local result, metadata = myparse("My text with WikiLinks.\n")
 --     print(result)
 
 local G = {}
