@@ -31,14 +31,28 @@ local M = {}
 -- :   Function from syntax table to syntax table,
 --     allowing the user to change or extend the markdown syntax.
 --     For an example, see the documentation for `lunamark`.
+--
+-- `references`
+-- :   A table of references to be used in resolving links
+--     in the document.  The keys should be all lowercase, with
+--     spaces and newlines collapsed into single spaces.
+--     Example:
+--
+--         { foo: { url = "/url", title = "my title" },
+--           bar: { url = "http://fsf.org" } }
+--
 -- `preserve_tabs`
 -- :   Preserve tabs instead of converting to spaces.
+--
 -- `smart`
 -- :   Parse quotation marks, dashes, ellipses intelligently.
+--
 -- `startnum`
 -- :   Make the opening number in an ordered list significant.
+--
 -- `notes`
 -- :   Enable footnotes as in pandoc.
+--
 -- `definition_lists`
 -- :   Enable definition lists as in pandoc.
 function M.new(writer, options)
@@ -311,7 +325,7 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   -- List of references defined in the document
-  local references = {}
+  local references
 
   -- add a reference to the list
   local function register_link(tag,url,title)
@@ -847,7 +861,7 @@ function M.new(writer, options)
   -- inp is a string; line endings are assumed to be LF (unix-style)
   -- and tabs are assumed to be expanded.
   return function(inp)
-      references = {}
+      references = options.references or {}
       lpegmatch(referenceparser,inp)
       local result = writer.start_document() .. blocks(inp)
                        .. writer.stop_document()
