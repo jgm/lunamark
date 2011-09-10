@@ -164,26 +164,15 @@ end
 local reader_options = extensions
 local parse = reader.new(writer, reader_options)
 
-if optarg.m then
-  local body = parse(manual)
-  local data = {}
-  data["if"] = cosmo.cif  -- this activates the "if" keyword
-  data.body = body
-  data.title = "lunamark"
-  data.date = os.date("%Y-%m-%d")
-  data.section = "1"
-  local result = cosmo.fill(writer.template, data)
-  io.write(result)
-  os.exit(0)
-end
-
 local args = {}
 for i=optind,#arg do
   table.insert(args,arg[i])
 end
 
 local inp
-if #args == 0 then
+if optarg.m then
+  inp = manual .. "\n"
+elseif #args == 0 then
   inp = io.read("*all") .. "\n"
 else
   inpt = {}
@@ -222,6 +211,13 @@ end
 
 if template_contents then
   local data = {}
+  data.timestamp = os.date("%Y-%m-%d %X")
+  if optarg.m then
+    data.date = os.date("%Y-%m-%d %X")
+    data.title = "lunamark"
+    data.section = "1"
+  end
+  data.sources = args
   if metadata then data = metadata end
   if optarg.d then
     for x in string.gmatch(optarg.d, "[%w_]+=[^,]+") do
@@ -230,8 +226,6 @@ if template_contents then
     end
   end
   data.body = body
-  data.timestamp = os.date("%Y-%m-%d %X")
-  data.sources = args
   data["if"] = cosmo.cif  -- this activates the "if" keyword
   local result = cosmo.fill(template_contents, data)
   io.write(result)
