@@ -136,7 +136,9 @@ $see[[<p><b>See also:</b> <a href="$url">$name</a>.</p>]]
 ]=]
 </div>
 <div id="index">
-$index
+$index[[
+<p><a href="$it.html">$it</a></p>
+]]
 </div>
 </body>
 </html>
@@ -175,7 +177,7 @@ dl.param
 }
 ]]
 
-local index_table = {}
+local index = {}
 
 local function get_modname(s)
   return s:gsub("%.lua$",""):gsub("/",".")
@@ -183,10 +185,8 @@ end
 
 for i=1,#arg do
   local modname = get_modname(arg[i])
-  table.insert(index_table, "<p><a href=\"" .. modname .. ".html\"><code>" .. modname .. "</code></a></p>")
+  table.insert(index, modname)
 end
-
-local index = table.concat(index_table,"\n")
 
 for i=1,#arg do
   local f = arg[i]
