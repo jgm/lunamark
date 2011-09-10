@@ -165,8 +165,10 @@ io.output(output)
 local standalone = optarg.s
 local template = optarg.T
 
+local template_contents
+
 if standalone and not template then
-  template = "default"
+  template_contents = writer.template
 end
 
 if template then
@@ -175,7 +177,13 @@ if template then
   if not template_name:match("%..+$") then
     template_name = template_name .. "." .. to
   end
-  local contents = lunamark.util.find_template(template_name)
+  template_contents = lunamark.util.find_template(template_name)
+  if not template_contents then
+    lunamark.util.err("Could not find template '" .. template_name .. "'")
+  end
+end
+
+if template_contents then
   local data = {}
   if metadata then data = metadata end
   if optarg.d then
@@ -188,12 +196,12 @@ if template then
   data.timestamp = os.date("%Y-%m-%d %X")
   data.sources = args
   data["if"] = cosmo.cif  -- this activates the "if" keyword
-  local result = cosmo.fill(contents, data)
+  local result = cosmo.fill(template_contents, data)
   io.write(result)
 else
   io.write(body)
 end
 
-if not template then
+if not template_contents then
   io.write("\n")
 end

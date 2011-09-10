@@ -120,6 +120,69 @@ function M.new(options)
     return contents
   end
 
+  ConTeXt.template = [===[
+\startmode[*mkii]
+  \enableregime[utf-8]
+  \setupcolors[state=start]
+\stopmode
+
+% Enable hyperlinks
+\setupinteraction[state=start, color=middleblue]
+
+\setuppapersize [letter][letter]
+\setuplayout    [width=middle,  backspace=1.5in, cutspace=1.5in,
+                 height=middle, topspace=0.75in, bottomspace=0.75in]
+
+\setuppagenumbering[location={footer,center}]
+
+\setupbodyfont[11pt]
+
+\setupwhitespace[medium]
+
+\setuphead[section]      [style=\tfc]
+\setuphead[subsection]   [style=\tfb]
+\setuphead[subsubsection][style=\bf]
+
+\definedescription
+  [description]
+  [headstyle=bold, style=normal, location=hanging, width=broad, margin=1cm]
+
+\setupitemize[autointro]    % prevent orphan list intro
+\setupitemize[indentnext=no]
+
+\setupthinrules[width=15em] % width of horizontal rules
+
+\setupdelimitedtext
+  [blockquote]
+  [before={\blank[medium]},
+   after={\blank[medium]},
+   indentnext=no,
+  ]
+
+\starttext
+$if{ title }[=[
+\startalignment[center]
+\blank[2*big]
+{\tfd $title}
+$if{ author }[[
+\blank[3*medium]
+{\tfa $author[==[{$it[\crlf]}]==]
+]]
+$if{ date }[[
+\blank[2*medium]
+{\tfa $date}
+]]
+\blank[3*medium]
+\stopalignment
+
+]=]
+$if{ toc }[[{\placecontent}
+]]
+$body
+
+\stoptext
+]===]
+
   return ConTeXt
 end
 

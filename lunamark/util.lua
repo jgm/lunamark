@@ -9,13 +9,12 @@ local insert = table.insert
 
 --- Find a template and return its contents.
 -- @param name Name of the template.
--- @returns String contents of template file.
+-- @returns String contents of template file, or `false`.
 -- The template is sought first in the
 -- working directory, then in `templates`, then in
 -- `$HOME/.lunamark/templates`, then in the Windows
 -- `APPDATA` directory.
 function M.find_template(name)
-  if not name then name = "default" end
   local base, ext = name:match("([^%.]*)(.*)")
   if (not ext or ext == "") and format then ext = "." .. format end
   local fname = base .. ext
@@ -35,10 +34,10 @@ function M.find_template(name)
       file = io.open(appdata .. "/lunamark/templates/" .. fname, "read")
     end
   end
-  if not file then
-    M.err("Could not find template '" .. fname .. "'")
-  else
+  if file then
     return file:read("*all")
+  else
+    return false, "Could not find template '" .. fname .. "'"
   end
 end
 

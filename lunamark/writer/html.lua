@@ -157,6 +157,18 @@ function M.new(options)
     return format("<dl>%s%s%s</dl>",Html.containersep, contents, Html.containersep)
   end
 
+  Html.template = [[
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>$title</title>
+</head>
+<body>
+$body
+</body>
+</html>
+]]
+
   return Html
 end
 

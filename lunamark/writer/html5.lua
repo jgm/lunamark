@@ -28,6 +28,18 @@ function M.new(options)
     end
   end
 
+  Html5.template = [[
+<html>
+<head>
+<title>$title</title>
+<meta charset="utf-8" />
+</head>
+<body>
+$body
+</body>
+</html>
+]]
+
   return Html5
 end
 

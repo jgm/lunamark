@@ -125,6 +125,17 @@ function M.new(options)
     return format("<variablelist>%s%s%s</variablelist>",Docbook.containersep, contents, Docbook.containersep)
   end
 
+  Docbook.template = [[
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN" "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
+<article>
+<articleinfo>
+<title>$title</title>
+</articleinfo>
+$body
+</article>
+]]
+
   return Docbook
 end
 
