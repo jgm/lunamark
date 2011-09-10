@@ -25,9 +25,26 @@ local cosmo = require("cosmo")
 
 local destdir = "doc"
 
+local index = {}
+local index_refs = {}
+
+local function get_modname(s)
+  return s:gsub("%.lua$",""):gsub("/",".")
+end
+
+local function normalize(s)
+  return s:gsub("[ \t\n]+"," "):lower()
+end
+
+for i=1,#arg do
+  local modname = get_modname(arg[i])
+  table.insert(index, modname)
+  index_refs[normalize(modname)] = { url = modname .. ".html" }
+end
+
 local writer = lunamark.writer.html.new()
 
-local converter = lunamark.reader.markdown.new(writer,{smart=true, definition_lists=true})
+local converter = lunamark.reader.markdown.new(writer,{smart=true, definition_lists=true, references = index_refs })
 
 
 local function extract_comments(f)
@@ -176,17 +193,6 @@ dl.param
         padding: 2px;
 }
 ]]
-
-local index = {}
-
-local function get_modname(s)
-  return s:gsub("%.lua$",""):gsub("/",".")
-end
-
-for i=1,#arg do
-  local modname = get_modname(arg[i])
-  table.insert(index, modname)
-end
 
 for i=1,#arg do
   local f = arg[i]
