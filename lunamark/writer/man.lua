@@ -107,7 +107,7 @@ function M.new(options)
   end
 
   Man.template = [===[
-.TH $title $section "$date" $description
+.TH "$title" "$section" "$date" "$left_footer" "$center_header"
 $body
 ]===]
 
