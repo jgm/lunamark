@@ -56,7 +56,7 @@
 -- Suppose we want to make CamelCase words into wikilinks:
 --
 --     lpeg = require("lpeg")
---     function add_wikilinks(syntax, writer, options)
+--     function add_wikilinks(syntax)
 --       local capword = lpeg.R("AZ") * lpeg.R("az")^1
 --       local parse_wikilink = lpeg.C(capword^2)
 --                            / function(wikipage)

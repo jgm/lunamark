@@ -28,8 +28,8 @@ local M = {}
 -- `options` can include the following fields:
 --
 -- `alter_syntax`
--- :   Function from syntax table, writer, and options to a syntax
---     table, allowing the user to change or extend the markdown syntax.
+-- :   Function from syntax table to syntax table,
+--     allowing the user to change or extend the markdown syntax.
 --     For an example, see the documentation for `lunamark`.
 -- `preserve_tabs`
 -- :   Preserve tabs instead of converting to spaces.
@@ -830,7 +830,7 @@ function M.new(writer, options)
   end
 
   if options.alter_syntax and type(options.alter_syntax) == "function" then
-    syntax = options.alter_syntax(syntax, writer, options)
+    syntax = options.alter_syntax(syntax)
   end
 
   docsyntax = Cs(syntax)
