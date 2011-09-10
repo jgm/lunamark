@@ -24,20 +24,19 @@ local M = {}
 --
 -- `options` can include the following fields:
 --
--- `custom_inline`
--- :    A custom inline parser (tried before any of the standard ones)
--- `custom_block`
--- :    A custom block parser (tried before any of the standard ones)
+-- `alter_syntax`
+-- :   Function from syntax table to syntax table, allowing
+--     the user to change or extend the markdown syntax.
 -- `preserve_tabs`
--- :    Preserve tabs instead of converting to spaces
+-- :   Preserve tabs instead of converting to spaces.
 -- `smart`
--- :    Parse quotation marks, dashes, ellipses intelligently.
+-- :   Parse quotation marks, dashes, ellipses intelligently.
 -- `startnum`
--- :    Make the opening number in an ordered list significant.
+-- :   Make the opening number in an ordered list significant.
 -- `notes`
--- :    Enable footnotes as in pandoc.
+-- :   Enable footnotes as in pandoc.
 -- `definition_lists`
--- :    Enable definition lists as in pandoc.
+-- :   Enable definition lists as in pandoc.
 function M.new(writer, options)
   local options = options or {}
 
@@ -814,16 +813,6 @@ function M.new(writer, options)
       Symbol                = Symbol,
     }
 
-  -- Add in custom inline and block parsers
-
-  if options.custom_inline then
-      syntax.Inline = options.custom_inline + syntax.Inline
-  end
-
-  if options.custom_block then
-      syntax.Block = options.custom_block + syntax.Block
-  end
-
   if not options.definition_lists then
     syntax.DefinitionList = fail
   end
@@ -834,6 +823,10 @@ function M.new(writer, options)
 
   if not options.smart then
     syntax.Smart = fail
+  end
+
+  if options.alter_syntax and type(options.alter_syntax) == "function" then
+    syntax = options.alter_syntax(syntax)
   end
 
   docsyntax = Cs(syntax)
