@@ -55,25 +55,23 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   local syntax
-  local docsyntax
-  local inlinessyntax
-  local docparser
-  local inlinesparser
+  local blocks_syntax
+  local inlines_syntax
 
-  docparser =
+  blocks =
     function(str)
-      local res = lpegmatch(docsyntax, str)
+      local res = lpegmatch(blocks_syntax, str)
       if res == nil
-        then error(format("docparser failed on:\n%s", str:sub(1,20)))
+        then error(format("blocks failed on:\n%s", str:sub(1,20)))
         else return res
         end
     end
 
-  inlinesparser =
+  inlines =
     function(str)
-      local res = lpegmatch(inlinessyntax, str)
+      local res = lpegmatch(inlines_syntax, str)
       if res == nil
-        then error(format("inlinesparser failed on:\n%s", str:sub(1,20)))
+        then error(format("inlines failed on:\n%s", str:sub(1,20)))
         else return res
         end
     end
@@ -286,7 +284,7 @@ function M.new(writer, options)
   local function lookup_note(ref)
     local found = rawnotes[normalize_tag(ref)]
     if found then
-      return writer.note(docparser(found))
+      return writer.note(blocks(found))
     else
       return "[^" .. ref .. "]"
     end
@@ -342,18 +340,18 @@ function M.new(writer, options)
           tag = label
           tagpart = "[]"
       else
-          tagpart = "[" .. inlinesparser(tag) .. "]"
+          tagpart = "[" .. inlines(tag) .. "]"
       end
       if sps then
         tagpart = sps .. tagpart
       end
       local r = references[normalize_tag(tag)]
       if r and img then
-        return writer.image(inlinesparser(label), r.url, r.title)
+        return writer.image(inlines(label), r.url, r.title)
       elseif r and not img then
-        return writer.link(inlinesparser(label), r.url, r.title)
+        return writer.link(inlines(label), r.url, r.title)
       else
-        return ("[" .. inlinesparser(label) .. "]" .. tagpart)
+        return ("[" .. inlines(label) .. "]" .. tagpart)
       end
   end
 
@@ -541,7 +539,7 @@ function M.new(writer, options)
                       / function(email) return writer.link(writer.string(email),"mailto:"..email) end
 
   local DirectLink    = image_marker 
-                      * (tag / inlinesparser)
+                      * (tag / inlines)
                       * spnl
                       * lparent
                       * (url + Cc(""))  -- link can be empty [foo]()
@@ -580,12 +578,12 @@ function M.new(writer, options)
                            * ((indentedline - blankline))^1)^1
                            ) / expandtabs / writer.verbatim
 
-  -- strip off leading > and indents, and run through docparser
+  -- strip off leading > and indents, and run through blocks
   local Blockquote     = Cs((
             ((nonindentspace * more * space^-1)/"" * linechar^0 * newline)^1
           * (-blankline * linechar^1 * newline)^0
           * blankline^0
-          )^1) / docparser / writer.blockquote
+          )^1) / blocks / writer.blockquote
 
   local function lineof(c)
       return (nonindentspace * (P(c) * optionalspace)^3 * newline * blankline^1)
@@ -622,7 +620,7 @@ function M.new(writer, options)
   local ListContinuationBlock = blanklines * (indent / "") * ListBlock
 
   local function TightListItem(starter)
-      return (Cs(starter / "" * ListBlock * NestedList^-1) / docparser)
+      return (Cs(starter / "" * ListBlock * NestedList^-1) / blocks)
              * -(blanklines * indent)
   end
 
@@ -630,7 +628,7 @@ function M.new(writer, options)
       return Cs( starter / "" * ListBlock * Cc("\n")
                * (NestedList + ListContinuationBlock^0)
                * (blanklines / "\n\n")
-               ) / docparser
+               ) / blocks
   end
 
   local BulletList = ( Ct(TightListItem(bullet)^1)
@@ -664,16 +662,16 @@ function M.new(writer, options)
   local dlchunk = Cs(line * (indentedline - blankline)^0)
 
   local function definition_list_item(term, defs, tight)
-    return { term = inlinesparser(term), definitions = defs }
+    return { term = inlines(term), definitions = defs }
   end
 
   local DefinitionListItemLoose = C(line) * skipblanklines
-                           * Ct((defstart * indented_blocks(dlchunk) / docparser)^1)
+                           * Ct((defstart * indented_blocks(dlchunk) / blocks)^1)
                            * Cc(false)
                            / definition_list_item
 
   local DefinitionListItemTight = C(line)
-                           * Ct((defstart * dlchunk / docparser)^1)
+                           * Ct((defstart * dlchunk / blocks)^1)
                            * Cc(true)
                            / definition_list_item
 
@@ -727,7 +725,7 @@ function M.new(writer, options)
   local function SetextHeader(maxlev)
     local markers
     if maxlev == 1 then markers = "=" else markers = "=-" end
-    return (#(line * S(markers)) * Cs(line / inlinesparser)
+    return (#(line * S(markers)) * Cs(line / inlines)
             * HeadingLevel(maxlev) *  optionalspace * newline)
   end
 
@@ -835,12 +833,12 @@ function M.new(writer, options)
     syntax = options.alter_syntax(syntax)
   end
 
-  docsyntax = Cs(syntax)
+  blocks_syntax = Cs(syntax)
 
-  local inlines_syntax = util.table_copy(syntax)
-  inlines_syntax[1] = "Inlines"
-  inlines_syntax.Inlines = Inline^0
-  inlinessyntax = Cs(inlines_syntax)
+  local inlines_t = util.table_copy(syntax)
+  inlines_t[1] = "Inlines"
+  inlines_t.Inlines = Inline^0
+  inlines_syntax = Cs(inlines_t)
 
   ------------------------------------------------------------------------------
   -- Exported conversion function
@@ -851,7 +849,7 @@ function M.new(writer, options)
   return function(inp)
       references = {}
       lpegmatch(referenceparser,inp)
-      local result = writer.start_document() .. docparser(inp)
+      local result = writer.start_document() .. blocks(inp)
                        .. writer.stop_document()
       return result, writer.get_metadata()
   end

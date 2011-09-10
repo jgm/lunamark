@@ -1,6 +1,5 @@
-* TODO markdown reader:
-  doc, blocks, inlines
-  better names for inlines_syntax & inlinessyntax!
+* TODO store default templates in writer tables.
+  look for them there if not found elsewhere.
 
 * TODO code comments/cleanup for lunadoc
   factor index into template
