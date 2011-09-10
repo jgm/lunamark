@@ -115,11 +115,11 @@ local reader = lunamark.reader.markdown
 
 local extensions = {  -- defaults
   containers = false,
-  startnum = optarg.man,
+  startnum = false,
   smart = false,
   preserve_tabs = false,
-  notes = optarg.m,
-  definition_lists = optarg.m,
+  notes = false,
+  definition_lists = false,
 }
 
 if optarg["0"] then
@@ -162,6 +162,10 @@ if not writer then
 end
 
 local reader_options = extensions
+if optarg.m then
+  reader_options.definition_lists = true
+  reader_options.notes = true
+end
 local parse = reader.new(writer, reader_options)
 
 local args = {}
