@@ -1,6 +1,35 @@
 #!/usr/bin/env lua
 -- lunamark program
 
+local manual = [===[
+# NAME
+
+lunamark - general markup converter
+
+# SYNOPSIS
+
+lunamark [options] [file..]
+
+# DESCRIPTION
+
+TODO
+
+# OPTIONS
+
+TODO
+
+# EXTENSIONS
+
+
+# EXAMPLES
+
+TODO
+
+# AUTHORS
+
+
+]===]
+
 local lunamark = require("lunamark")
 local alt_getopt = require("alt_getopt")
 local cosmo = require("cosmo")
@@ -30,6 +59,7 @@ Options:
   --data,-d K=V[,K=V..]      Set metadata to be passed to template
   --strict,-0                Disable markdown extensions
   --version,-V               Version information
+  --man,-m                   Lunamark's man page (optionally in --to FORMAT)
   --help,-h                  This message
 
 FORMAT can be html, html5, docbook, latex, context, or man.
@@ -51,7 +81,6 @@ The keyword 'all' may also be used, to set all extensions simultaneously.
 
 local long_opts = {
   to = "t",
-  from = "f",
   layout = "l",
   extensions = "X",
   output = "o",
@@ -60,10 +89,11 @@ local long_opts = {
   data = "d",
   strict = "0",
   version = "V",
+  man = "m",
   help = "h"
 }
 
-local short_opts = "t:f:l:X:o:sT:d:0Vh"
+local short_opts = "t:l:X:o:sT:d:0Vmh"
 
 local optarg,optind = alt_getopt.get_opts(arg, short_opts, long_opts)
 
@@ -77,25 +107,19 @@ if optarg.V then
   os.exit(0)
 end
 
-local from = optarg.f or "markdown"
-local to = optarg.t or "html"
-
-ensure_one_of("--from,-f", from, {"markdown"})
+local to = optarg.t or ((optarg.m and "man") or "html")
 ensure_one_of("--to,-t", to,
   {"markdown","html","html5","docbook","latex","context","man"})
 
-local reader = lunamark.reader[from]
-if not reader then
-  lunamark.util.err("Unknown reader: " .. tostring(from), 3)
-end
+local reader = lunamark.reader.markdown
 
 local extensions = {  -- defaults
   containers = false,
-  startnum = false,
+  startnum = optarg.man,
   smart = false,
   preserve_tabs = false,
-  notes = false,
-  definition_lists = false,
+  notes = optarg.m,
+  definition_lists = optarg.m,
 }
 
 if optarg["0"] then
@@ -123,6 +147,9 @@ for x in extensions_opt:gmatch("[%+%-]?[%a_]+") do
   end
 end
 
+local output = optarg.o
+io.output(output)
+
 local writer_options = extensions
 
 local layout = optarg["l"] or "default"
@@ -134,13 +161,26 @@ if not writer then
   lunamark.util.err("Unknown writer: " .. tostring(to), 5)
 end
 
+local reader_options = extensions
+local parse = reader.new(writer, reader_options)
+
+if optarg.m then
+  local body = parse(manual)
+  local data = {}
+  data["if"] = cosmo.cif  -- this activates the "if" keyword
+  data.body = body
+  data.title = "lunamark"
+  data.date = os.date("%Y-%m-%d")
+  data.section = "1"
+  local result = cosmo.fill(writer.template, data)
+  io.write(result)
+  os.exit(0)
+end
+
 local args = {}
 for i=optind,#arg do
   table.insert(args,arg[i])
 end
-
-local reader_options = extensions
-local parse = reader.new(writer, reader_options)
 
 local inp
 if #args == 0 then
@@ -158,9 +198,6 @@ if inp:find("\r",1,true) then
 end
 
 local body, metadata = parse(inp)
-
-local output = optarg.o
-io.output(output)
 
 local standalone = optarg.s
 local template = optarg.T
@@ -205,3 +242,5 @@ end
 if not template_contents then
   io.write("\n")
 end
+
+
