@@ -41,7 +41,7 @@
 --
 -- Suppose we want emphasized text to be in ALL CAPS,
 -- rather than italics:
-
+--
 --     function writer.emphasis(s)
 --       return string.upper(s)
 --     end

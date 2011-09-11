@@ -17,44 +17,47 @@ local expand_tabs_in_line = util.expand_tabs_in_line
 local M = {}
 
 --- Create a new markdown parser.
--- @param writer A writer (see [lunamark.writer.generic])
--- @param options Table with parsing options
--- @returns A function that converts a markdown string using `writer`
 --
--- The converter assumes that the input has unix
--- line endings (newline).  If the input might have DOS
--- line endings, a simple `gsub("\r","")` should take care of them.
+-- *   `writer` is a writer table (see [lunamark.writer.generic]).
 --
--- `options` can include the following fields:
+-- *   `options` is a table with parsing options.
+--     It can include the following fields:
 --
--- `alter_syntax`
--- :   Function from syntax table to syntax table,
---     allowing the user to change or extend the markdown syntax.
---     For an example, see the documentation for `lunamark`.
+--     `alter_syntax`
+--     :   Function from syntax table to syntax table,
+--         allowing the user to change or extend the markdown syntax.
+--         For an example, see the documentation for `lunamark`.
 --
--- `references`
--- :   A table of references to be used in resolving links
---     in the document.  The keys should be all lowercase, with
---     spaces and newlines collapsed into single spaces.
---     Example:
+--     `references`
+--     :   A table of references to be used in resolving links
+--         in the document.  The keys should be all lowercase, with
+--         spaces and newlines collapsed into single spaces.
+--         Example:
 --
---         { foo: { url = "/url", title = "my title" },
---           bar: { url = "http://fsf.org" } }
+--             { foo: { url = "/url", title = "my title" },
+--               bar: { url = "http://fsf.org" } }
 --
--- `preserve_tabs`
--- :   Preserve tabs instead of converting to spaces.
+--     `preserve_tabs`
+--     :   Preserve tabs instead of converting to spaces.
 --
--- `smart`
--- :   Parse quotation marks, dashes, ellipses intelligently.
+--     `smart`
+--     :   Parse quotation marks, dashes, ellipses intelligently.
 --
--- `startnum`
--- :   Make the opening number in an ordered list significant.
+--     `startnum`
+--     :   Make the opening number in an ordered list significant.
 --
--- `notes`
--- :   Enable footnotes as in pandoc.
+--     `notes`
+--     :   Enable footnotes as in pandoc.
 --
--- `definition_lists`
--- :   Enable definition lists as in pandoc.
+--     `definition_lists`
+--     :   Enable definition lists as in pandoc.
+--
+-- *   Returns a converter function that converts a markdown string
+--     using `writer`, returning the parsed document as first result,
+--     and a table containing any extracted metadata as the second
+--     result. The converter assumes that the input has unix
+--     line endings (newline).  If the input might have DOS
+--     line endings, a simple `gsub("\r","")` should take care of them.
 function M.new(writer, options)
   local options = options or {}
 
