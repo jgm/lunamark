@@ -31,33 +31,42 @@
 -- ## Simple usage example
 --
 --     local lunamark = require("lunamark")
---     local options = { smart = true }
---     local writer = lunamark.writer.html.new(options)
---     local parse = lunamark.reader.markdown.new(writer, options)
+--     local writer = lunamark.writer.html.new()
+--     local parse = lunamark.reader.markdown.new(writer, { smart = true })
 --     local result, metadata = parse("Here's 'my *text*'...")
 --     print(result)
 --     assert(result == 'Here’s ‘my <em>text</em>’…')
 --
 -- ## Customizing the writer
 --
--- Suppose we want emphasized text to be in ALL CAPS,
--- rather than italics:
+-- Render emphasized text as ALL CAPS, rather than italics:
 --
 --     local unicode = require("unicode")
 --     local utf8 = unicode.utf8
 --     function writer.emphasis(s)
 --       return utf8.upper(s)
 --     end
---     local parse = lunamark.reader.markdown.new(writer, options)
+--     local parse = lunamark.reader.markdown.new(writer, { smart = true })
 --     local result, metadata = parse("*Beiß* nicht in die Hand, die dich *füttert*.")
 --     print(result)
 --     assert(result == 'BEIß nicht in die Hand, die dich FÜTTERT.')
 --
+-- Eliminate hyperlinks:
+--
+--     function writer.link(lab,url,tit)
+--       return lab
+--     end
+--     local parse = lunamark.reader.markdown.new(writer, { smart = true })
+--     local result, metadata = parse("[hi](/url) there")
+--     print(result)
+--     assert(result == 'hi there')
+--
 -- ## Customizing the parser
 --
--- Suppose we want to make CamelCase words into wikilinks:
+-- Parse CamelCase words as wikilinks:
 --
 --     lpeg = require("lpeg")
+--     local writer = lunamark.writer.html.new()
 --     function add_wikilinks(syntax)
 --       local capword = lpeg.R("AZ")^1 * lpeg.R("az")^1
 --       local parse_wikilink = lpeg.C(capword^2)
@@ -73,6 +82,7 @@
 --     local result, metadata = parse("My text with WikiLinks.\n")
 --     print(result)
 --     assert(result == 'My text with <a href="/WikiLinks" title="Go to WikiLinks">WikiLinks</a>.')
+--
 
 local G = {}
 
