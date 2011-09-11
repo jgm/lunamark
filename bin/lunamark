@@ -74,15 +74,24 @@ It is slightly faster than the author's own C library
 The following extensions are defined, with the default setting given in parentheses:
 
 `(-) containers`
-:   Put sections in containers (e.g. `div` or `section` tags)
+:   Put sections in containers (`div` tags for `html` writer,
+    `section` tags for `html5`).
 `(-) startnum`
-:   Start number of an ordered list is significant. TODO
+:   Start number of an ordered list is significant. In standard
+    markdown, the starting number is irrelevant.  If this
+    extension is selected, the starting number determines
+    the starting number of the list in the output.  (The
+    subsequent numbers are ignored, as in standard markdown.)
 `(-) smart`
-:   Smart typography (quotes, dashes, ellipses). TODO
+:   Smart typography. Straight quotes are turned into curly
+    quotes, `--` into en dashes, `---` into em dashes, `...`
+    into an ellipsis character.
 `(-) preserve_tabs`
-:   Don't expand tabs to spaces. TODO
+:   Don't expand tabs to spaces. Standard markdown expands all
+    tabs, using a tabstop of 4 spaces.  This extension allows
+    tabs to be preserved in literal code contexts.
 `(-) notes`
-:   Footnotes, as in pandoc. TODO
+:   Footnotes. TODO
 `(-) definition_lists`
 :   Definition lists, as in pandoc. TODO
 
@@ -92,7 +101,7 @@ TODO cosmo templates, examples.
 
 # EXAMPLES
 
-TODO usage examples
+
 
 # AUTHORS
 
