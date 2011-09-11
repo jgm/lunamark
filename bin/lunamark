@@ -1,7 +1,8 @@
 #!/usr/bin/env lua
 -- lunamark program
 
-local manual = [===[
+--[===[
+@startman
 # NAME
 
 lunamark - converts markdown to many formats
@@ -64,8 +65,6 @@ It is slightly faster than the author's own C library
 :   Disable all markdown extensions.
 `--version,-V`
 :   Print version information.
-`--man,-m`
-:   Print lunamark's man page in markdown format.
 `--help,-h`
 :   This message
 
@@ -109,7 +108,8 @@ Most of lunamark is written by John MacFarlane.  Hans Hagen
 made some major performance improvements to the markdown
 parser.  Khaled Hosny added the original ConTeXt writer.
 
-]===]
+@stopman
+--]===]
 
 local lunamark = require("lunamark")
 local alt_getopt = require("alt_getopt")
@@ -141,7 +141,6 @@ Options:
   --data,-d K=V[,K=V..]      Set metadata to be passed to template
   --strict,-0                Disable markdown extensions
   --version,-V               Version information
-  --man,-m                   Print lunamark's man page in markdown format
   --help,-h                  This message
 
 FORMAT can be html, html5, docbook, latex, context, or man.
@@ -171,11 +170,10 @@ local long_opts = {
   data = "d",
   strict = "0",
   version = "V",
-  man = "m",
   help = "h"
 }
 
-local short_opts = "t:l:X:o:sT:d:0Vmh"
+local short_opts = "t:l:X:o:sT:d:0Vh"
 
 local optarg,optind = alt_getopt.get_opts(arg, short_opts, long_opts)
 
@@ -186,11 +184,6 @@ end
 
 if optarg.V then
   io.write(version)
-  os.exit(0)
-end
-
-if optarg.m then
-  io.write(manual)
   os.exit(0)
 end
 
