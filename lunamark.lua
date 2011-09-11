@@ -35,6 +35,7 @@
 --     local writer = lunamark.writer.html.new(options)
 --     local parse = lunamark.reader.markdown.new(writer, options)
 --     local result, metadata = parse("Here's 'my *text*'...")
+--     print(result)
 --     assert(result == 'Here’s ‘my <em>text</em>’…')
 --
 -- ## Customizing the writer
@@ -42,12 +43,15 @@
 -- Suppose we want emphasized text to be in ALL CAPS,
 -- rather than italics:
 --
+--     local unicode = require("unicode")
+--     local utf8 = unicode.utf8
 --     function writer.emphasis(s)
---       return string.upper(s)
+--       return utf8.upper(s)
 --     end
 --     local parse = lunamark.reader.markdown.new(writer, options)
---     local result, metadata = parse("Here's 'my *text*'...")
---     assert(result == 'Here’s ‘my TEXT’…')
+--     local result, metadata = parse("*Beiß* nicht in die Hand, die dich *füttert*.")
+--     print(result)
+--     assert(result == 'BEIß nicht in die Hand, die dich FÜTTERT.')
 --
 -- ## Customizing the parser
 --
@@ -67,6 +71,7 @@
 --     end
 --     local parse = lunamark.reader.markdown.new(writer, { alter_syntax = add_wikilinks })
 --     local result, metadata = parse("My text with WikiLinks.\n")
+--     print(result)
 --     assert(result == 'My text with <a href="/WikiLinks" title="Go to WikiLinks">WikiLinks</a>.')
 
 local G = {}
