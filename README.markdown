@@ -81,8 +81,8 @@ For a more complex example, see the source for the
 # Authors
 
 Most of the library is written by John MacFarlane.  Hans Hagen
-made some major performance improvements.  Khaled Hosny added a
-ConTeXt writer.
+made some major performance improvements.  Khaled Hosny added the
+original ConTeXt writer.
 
 The `htmlparser` module is (c) 2009 by Christopher E. Moore, MIT licensed.
 It has been modified slightly by John MacFarlane.
