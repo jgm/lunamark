@@ -23,6 +23,7 @@ dependencies = {
    "cosmo >= 10.0",
    "bit32",  -- this can go away when we require lua 5.2
    "alt-getopt >= 0.7",
+   "slnunicode >= 1.1",
 }
 build = {
    type = "none",

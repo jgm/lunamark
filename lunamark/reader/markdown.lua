@@ -13,8 +13,16 @@ local P, R, S, V, C, Ct, Cg, Cb, Cmt, Cc, Cf, Cs, B =
   lpeg.Cmt, lpeg.Cc, lpeg.Cf, lpeg.Cs, lpeg.B
 local lpegmatch = lpeg.match
 local expand_tabs_in_line = util.expand_tabs_in_line
+local unicode = require("unicode")
+local utf8 = unicode.utf8
 
 local M = {}
+
+-- Normalize a markdown reference tag.  (Make lowercase, and collapse
+-- adjacent whitespace characters.)
+local function normalize_tag(tag)
+  return utf8.lower(gsub(tag, "[ \n\r\t]+", " "))
+end
 
 --- Create a new markdown parser.
 --
@@ -286,11 +294,6 @@ function M.new(writer, options)
   -- Footnotes
   ------------------------------------------------------------------------------
 
-  -- markdown reference tags are case-insensitive
-  local function normalize_tag(tag)
-      return lower(gsub(tag, "[ \n\r\t]+", " "))
-  end
-
   local rawnotes = {}
 
   local function strip_first_char(s)
@@ -391,7 +394,7 @@ function M.new(writer, options)
   -- case-insensitive match (we assume s is lowercase)
   local function keyword_exact(s)
     local parser = P(0)
-    s = lower(s)
+    s = utf8.lower(s)
     for i=1,#s do
       local c = s:sub(i,i)
       local m = c .. upper(c)
@@ -457,7 +460,7 @@ function M.new(writer, options)
   end
 
   local function parse_matched_tags(s,pos)
-    local t = lower(lpegmatch(less * C(keyword),s,pos))
+    local t = utf8.lower(lpegmatch(less * C(keyword),s,pos))
     return lpegmatch(in_matched(t),s,pos)
   end
 
