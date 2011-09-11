@@ -1,6 +1,4 @@
-* TODO make lunadoc simpler?  remove @param, etc.
-  Just process specially marked comments, AND pick up on following
-  declarations.
+* TODO rewrite test runner in lua?
 
 * TODO code comments/cleanup for lunadoc
 
