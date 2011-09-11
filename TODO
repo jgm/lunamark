@@ -1,10 +1,3 @@
-* TODO put template handling/standalone in library
-  not executable.  simplify by using "$body" when standalone
-  not selected.
-
-* TODO provide an easy way to select Inline, Inline^0, etc.
-  as parse target?
-
 * TODO code comments/cleanup for lunadoc
 
 * TODO man pages for lunamark, lunadoc
