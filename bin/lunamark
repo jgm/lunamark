@@ -37,59 +37,62 @@ It is slightly faster than the author's own C library
 `--to,-t` *format*
 :   Specify format for output.
     *format* can be `html`, `html5`, `docbook`, `latex`, `context`, or `man`.
-
 `--layout,-l` *layout*
 :   Control whitespace in output.
     *layout* can be `default` (blank lines between block-level elements),
     `compact` (avoid unnecessary blank lines), or `minimize` (avoid
     all unnecessary space).
-
 `--extensions,-X` *extensions*
 :   Use the specified syntax extensions in parsing markdown.
     *extensions* is a comma-separated list of extensions, each optionally
     prefixed by `+` (enable) or `-` (disable).  See EXTENSIONS, below, for
-    a list of supported extensions.
-
+    a list of supported extensions.  The keyword 'all' may also be used,
+    to set all extensions simultaneously.
 `--output,-o` *file*
 :   Write output to *file*.
-
 `--standalone,-s`
 :   Add header and footer to the document, so that it is a functional
     standalone document, not a fragment.  Use the default template
     for the writer, unless `--template,-T` is used.
-
 `--template,-T` *file*
 :   Insert converted text and metadata into a template.  See TEMPLATES,
     below, for template format.  Implies `--standalone,-s`.
-
---data,-d K=V[,K=V..]      Set metadata to be passed to template
---strict,-0                Disable markdown extensions
---version,-V               Version information
---man,-m                   Print lunamark's man page in markdown format
---help,-h                  This message
-
-
-LAYOUT can be default, compact (no unnecessary blank lines), or
-minimize (no unnecessary blank space).
+`--data,-d` *key=value[,key=value..]*
+:   Set metadata fields to be passed to template.  Argument is a list
+    of *key=value* pairs, separated by commas.
+`--strict,-0`
+:   Disable all markdown extensions.
+`--version,-V`
+:   Print version information.
+`--man,-m`
+:   Print lunamark's man page in markdown format.
+`--help,-h`
+:   This message
 
 # EXTENSIONS
 
-EXTENSIONS is a comma-separated list of extensions, each optionally prefixed
-by + (enable) or - (disable).  The following extensions are defined,
-with the default setting given in parentheses:
-  (-) containers        Put sections in containers (e.g. div or section tags)
-  (-) startnum          Start number of an ordered list is significant
-  (-) smart             Smart typography (quotes, dashes, ellipses)
-  (-) preserve_tabs     Don't expand tabs to spaces
-  (-) notes             Footnotes
-  (-) definition_lists  Definition lists
-The keyword 'all' may also be used, to set all extensions simultaneously.
+The following extensions are defined, with the default setting given in parentheses:
+
+`(-) containers`
+:   Put sections in containers (e.g. `div` or `section` tags)
+`(-) startnum`
+:   Start number of an ordered list is significant. TODO
+`(-) smart`
+:   Smart typography (quotes, dashes, ellipses). TODO
+`(-) preserve_tabs`
+:   Don't expand tabs to spaces. TODO
+`(-) notes`
+:   Footnotes, as in pandoc. TODO
+`(-) definition_lists`
+:   Definition lists, as in pandoc. TODO
 
 # TEMPLATES
 
+TODO cosmo templates, examples.
+
 # EXAMPLES
 
-TODO
+TODO usage examples
 
 # AUTHORS
 
