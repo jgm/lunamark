@@ -1,9 +1,9 @@
 -- (c) 2009-2011 John MacFarlane.  Released under MIT license.
 -- See the file LICENSE in the source for details.
 
---- @copyright 2009-2011 John MacFarlane
--- @license MIT (see LICENSE in the source for details)
--- @release 0.2
+--- Copyright &copy; 2009-2011 John MacFarlane.
+--
+-- Released under the MIT license (see LICENSE in the source for details).
 --
 -- ## Description
 --

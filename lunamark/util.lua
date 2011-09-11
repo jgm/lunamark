@@ -7,10 +7,8 @@ local M = {}
 local rep  = string.rep
 local insert = table.insert
 
---- Find a template and return its contents.
--- @param name Name of the template.
--- @returns String contents of template file, or `false`.
--- The template is sought first in the
+--- Find a template and return its contents (or `false` if
+-- not found). The template is sought first in the
 -- working directory, then in `templates`, then in
 -- `$HOME/.lunamark/templates`, then in the Windows
 -- `APPDATA` directory.
@@ -54,16 +52,12 @@ end
 --]]
 
 --- Print error message and exit.
--- @param msg Error message to print.
--- @param exit_code Exit code to return on exit.
 function M.err(msg, exit_code)
   io.stderr:write("lunamark: " .. msg .. "\n")
   os.exit(exit_code or 1)
 end
 
 --- Shallow table copy including metatables.
--- @param t Table to copy.
--- @returns Copy of table.
 function M.table_copy(t)
   local u = { }
   for k, v in pairs(t) do u[k] = v end
@@ -71,9 +65,8 @@ function M.table_copy(t)
 end
 
 --- Expand tabs in a line of text.
+-- `s` is assumed to be a single line of text.
 -- From *Programming Lua*.
--- @param s String, assumed to be a single line of text.
--- @param tabstop Number of spaces per tabstop.
 function M.expand_tabs_in_line(s, tabstop)
   local tab = tabstop or 4
   local corr = 0
