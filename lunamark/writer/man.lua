@@ -46,7 +46,7 @@ function M.new(options)
   function Man.bulletlist(items,tight)
     local buffer = {}
     for _,item in ipairs(items) do
-      buffer[#buffer + 1] = format(".IP \[bu] 2\n%s",item)
+      buffer[#buffer + 1] = format(".IP \\[bu] 2\n%s",item)
     end
     return table.concat(buffer, Man.containersep)
   end
@@ -83,10 +83,16 @@ function M.new(options)
     return format('[%d]', num)
   end
 
-  function Man.definitionlist(items)
+  function Man.definitionlist(items,tight)
     local buffer = {}
+    local fmt
+    if tight then
+      fmt = ".TP\n.B %s\n%s\n.RS\n.RE"
+    else
+      fmt = ".TP\n.B %s\n.RS\n%s\n.RE"
+    end
     for _,item in ipairs(items) do
-      buffer[#buffer + 1] = format(".TP\n.B %s\n%s\n.RS\n.RE",
+      buffer[#buffer + 1] = format(fmt,
         item.term, table.concat(item.definitions, "\n.RS\n.RE\n"))
     end
     local contents = table.concat(buffer, "\n")
