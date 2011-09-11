@@ -4,7 +4,7 @@
 local manual = [===[
 # NAME
 
-lunamark - general markup converter
+lunamark - converts markdown to many formats
 
 # SYNOPSIS
 
@@ -12,14 +12,80 @@ lunamark [options] [file..]
 
 # DESCRIPTION
 
-TODO
+Lunamark is a lua library and command-line program for conversion of markdown
+to other textual formats. Currently HTML, Docbook, ConTeXt, LaTeX, and Groff man
+are the supported output formats, but it is easy to add new writers or modify
+existing ones. The markdown parser is written using a PEG grammar and can also
+be modified by the user.
+
+Lunamark's markdown parser currently supports the following extensions (which
+can be turned on or off individually):
+
+  - Smart typography (fancy quotes, dashes, ellipses)
+  - Significant start numbers in ordered lists
+  - Footnotes
+  - Definition lists
+
+More extensions will be supported in later versions.
+
+The library is as portable as lua and has very good performance.
+It is slightly faster than the author's own C library
+[peg-markdown](http://github.com/jgm/peg-markdown).
 
 # OPTIONS
 
-TODO
+`--to,-t` *format*
+:   Specify format for output.
+    *format* can be `html`, `html5`, `docbook`, `latex`, `context`, or `man`.
+
+`--layout,-l` *layout*
+:   Control whitespace in output.
+    *layout* can be `default` (blank lines between block-level elements),
+    `compact` (avoid unnecessary blank lines), or `minimize` (avoid
+    all unnecessary space).
+
+`--extensions,-X` *extensions*
+:   Use the specified syntax extensions in parsing markdown.
+    *extensions* is a comma-separated list of extensions, each optionally
+    prefixed by `+` (enable) or `-` (disable).  See EXTENSIONS, below, for
+    a list of supported extensions.
+
+`--output,-o` *file*
+:   Write output to *file*.
+
+`--standalone,-s`
+:   Add header and footer to the document, so that it is a functional
+    standalone document, not a fragment.  Use the default template
+    for the writer, unless `--template,-T` is used.
+
+`--template,-T` *file*
+:   Insert converted text and metadata into a template.  See TEMPLATES,
+    below, for template format.  Implies `--standalone,-s`.
+
+--data,-d K=V[,K=V..]      Set metadata to be passed to template
+--strict,-0                Disable markdown extensions
+--version,-V               Version information
+--man,-m                   Print lunamark's man page in markdown format
+--help,-h                  This message
+
+
+LAYOUT can be default, compact (no unnecessary blank lines), or
+minimize (no unnecessary blank space).
 
 # EXTENSIONS
 
+EXTENSIONS is a comma-separated list of extensions, each optionally prefixed
+by + (enable) or - (disable).  The following extensions are defined,
+with the default setting given in parentheses:
+  (-) containers        Put sections in containers (e.g. div or section tags)
+  (-) startnum          Start number of an ordered list is significant
+  (-) smart             Smart typography (quotes, dashes, ellipses)
+  (-) preserve_tabs     Don't expand tabs to spaces
+  (-) notes             Footnotes
+  (-) definition_lists  Definition lists
+The keyword 'all' may also be used, to set all extensions simultaneously.
+
+# TEMPLATES
 
 # EXAMPLES
 
@@ -27,6 +93,9 @@ TODO
 
 # AUTHORS
 
+Most of lunamark is written by John MacFarlane.  Hans Hagen
+made some major performance improvements to the markdown
+parser.  Khaled Hosny added the original ConTeXt writer.
 
 ]===]
 
