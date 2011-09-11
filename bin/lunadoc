@@ -11,14 +11,14 @@
 -- any following text.
 --
 -- If the comment block immediately precedes a declaration
--- of a function or variable, the name is extracted automatically.
+-- of a function or variable, the name is extracted automatically
+-- and placed at the top of the comment block in the output.
 --
 -- Each file is assumed to be a module.  The 'module' keyword need
 -- not be used.
 --
--- Documentation is parsed as markdown.  A number of luadoc directives
--- beginning with `@` are recognized, including `@copyright`, `@license`,
--- `@release`, `@author`, `@name`, `@param`, `@returns`.
+-- Documentation is parsed as markdown, with definition lists
+-- and smart typography extensions.
 
 local lunamark = require("lunamark")
 local cosmo = require("cosmo")
@@ -49,10 +49,8 @@ local converter = lunamark.reader.markdown.new(writer,{smart=true, definition_li
 
 local function extract_comments(f)
   local commentlines = {}
-  local metadata = { author = {} }
   local chunks = {}
   local collect = false
-  local decl
   io.input(f)
   for l in io.lines() do
     local m = l:match("^%s*%-%-%-%s(.*)")
@@ -73,53 +71,22 @@ local function extract_comments(f)
         if not declname then
           declname = l:match("([^%s=]+)%s*=")
         end
-        if declname then declname = string.gsub(declname,"^M%.","") end  -- strip off M. which puts declaration in module
-        decl = (declname or "") .. ((declname and decargs) or "")
-        -- extract metadata lines
-        local thischunk = { lines = {}, author = {}, param = {}, returns = {}, see = {}, name = decl }
-        for _,line in ipairs(commentlines) do
-          local m, val = line:match("^ ? ? ?@(%a+)[ \t]*(.*)$")
-          val = val and writer.string(val)
-          if m == "author" then
-            table.insert(metadata.author, val)
-          elseif m == "copyright" then
-            metadata.copyright = val
-          elseif m == "license" then
-            metadata.license = val
-          elseif m == "release" then
-            metadata.release = val
-          elseif m == "usage" then
-            table.insert(thischunk.lines, val)
-          elseif m == "description" then
-            table.insert(thischunk.lines, val)
-          elseif m == "param" then
-            local paramname, paramdescr = val:match("(%S*)%s*(.*)")
-            table.insert(thischunk.param, { name = paramname, description = paramdescr })
-          elseif m == "returns" then
-            table.insert(thischunk.returns, val)
-          elseif m == "see" then
-            table.insert(thischunk.see, { name = val, url = val:gsub("([^#]+)","%1%.html") })
-          elseif m then
-            thischunk[m] = val
-          else
-            table.insert(thischunk.lines, line)
-          end
+        if declname then
+          -- strip off M. which puts declaration in module
+          declname = string.gsub(declname,"^M%.","")
         end
-        for i,x in ipairs(thischunk.returns) do
-          local n
-          if i == 1 then n = "⇒" else n = "," end
-          table.insert(thischunk.param, { name = n, description = x })
-        end
-        local rawcontents = string.gsub(table.concat(thischunk.lines, "\n") .. "\n\n", "\r", "")
-        thischunk.contents = converter(rawcontents)
-        thischunk.id = thischunk.name and thischunk.name:match("^[^%( \t]*")
-        thischunk.lines = nil
+        local decl = (declname or "") .. ((declname and decargs) or "")
+        local rawcontents = table.concat(commentlines, "\n") .. "\n\n"
+        local thischunk = { name = decl,
+                            contents = converter(rawcontents),
+                            id = decl and decl:match("^[^%( \t]*")
+                          }
         table.insert(chunks, thischunk)
         commentlines = {}
       end
     end
   end
-  return metadata, chunks
+  return chunks
 end
 
 local template = [===[
@@ -132,23 +99,10 @@ local template = [===[
 <body>
 <div id="content">
 <h1 class="module"><code>$modname</code></h1>
-$if{ #author > 0 }[[<p><b>Author:</b> $author</p>]]
-$if{ copyright }[[<p><b>Copyright:</b> &copy; $copyright</p>]]
-$if{ release }[[<p><b>Release:</b> $release</p>]]
-$if{ license }[[<p><b>License:</b> $license</p>]]
 $chunks[=[
 <div class="section" $if{ id }[[ id="$id"]]>
 <h3 class="declaration"><code>$name</code></h3>
 $contents
-<dl class="param">
-$param[[
-<dt><code>$name</code></dt>
-<dd>$description</dt>
-]]
-</dl>
-$if{ see }[==[
-$see[[<p><b>See also:</b> <a href="$url">$name</a>.</p>]]
-]==]
 </div>
 ]=]
 </div>
@@ -168,44 +122,15 @@ div.section { clear: both; border-top: 2px solid #eee; }
 code,pre { font-family: Courier, monospace; font-size: 90%; }
 div#index { position: absolute; left: 1em; top: 1em; width:14em; }
 div#content { position: absolute; left: 15em; top: 0.5em; padding-left: 2em; max-width: 40em; padding-bottom: 1em; border-left: 1px solid #555; }
-dl.param
-{
-        float: left;
-        margin: 0;
-        padding: 0;
-        padding-bottom: 0.5em;
-}
-
-.param dt
-{
-        clear: left;
-        float: left;
-        width: 8em;
-        margin: 0;
-        padding: 2px;
-        font-weight: bold;
-}
-
-.param dd
-{
-        float: left;
-        margin: 0;
-        padding: 2px;
-}
 ]]
 
 for i=1,#arg do
   local f = arg[i]
   local data = {}
-  local metadata
   data["if"] = cosmo.cif  -- this activates the "if" keyword
-  metadata, data.chunks = extract_comments(f)
-  data.author = table.concat(metadata.author, "; ")
-  data.copyright = metadata.copyright
-  data.license = metadata.license
-  data.release = metadata.release
-  data.index = index
+  data.chunks = extract_comments(f)
   data.modname = get_modname(f)
+  data.index = index
   local page = cosmo.fill(template, data)
   local file = io.open(destdir .. "/" .. data.modname .. ".html", "w")
   file:write(page)
