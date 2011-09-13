@@ -47,8 +47,7 @@ $body
       /* The font from Google */
       font-family: 'Oswald', arial, serif;
       font-size: 2em;
-      margin-left: 40px;
-      margin-right: 40px;
+      padding-left: 1em;
   }
   h1, h2, h3 {
       margin-top: 50px;
@@ -118,7 +117,7 @@ $body
   section {
     position: absolute;
     pointer-events: none;
-    width: 100%; height: 100%;
+    width: 95%; height: 100%;
   }
   section[aria-selected] { pointer-events: auto; }
   body { display: none; }
