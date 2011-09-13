@@ -27,8 +27,10 @@ function M.new(options)
   end
 
   Html5.template = [[
+<!DOCTYPE html>
 <html>
 <head>
+<meta charset="utf-8">
 <title>$title</title>
 <meta charset="utf-8" />
 </head>
