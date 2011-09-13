@@ -3,6 +3,8 @@
 
 * TODO use lake or just a plain ruby script to unify tests, docs, etc.
 
+* TODO metadata as yaml-style set off by --- ---
+
 * TODO rewrite test runner in lua?
 
 * TODO code comments/cleanup for lunadoc
