@@ -210,13 +210,13 @@ function M.new(writer, options)
       end
   end
 
-  local bulletchar = plus + asterisk + dash
+  local bulletchar = C(plus + asterisk + dash)
 
   local bullet     = ( bulletchar * #spacing * (tab + space^-3)
                      + space * bulletchar * #spacing * (tab + space^-2)
                      + space * space * bulletchar * #spacing * (tab + space^-1)
                      + space * space * space * bulletchar * #spacing
-                     ) * -bulletchar / "*"
+                     ) * -bulletchar
 
   local enumerator = C(digit^3 * period) * #spacing
                    + C(digit^2 * period) * #spacing * (tab + space^1)
