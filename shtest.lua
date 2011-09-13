@@ -23,14 +23,20 @@ end
 
 local format = string.format
 
+local function ansicolor(s)
+  return string.char(27) .. '[' .. tostring(s) .. 'm'
+end
+
 local function show_diff(expected, actual)
-  local difflines = diff.diff(expected, actual,"\n")
+  local difflines = diff.diff(expected, actual)
   for _,l in ipairs(difflines) do
     local text, status = l[1], l[2]
     if status == "in" then
-      io.write(format("+ %s\n",text))
+      io.write(ansicolor(42) .. text .. ansicolor(0))
     elseif status == "out" then
-      io.write(format("- %s\n",text))
+      io.write(ansicolor(41) .. ansicolor(37) .. text .. ansicolor(0))
+    else
+      io.write(ansicolor(36) .. text .. ansicolor(0))
     end
   end
 end
