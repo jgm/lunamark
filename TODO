@@ -4,6 +4,17 @@
 * TODO use lake or just a plain ruby script to unify tests, docs, etc.
 
 * TODO metadata as yaml-style set off by --- ---
+  or, why not lua itself, instead of yaml? then we don't need a yaml
+  parser.
+  {
+  title: "My great book",
+  author: "John",
+  abstract: [[
+    This is the abstract. It is pretty
+    long.]]
+  }
+  I suppose some kind of sandboxing would be needed to prevent
+  running of arbitrary code.
 
 * TODO rewrite test runner in lua?
 
