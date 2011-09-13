@@ -37,7 +37,7 @@ It is slightly faster than the author's own C library
 
 `--to,-t` *format*
 :   Specify format for output.
-    *format* can be `html`, `html5`, `docbook`, `latex`, `context`, or `man`.
+    *format* can be `html`, `html5`, `dzslides`, `docbook`, `latex`, `context`, or `man`.
 `--layout,-l` *layout*
 :   Control whitespace in output.
     *layout* can be `default` (blank lines between block-level elements),
@@ -74,7 +74,12 @@ The following extensions are defined, with the default setting given in parenthe
 
 `(-) containers`
 :   Put sections in containers (`div` tags for `html` writer,
-    `section` tags for `html5`).
+    `section` tags for `html5` or `dzslides`).
+`(-) slides`
+:   Like `containers`, but do not allow containers to nest.
+    The container for a section will end before the container for
+    a subsection begins.  This is usually what is wanted
+    for HTML5 slide shows.
 `(-) startnum`
 :   Start number of an ordered list is significant. In standard
     markdown, the starting number is irrelevant.  If this
@@ -152,6 +157,7 @@ EXTENSIONS is a comma-separated list of extensions, each optionally prefixed
 by + (enable) or - (disable).  The following extensions are defined,
 with the default setting given in parentheses:
   (-) containers        Put sections in containers (e.g. div or section tags)
+  (-) slides            Like containers, but do not nest them
   (-) startnum          Start number of an ordered list is significant
   (-) smart             Smart typography (quotes, dashes, ellipses)
   (-) preserve_tabs     Don't expand tabs to spaces
@@ -189,12 +195,13 @@ end
 
 local to = optarg.t or "html"
 ensure_one_of("--to,-t", to,
-  {"markdown","html","html5","docbook","latex","context","man"})
+  {"markdown","html","html5","dzslides","docbook","latex","context","man"})
 
 local reader = lunamark.reader.markdown
 
 local extensions = {  -- defaults
   containers = false,
+  slides = false,
   startnum = false,
   smart = false,
   preserve_tabs = false,
@@ -242,6 +249,7 @@ if not writer then
 end
 
 local reader_options = extensions
+
 local parse = reader.new(writer, reader_options)
 
 local args = {}

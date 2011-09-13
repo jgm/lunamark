@@ -29,7 +29,7 @@ end
 -- *   `writer` is a writer table (see [lunamark.writer.generic]).
 --
 -- *   `options` is a table with parsing options.
---     It can include the following fields:
+--     The following fields are significant:
 --
 --     `alter_syntax`
 --     :   Function from syntax table to syntax table,
@@ -59,6 +59,10 @@ end
 --
 --     `definition_lists`
 --     :   Enable definition lists as in pandoc.
+--
+--     `slides`
+--     :   Do not allow containers to nest; when a subsection begins,
+--         close the section's container and start a new one.
 --
 -- *   Returns a converter function that converts a markdown string
 --     using `writer`, returning the parsed document as first result,
@@ -764,8 +768,16 @@ function M.new(writer, options)
        (Blank^0 / writer.interblocksep * secblock)^0) / writer.section
   end
 
-  local Section = SectionMax(1) + SectionMax(2) + SectionMax(3) +
-                  SectionMax(4) + SectionMax(5) + SectionMax(6)
+  local Section
+
+  if options.slides then
+    -- if slide show, don't nest sections
+    Section = SectionMax(6)
+  else
+    Section = SectionMax(1) + SectionMax(2) + SectionMax(3) +
+                SectionMax(4) + SectionMax(5) + SectionMax(6)
+  end
+
 
   ------------------------------------------------------------------------------
   -- Syntax specification

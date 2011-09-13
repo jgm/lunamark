@@ -84,5 +84,5 @@ Most of the library is written by John MacFarlane.  Hans Hagen
 made some major performance improvements.  Khaled Hosny added the
 original ConTeXt writer.
 
-The `htmlparser` module is (c) 2009 by Christopher E. Moore, MIT licensed.
-It has been modified slightly by John MacFarlane.
+The dzslides HTML, CSS, and javascript code is by Paul Rouget, released under
+the DWTFYWT Public License.

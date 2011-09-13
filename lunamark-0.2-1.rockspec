@@ -41,6 +41,7 @@ build = {
        ["lunamark.writer.docbook"]  = "lunamark/writer/docbook.lua",
        ["lunamark.writer.html"]     = "lunamark/writer/html.lua",
        ["lunamark.writer.html5"]    = "lunamark/writer/html5.lua",
+       ["lunamark.writer.dzslides"] = "lunamark/writer/dzslides.lua",
        ["lunamark.writer.tex"]      = "lunamark/writer/tex.lua",
        ["lunamark.writer.latex"]    = "lunamark/writer/latex.lua",
        ["lunamark.writer.context"]  = "lunamark/writer/context.lua",
