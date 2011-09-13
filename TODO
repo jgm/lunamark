@@ -1,3 +1,8 @@
+* TODO make it cross-platform (no /usr/bin/env)
+  see docs for https://github.com/stevedonovan/Lake
+
+* TODO use lake or just a plain ruby script to unify tests, docs, etc.
+
 * TODO rewrite test runner in lua?
 
 * TODO code comments/cleanup for lunadoc
