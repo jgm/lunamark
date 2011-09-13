@@ -28,7 +28,8 @@ local function ansicolor(s)
 end
 
 local function show_diff(expected, actual)
-  local difflines = diff.diff(expected, actual)
+  local token = "[%s<>'\"]"
+  local difflines = diff.diff(expected, actual, token)
   for _,l in ipairs(difflines) do
     local text, status = l[1], l[2]
     if status == "in" then
