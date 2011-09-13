@@ -42,18 +42,20 @@ $body
 <style>
   html { background-color: black; }
   body { background-color: white; }
-  /* A section is a slide. It's size is 800x600, and this will never change */
+  /* A section is a slide. Its size is 800x600, and this will never change */
   section {
       /* The font from Google */
       font-family: 'Oswald', arial, serif;
       font-size: 2em;
+      margin-left: 40px;
+      margin-right: 40px;
   }
   h1, h2, h3 {
       margin-top: 50px;
       text-align: center;
   }
   ul {
-      margin-left: 200px;
+      margin-left: 40px;
   }
   a { color: #FF0066; } a:hover { text-decoration: underline; }
   footer { position: absolute; bottom: 50px; right: 50px; }
