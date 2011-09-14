@@ -235,7 +235,10 @@ for x in extensions_opt:gmatch("[%+%-]?[%a_]+") do
 end
 
 local output = optarg.o
-io.output(output)
+local ok, msg = pcall(function() io.output(output) end)
+if not ok then
+  lunamark.util.err("Could not open '" .. output .. "' for writing.\n" .. msg, 9)
+end
 
 local writer_options = extensions
 
@@ -263,8 +266,12 @@ if #args == 0 then
 else
   inpt = {}
   for _,f in ipairs(args) do
-    io.input(f)
-    table.insert(inpt, io.read("*all"))
+    local ok, msg = pcall(function() io.input(f) end)
+    if ok then
+      table.insert(inpt, io.read("*all"))
+    else
+      lunamark.util.err("Could not open file '" .. f .. "'", 7)
+    end
   end
   inp = table.concat(inpt, "\n") .. "\n"
 end

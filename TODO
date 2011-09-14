@@ -1,5 +1,3 @@
-* TODO better error checking for opening files etc.
-
 * TODO metadata as yaml-style set off by --- ---
   or, why not lua itself, instead of yaml? then we don't need a yaml
   parser.
