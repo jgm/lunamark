@@ -4,6 +4,8 @@ local testdir = tests
 local lfs = require("lfs")
 local diff = require("diff")
 local cmdname = "lunamark"
+local tests_failed = 0
+local tests_passed = 0
 
 local function is_directory(path)
   return lfs.attributes(path, "mode") == "directory"
@@ -59,7 +61,7 @@ end
 
 local function show_diff(expected, actual)
   io.write(expectedcolor("expected") .. actualcolor("actual") .. "\n")
-  local tokenpattern = "%A"
+  local tokenpattern = "[%s]"
   local difftoks = diff.diff(expected, actual, tokenpattern)
   for _,l in ipairs(difftoks) do
     local text, status = l[1], l[2]
@@ -84,8 +86,10 @@ local function run_test(test)
   outh:close()
   os.remove(tmp)
   if actual_out == test.output then
+    tests_passed = tests_passed + 1
     io.write(passcolor("[OK]") .. "     " .. test.path .. "\n")
   else
+    tests_failed = tests_failed + 1
     io.write(failcolor("[FAILED]") .. " " .. test.path .. "\n")
     local worddiff = false
     show_diff(test.output, actual_out)
@@ -94,3 +98,6 @@ end
 
 -- test:
 do_matching_tests(arg[1], arg[2], run_test)
+io.write(string.format("Passed: %d\nFailed: %d\n", tests_passed, tests_failed))
+os.exit(tests_failed)
+
