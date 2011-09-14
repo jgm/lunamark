@@ -1,13 +1,26 @@
 version=$(bin/lunamark --version)
 date=$(date "%Y-%m-%d")
 luas=lunamark.lua lunamark/*.lua lunamark/*/*.lua
+testfile=tmptest.txt
+PROG ?= bin/lunamark
+NUM ?= 25
 
 all:
-	@echo Targets: test docs install clean
+	@echo Targets: test bench docs install clean
 
-.PHONY: test docs clean install
+.PHONY: test bench docs clean install
 test:
 	-lua shtest.lua -p `pwd`/bin/lunamark $@
+
+testfile: tests/Markdown_1.0.3/Markdown\ Documentation\ -\ Syntax.test
+	x=${NUM}; \
+	while [ $$x -gt 0 ] do \
+		sed -e '1/<<</d' -e '/>>>/',$d' $< > $@; \
+	    	x=$$(($$x-1)); \
+	done
+
+bench: ${testfile}
+	time ${PROG} < ${testfile} > /dev/null
 
 %.1: bin/%.lua
 	prog=$(echo $< | sed -e 's/^bin\///' -e 's/\.lua$//') \
@@ -23,4 +36,4 @@ install: ${luas}
 	luarocks make
 
 clean:
-	-rm -rf doc
+	-rm -rf doc ${testfile}
