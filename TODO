@@ -1,3 +1,10 @@
+* TODO code comments/cleanup for lunadoc
+
+* TODO man pages for lunamark, lunadoc
+  (use existing shells)
+
+* TODO add lunadoc to rock?
+
 * TODO metadata as yaml-style set off by --- ---
   or, why not lua itself, instead of yaml? then we don't need a yaml
   parser.
@@ -27,15 +34,6 @@
                    book2: { ... } }
   ---
   would be nice to allow metadata at end of document, too.
-
-* TODO rewrite test runner in lua?
-
-* TODO code comments/cleanup for lunadoc
-
-* TODO man pages for lunamark, lunadoc
-  (use existing shells)
-
-* TODO add lunadoc to rock?
 
 * TODO update readme
 

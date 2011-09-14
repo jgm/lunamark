@@ -22,9 +22,8 @@ testfile: tests/Markdown_1.0.3/Markdown\ Documentation\ -\ Syntax.test
 bench: ${testfile}
 	time ${PROG} < ${testfile} > /dev/null
 
-%.1: bin/%.lua
-	prog=$(echo $< | sed -e 's/^bin\///' -e 's/\.lua$//') \
-	sed '1,/^@startman/d;/^@stopman/,$d' $< | bin/lunamark -Xdefinition_lists,notes,-smart -t man -s -d section=1,title=$$prog,center_header="${version}",date="${date}" -o $$prog.1
+%.1: bin/%
+	sed '1,/^@startman/d;/^@stopman/,$$d' $< | bin/lunamark -Xdefinition_lists,notes,-smart -t man -s -d section=1,title=$$prog,center_header="${version}",date="${date}" -o $(subst .1,,$@).1
 
 docs: doc lunamark.1 lunadoc.1
 
@@ -40,4 +39,4 @@ install: ${luas}
 	luarocks make
 
 clean:
-	-rm -rf doc ${testfile}
+	-rm -rf doc ${testfile} lunamark.1 lunadoc.1
