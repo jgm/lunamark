@@ -6,9 +6,9 @@ PROG ?= bin/lunamark
 NUM ?= 25
 
 all:
-	@echo Targets: test bench docs install clean
+	@echo Targets: test bench docs run-code-examples install clean
 
-.PHONY: test bench docs clean install
+.PHONY: test bench docs clean run-code-examples install
 test:
 	-lua shtest.lua -p `pwd`/bin/lunamark $@
 
@@ -28,9 +28,13 @@ bench: ${testfile}
 
 docs: doc lunamark.1 lunadoc.1
 
-doc: ${luas}
+doc: ${luas} run-code-examples
 	mkdir -p doc
 	bin/lunadoc ${luas}
+
+run-code-examples: lunamark.lua
+	@echo Running code examples... ;\
+	grep -e '^--     ' $< | sed -e 's/^--     //' | lua
 
 install: ${luas}
 	luarocks make
