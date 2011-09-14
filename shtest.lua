@@ -1,3 +1,5 @@
+#!/usr/bin/env lua
+
 local testdir = tests
 local lfs = require("lfs")
 local diff = require("diff")
