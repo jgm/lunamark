@@ -2,6 +2,11 @@
 
 * TODO man page for lunadoc
 
+* TODO implement a sepby keyword for cosmo (like cosmo.cif)?
+
+* TODO test some diverse documents with default templates,
+  to make sure everything works
+
 * TODO add lunadoc to rock?
 
 * TODO metadata as yaml-style set off by --- ---
