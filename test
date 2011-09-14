@@ -1,4 +1,0 @@
-#!/bin/sh
-PROG=${PROG:-`pwd`/bin/lunamark}
-lua shtest.lua -p $PROG $@
-

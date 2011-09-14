@@ -1,9 +1,0 @@
-#!/bin/sh
-rm -rf doc
-mkdir doc
-bin/lunadoc lunamark.lua lunamark/*.lua lunamark/*/*.lua
-for prog in lunamark lunadoc; do
-  version=`bin/lunamark --version | head -1`
-  date=`date +'%F'`
-  sed '1,/^@startman/d;/^@stopman/,$d' bin/$prog | bin/lunamark -Xdefinition_lists,notes,-smart -t man -s -d section=1,title=$prog,center_header="$version",date="$date" -o $prog.1
-done
