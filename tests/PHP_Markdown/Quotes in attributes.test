@@ -1,4 +1,4 @@
-markdown --strict
+markdown
 <<<
 [Test](/"style="color:red)
 [Test](/'style='color:red)

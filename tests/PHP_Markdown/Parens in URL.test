@@ -1,4 +1,4 @@
-markdown --strict
+markdown
 <<<
 [Inline link 1 with parens](/url\(test\) "title").
 

@@ -1,4 +1,4 @@
-markdown --strict
+markdown
 <<<
 ***This is strong and em.***
 
