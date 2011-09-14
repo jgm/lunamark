@@ -1,4 +1,4 @@
 #!/bin/sh
 PROG=${PROG:-`pwd`/bin/lunamark}
-perl shtest.pl -w $PROG $@
+lua shtest.lua -p $PROG $@
 
