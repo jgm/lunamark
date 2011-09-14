@@ -82,17 +82,18 @@ local function run_test(test)
   tmph:close()
   local cmd = test.command .. " " .. tmp
   local outh = io.popen(cmd, "r")
-  local actual_out = outh:read("*all")
+  local actual = outh:read("*all")
+  local expected = test.output
   outh:close()
   os.remove(tmp)
-  if actual_out == test.output then
+  if actual == expected then
     tests_passed = tests_passed + 1
     io.write(passcolor("[OK]") .. "     " .. test.path .. "\n")
   else
     tests_failed = tests_failed + 1
     io.write(failcolor("[FAILED]") .. " " .. test.path .. "\n")
     local worddiff = false
-    show_diff(test.output, actual_out)
+    show_diff(expected, actual)
   end
 end
 
@@ -135,6 +136,7 @@ end
 
 local testdir = optarg.d or "tests"
 local pattern = arg[optind]
+local normalize = optarg.n
 
 do_matching_tests(testdir, pattern, run_test)
 io.write(string.format("Passed: %d\nFailed: %d\n", tests_passed, tests_failed))
