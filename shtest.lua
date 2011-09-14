@@ -1,8 +1,8 @@
 #!/usr/bin/env lua
 
-local testdir = tests
 local lfs = require("lfs")
 local diff = require("diff")
+local alt_getopt = require("alt_getopt")
 local cmdname = "lunamark"
 local tests_failed = 0
 local tests_passed = 0
@@ -96,8 +96,46 @@ local function run_test(test)
   end
 end
 
--- test:
-do_matching_tests(arg[1], arg[2], run_test)
+-- main program
+
+local version = [[
+shtest.lua 0.1
+Copyright (C) 2009-2011 John MacFarlane
+]]
+
+local usage = [[
+Usage: shtest.lua [options] [pattern] - run shell tests
+
+Options:
+  --dir,-d PATH      Directory containing .test files (default tests)
+  --normalize,-n     Normalize whitespace in output
+  --version,-V       Version information
+  --help,-h          This message
+]]
+
+local long_opts = {
+  dir = "d",
+  normalize = "n",
+  version = "V",
+  help = "h"
+}
+
+local short_opts = "d:nVh"
+local optarg,optind = alt_getopt.get_opts(arg, short_opts, long_opts)
+
+if optarg.h then
+  io.write(usage)
+  os.exit(0)
+end
+
+if optarg.V then
+  io.write(version)
+  os.exit(0)
+end
+
+local testdir = optarg.d or "tests"
+local pattern = arg[optind]
+
+do_matching_tests(testdir, pattern, run_test)
 io.write(string.format("Passed: %d\nFailed: %d\n", tests_passed, tests_failed))
 os.exit(tests_failed)
-
