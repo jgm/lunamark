@@ -1,6 +1,4 @@
 #!/usr/bin/env lua
-require("luarocks.loader")
-
 -- (c) 2011 John MacFarlane
 -- Released under the MIT license.
 
@@ -69,6 +67,8 @@ John MacFarlane.
 @stopman
 --]===]
 
+-- load luarocks.loader if it's installed...
+pcall(function() require("luarocks.loader") end)
 
 local lunamark = require("lunamark")
 local cosmo = require("cosmo")
