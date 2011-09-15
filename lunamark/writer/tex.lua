@@ -70,9 +70,11 @@ function M.new(options)
   end
 
   function TeX.inline_html(s)
+    return ""
   end
 
   function TeX.display_html(s)
+    return ""
   end
 
   function TeX.paragraph(s)
