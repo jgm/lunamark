@@ -748,8 +748,8 @@ function M.new(writer, options)
   -- parse setext header of maximum level maxlev
   local function SetextHeader(maxlev)
     local markers
-    if maxlev == 1 then markers = "=" else markers = "=-" end
-    return (#(line * S(markers)) * Cs(line / inlines)
+    if maxlev == 1 then marker = P("=") else marker = S("=-") end
+    return (#(line * marker) * Cs(line / inlines)
             * HeadingLevel(maxlev) *  optionalspace * newline)
   end
 
