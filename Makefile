@@ -13,6 +13,7 @@ test:
 	-lua shtest.lua -p `pwd`/bin/lunamark $@
 
 ${testfile}: all-markdown-tests.txt
+	echo > ${testfile} ; \
 	x=${NUM}; \
 	while [ $$x -gt 0 ]; do \
 		cat $< >> $@; \
