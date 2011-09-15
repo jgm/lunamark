@@ -1,8 +1,8 @@
+* TODO command-line parsing for lunadoc
+
 * TODO code comments/cleanup for lunadoc
 
 * TODO man page for lunadoc
-
-* TODO implement a sepby keyword for cosmo (like cosmo.cif)?
 
 * TODO test some diverse documents with default templates,
   to make sure everything works

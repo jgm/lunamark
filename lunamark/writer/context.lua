@@ -165,7 +165,7 @@ $if{ title }[=[
 {\tfd $title}
 $if{ author }[[
 \blank[3*medium]
-{\tfa $author[==[{$it[\crlf]}]==]
+{\tfa $sepby{author}[==[$it]==][==[\crlf ]==]}
 ]]
 $if{ date }[[
 \blank[2*medium]

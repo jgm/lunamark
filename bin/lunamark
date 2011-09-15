@@ -60,7 +60,8 @@ It is slightly faster than the author's own C library
     below, for template format.  Implies `--standalone,-s`.
 `--data,-d` *key=value[,key=value..]*
 :   Set metadata fields to be passed to template.  Argument is a list
-    of *key=value* pairs, separated by commas.
+    of *key=value* pairs, separated by commas.  If keys are repeated,
+    an array value will be formed.
 `--strict,-0`
 :   Disable all markdown extensions.
 `--version,-V`
@@ -126,7 +127,7 @@ The following extensions are defined, with the default setting given in parenthe
         :   a tool for gathering leaves.
 
             (paragraph two of definition one.)
-        
+
         :   a ruby build system.
 
 # TEMPLATES
@@ -144,10 +145,21 @@ in the `$HOME?lunamark/templates` directory, and use it anywhere
 with `lunamark --template letter`.
 
 The templates are [cosmo](http://cosmo.luaforge.net/) templates.
-Conditionals are enabled, so you can use the `$if` keyword.
+Conditionals are enabled, so you can use the `$if` keyword
+as follows:
+
+    $if{ #people == 1 }[[There is only one.]][[There are many.]]
+
+A `sepby` keyword is also enabled:
+
+    $sepby{ people }[[$it]][[ and ]]
+
+will render "`Sid`" if `people == {"Sid"}` and
+"`Sid and Nancy`" if `people == {"Sid","Nancy"}`.
+
 The following variables are set by default; others may be set
 by the reader (if metadata extensions are used) or through
-the `--data` option.
+the `--data` option:
 
 `body`
 :   the fragment converted from markdown
@@ -175,12 +187,12 @@ reads `ch1.txt`, `ch2.txt`, `ch3.txt`, and `references.txt`,
 concatenates them, and converts the result from markdown to LaTeX,
 using the default template and saving the result as `mybook.tex`.
 
-    lunamark -Xall --template letter -d cc="Sam Smith",sign="yes" \
+    lunamark -Xall --template letter -d cc=Smith,cc="Jim Jones",sign="yes" \
       -t context -o myletter.ctx myletter.txt
 
 produces a ConTeXt file using the template `letter.context`,
-and setting the variables `cc` and `sign` as specified.
-All lunamark etensions are enabled.
+and setting the variable `cc` to `{"Smith","Jim Jones"}`
+and `sign` to `"yes"`.  All lunamark etensions are enabled.
 
 # AUTHORS
 
@@ -378,18 +390,29 @@ if template then
 end
 
 if template_contents then
-  local data = {}
+  local data = metadata or {}
   data.timestamp = os.date("%Y-%m-%d %X")
   data.sources = args
-  if metadata then data = metadata end
+  local keys = {}
   if optarg.d then
     for x in string.gmatch(optarg.d, "[%w_]+=[^,]+") do
       local k,v = string.match(x, "([^=]*)=(.*)")
-      data[k] = writer.string(v)
+      if keys[k] then
+        if keys[k] == "string" then
+          data[k] = {data[k], v}
+        elseif keys[k] == "array" then
+          data[k] = table.insert(data[k],v)
+        end
+        keys[k] = "array"
+      else
+        data[k] = writer.string(v)
+        keys[k] = "string"
+      end
     end
   end
   data.body = body
   data["if"] = cosmo.cif  -- this activates the "if" keyword
+  data.sepby = lunamark.util.sepby  -- actives "sepby" keyword
   local result = cosmo.fill(template_contents, data)
   io.write(result)
 else

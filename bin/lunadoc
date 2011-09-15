@@ -128,6 +128,7 @@ for i=1,#arg do
   local f = arg[i]
   local data = {}
   data["if"] = cosmo.cif  -- this activates the "if" keyword
+  data.sepby = lunamark.util.sepby
   data.chunks = extract_comments(f)
   data.modname = get_modname(f)
   data.index = index
