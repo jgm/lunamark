@@ -1,4 +1,5 @@
 #!/usr/bin/env lua
+require("luarocks.loader")
 -- lunamark program
 
 --[===[
