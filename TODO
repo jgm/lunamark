@@ -11,8 +11,11 @@
   a 'start section' and 'end section' writer?
 
 * BUG 3: on linux, but not osx, bin/lunamark gives a "grammar too large"
-  error.  same lpeg version -- what's going on? if needed, shrink grammar
-  by removing customizability of individual parsers.
+  error.  same lpeg version -- what's going on?
+  if needed, shrink grammar
+  by removing customizability of individual parsers. UPDATE: that's
+  not the problem; taking those out doesn't matter. The problem
+  comes from the Section parsers; taking that out solves the issue.
 
 * TODO code comments/cleanup for lunadoc
 
