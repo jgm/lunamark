@@ -2,6 +2,7 @@ version=$(bin/lunamark --version)
 date=$(date "%Y-%m-%d")
 luas=lunamark.lua lunamark/*.lua lunamark/*/*.lua
 testfile=tmptest.txt
+benchtext=benchtext.txt
 PROG ?= bin/lunamark
 NUM ?= 25
 
@@ -12,8 +13,11 @@ all:
 test:
 	-lua shtest.lua -p `pwd`/bin/lunamark $@
 
-${testfile}: all-markdown-tests.txt
-	echo > ${testfile} ; \
+${benchtext}:
+	for i in tests/Markdown_1.0.3/*.test; do sed -e '1,/<<</d;/>>>/,$$d' "$$i" >> $@; echo >> $@.txt; done
+
+${testfile}: ${benchtext}
+	cat < /dev/null > ${testfile} ; \
 	x=${NUM}; \
 	while [ $$x -gt 0 ]; do \
 		cat $< >> $@; \

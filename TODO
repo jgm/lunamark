@@ -6,6 +6,9 @@
   goes away if you do -Xslides
   goes away if you get rid of SetextHeader in Header(maxlev)
   goes away if you get rid of SectionMax >= 4.
+  can also be fixed by: lpeg.setmaxstack(1000)
+  but it would be better to rethink the header parsers.  perhaps have
+  a 'start section' and 'end section' writer?
 
 * TODO code comments/cleanup for lunadoc
 
