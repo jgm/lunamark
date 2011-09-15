@@ -1,3 +1,9 @@
+* BUG 1:  bin/lunamark tmptest.txt > tmptest.html
+  It's only converting the last part!
+
+* BUG 2:  bin/lunamark pandoc2.txt
+  Error lua: ./lunamark/reader/markdown.lua:92: too many pending calls/choices
+
 * TODO code comments/cleanup for lunadoc
 
 * TODO test some diverse documents with default templates,
