@@ -3,22 +3,71 @@
 -- (c) 2011 John MacFarlane
 -- Released under the MIT license.
 
---- This program reads a number of source files, scans them
--- for special comment blocks beginning with '---', and writes
--- an HTML file documenting each module to the doc directory.
---
--- There must be blank space between the opening dashes and
--- any following text.
---
--- If the comment block immediately precedes a declaration
--- of a function or variable, the name is extracted automatically
--- and placed at the top of the comment block in the output.
---
--- Each file is assumed to be a module.  The 'module' keyword need
--- not be used.
---
--- Documentation is parsed as markdown, with definition lists
--- and smart typography extensions.
+--[===[
+@startman
+# NAME
+
+lunadoc - simple markdown documentation for lua modules
+
+# SYNOPSIS
+
+luadoc [options] [file..]
+
+# DESCRIPTION
+
+This program reads a number of source files, scans them
+for special comment blocks beginning with '---', and writes
+an HTML file documenting each module to the doc directory.
+There must be blank space between the opening dashes and
+any following text.
+
+If the comment block immediately precedes a declaration
+of a function or variable, the name is extracted automatically
+and placed at the top of the comment block in the output.
+Example:
+
+    --- This function frobs a brib.
+    -- `brib` is the brib to frob.
+    -- `smorg` turns on smorging if true.
+    function M.frob_a_brib(brib)
+
+Each file is assumed to be a module.  The 'module' keyword need
+not be used. The `M.` prefix on declarations will be removed,
+as it is assumed that this is used to put definitions in the
+module's namespace.
+
+Documentation is parsed as markdown, with definition lists and smart
+typography extensions.
+
+Module names in square brackets automatically create links to the module's
+documentation. For example:
+
+    -- See [lunamark.util].
+
+# OPTIONS
+
+`--dir,-d` PATH
+:   Output directory (default 'doc'). Directory will
+    be created if it does not exist.
+`--css,-c` PATH
+:   Path of CSS file to use. If not specified, a
+    default CSS file will be used.
+`--template,-T` PATH
+:   Path of a cosmo template to be used for module
+    documentation.  If not specified, a default template
+    will be used.
+`--version,-V`
+:   Print version information.
+`--help,-h`
+:   This message
+
+# AUTHORS
+
+John MacFarlane.
+
+@stopman
+--]===]
+
 
 local lunamark = require("lunamark")
 local cosmo = require("cosmo")
@@ -36,7 +85,7 @@ Usage: lunadoc [options] [source..] - create documentation
 Options:
   --dir,-d PATH        Output directory (default 'doc')
   --css,-c PATH        CSS to use
-  --template,-t PATH   Template to use
+  --template,-T PATH   Template to use
   --version,-V         Version information
   --help,-h            This message
 ]]
@@ -44,7 +93,7 @@ Options:
 local long_opts = {
   dir = "d",
   css = "c",
-  template = "t",
+  template = "T",
   version = "V",
   help = "h"
 }
