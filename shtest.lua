@@ -1,5 +1,5 @@
 #!/usr/bin/env lua
-
+require("luarocks.loader")
 local lfs = require("lfs")
 local diff = require("diff")
 local utf8 = require("unicode").utf8
@@ -24,7 +24,9 @@ local function do_matching_tests(path, patt, fun)
         local contents = fh:read("*all"):gsub("\r","")
         local cmd, inp, out = contents:match("^([^\n]*)\n<<<[ \t]*\n(.-\n)>>>[ \t]*\n(.*)$")
         assert(cmd ~= nil, "Command not found in " .. f)
-        cmd = cmd:gsub("^(%S+)",cmdname)
+        if cmdname then
+          cmd = cmd:gsub("^(%S+)",cmdname)
+        end
         fun({ name = f:match("^(.*)%.test$"), path = fpath,
               command = cmd, input = inp or "", output = out or ""})
         fh:close()
@@ -382,7 +384,7 @@ Usage: shtest.lua [options] [pattern] - run shell tests
 
 Options:
   --dir,-d PATH      Directory containing .test files (default 'tests')
-  --prog,-p CMD      Program to run for tests (default 'lunamark')
+  --prog,-p CMD      Program to run for tests
   --normalize,-n     Normalize whitespace in output
   --version,-V       Version information
   --help,-h          This message
@@ -411,7 +413,7 @@ end
 
 local testdir = optarg.d or "tests"
 local pattern = arg[optind]
-cmdname = optarg.p or "lunamark"
+cmdname = optarg.p
 normalize = optarg.n
 
 do_matching_tests(testdir, pattern, run_test)
