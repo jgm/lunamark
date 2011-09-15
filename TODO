@@ -10,6 +10,10 @@
   but it would be better to rethink the header parsers.  perhaps have
   a 'start section' and 'end section' writer?
 
+* BUG 3: on linux, but not osx, bin/lunamark gives a "grammar too large"
+  error.  same lpeg version -- what's going on? if needed, shrink grammar
+  by removing customizability of individual parsers.
+
 * TODO code comments/cleanup for lunadoc
 
 * TODO slides: split slides on hrule
