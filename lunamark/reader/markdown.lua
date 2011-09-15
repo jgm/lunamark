@@ -784,9 +784,9 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   syntax =
-    { "Document",
+    { "Blocks",
 
-      Document              = Blank^0 / "" *
+      Blocks                = Blank^0 / "" *
                               Block^-1 *
                               (Blank^0 / writer.interblocksep * Block)^0,
 

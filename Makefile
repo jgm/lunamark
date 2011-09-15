@@ -12,10 +12,10 @@ all:
 test:
 	-lua shtest.lua -p `pwd`/bin/lunamark $@
 
-testfile: tests/Markdown_1.0.3/Markdown\ Documentation\ -\ Syntax.test
+${testfile}: all-markdown-tests.txt
 	x=${NUM}; \
-	while [ $$x -gt 0 ] do \
-		sed -e '1/<<</d' -e '/>>>/',$d' $< > $@; \
+	while [ $$x -gt 0 ]; do \
+		cat $< >> $@; \
 	    	x=$$(($$x-1)); \
 	done
 
