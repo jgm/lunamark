@@ -3,8 +3,12 @@
 
 * BUG 2:  bin/lunamark pandoc2.txt
   Error lua: ./lunamark/reader/markdown.lua:92: too many pending calls/choices
+  goes away if you do -Xslides
+  goes away if you get rid of SetextHeader in Header(maxlev)
 
 * TODO code comments/cleanup for lunadoc
+
+* TODO slides: split slides on hrule
 
 * TODO test some diverse documents with default templates,
   to make sure everything works
