@@ -22,8 +22,45 @@
 
 local lunamark = require("lunamark")
 local cosmo = require("cosmo")
+local alt_getopt = require("alt_getopt")
+local lfs = require("lfs")
 
-local destdir = "doc"
+local version = [[
+lunadoc 0.1
+Copyright (C) 2011 John MacFarlane
+]]
+
+local usage = [[
+Usage: lunadoc [options] [source..] - create documentation
+
+Options:
+  --dir,-d PATH        Output directory (default 'doc')
+  --css,-c PATH        CSS to use
+  --template,-t PATH   Template to use
+  --version,-V         Version information
+  --help,-h            This message
+]]
+
+local long_opts = {
+  dir = "d",
+  css = "c",
+  template = "t",
+  version = "V",
+  help = "h"
+}
+
+local short_opts = "d:c:t:Vh"
+local optarg,optind = alt_getopt.get_opts(arg, short_opts, long_opts)
+
+if optarg.h or optind > #arg then
+  io.write(usage)
+  os.exit(0)
+end
+
+if optarg.V then
+  io.write(version)
+  os.exit(0)
+end
 
 local index = {}
 local index_refs = {}
@@ -36,7 +73,7 @@ local function normalize(s)
   return s:gsub("[ \t\n]+"," "):lower()
 end
 
-for i=1,#arg do
+for i=optind,#arg do
   local modname = get_modname(arg[i])
   table.insert(index, modname)
   index_refs[normalize(modname)] = { url = modname .. ".html" }
@@ -89,7 +126,7 @@ local function extract_comments(f)
   return chunks
 end
 
-local template = [===[
+local default_template = [===[
 <html>
 <head>
 <title>$modname</title>
@@ -115,7 +152,7 @@ $index[[
 </html>
 ]===]
 
-local css = [[
+local default_css = [[
 body { font-family: Georgia, serif; }
 h3.declaration { margin-bottom: 0.5em; }
 div.section { clear: both; border-top: 2px solid #eee; }
@@ -124,7 +161,23 @@ div#index { position: absolute; left: 1em; top: 1em; width:14em; }
 div#content { position: absolute; left: 15em; top: 0.5em; padding-left: 2em; max-width: 40em; padding-bottom: 1em; border-left: 1px solid #555; }
 ]]
 
-for i=1,#arg do
+local destdir = optarg.d or "doc"
+
+local template = default_template
+if optarg.t then
+  local tfile = io.open(optarg.t, "r")
+  template = tfile:read("*all")
+  tfile:close()
+end
+
+local css = default_css
+if optarg.c then
+  local cfile = io.open(optarg.c, "r")
+  css = cfile:read("*all")
+  cfile:close()
+end
+
+for i=optind,#arg do
   local f = arg[i]
   local data = {}
   data["if"] = cosmo.cif  -- this activates the "if" keyword
@@ -133,9 +186,19 @@ for i=1,#arg do
   data.modname = get_modname(f)
   data.index = index
   local page = cosmo.fill(template, data)
+  if not lfs.attributes(destdir) then
+    lfs.mkdir(destdir)
+  end
   local file = io.open(destdir .. "/" .. data.modname .. ".html", "w")
   file:write(page)
   file:close()
+  -- index page is a copy of the first page
+  -- symlink would be better, but that won't work on windows
+  if i == optind then
+    file = io.open(destdir .. "/" .. "index.html", "w")
+    file:write(page)
+    file:close()
+  end
 end
 
 local file = io.open(destdir .. "/lunadoc.css", "w")
