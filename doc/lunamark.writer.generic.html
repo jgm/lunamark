@@ -1,0 +1,256 @@
+<html>
+<head>
+<title>lunamark.writer.generic</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="lunadoc.css" type="text/css" />
+</head>
+<body>
+<div id="content">
+<h1 class="module"><code>lunamark.writer.generic</code></h1>
+
+<div class="section"  id="">
+<h3 class="declaration"><code></code></h3>
+<p>Generic writer for lunamark. This serves as generic documentation for lunamark writers, which all export a table with the same functions defined.</p>
+
+<p>New writers can simply modify the generic writer: for example,</p>
+
+<pre><code>local Xml = generic.new(options)
+
+Xml.linebreak = &quot;&lt;linebreak /&gt;&quot;
+
+local escaped = {
+     [&quot;&lt;&quot; ] = &quot;&amp;lt;&quot;,
+     [&quot;&gt;&quot; ] = &quot;&amp;gt;&quot;,
+     [&quot;&amp;&quot; ] = &quot;&amp;amp;&quot;,
+     [&quot;\&quot;&quot; ] = &quot;&amp;quot;&quot;,
+     [&quot;&#39;&quot; ] = &quot;&amp;#39;&quot;
+}
+
+function Xml.string(s)
+  return s:gsub(&quot;.&quot;,escaped)
+end
+</code></pre>
+</div>
+
+<div class="section"  id="new">
+<h3 class="declaration"><code>new(options)</code></h3>
+<p>Returns a table with functions defining a generic lunamark writer, which outputs plain text with no formatting. <code>options</code> is an optional table with the following fields:</p>
+
+<dl>
+<dt><code>layout</code></dt>
+<dd><code>minimize</code> (no space between blocks)</dd>
+<dd><code>compact</code> (no extra blank lines between blocks)</dd>
+<dd><code>default</code> (blank line between blocks)</dd>
+</dl>
+</div>
+
+<div class="section"  id="">
+<h3 class="declaration"><code></code></h3>
+<p>The table contains the following fields:</p>
+</div>
+
+<div class="section"  id="W.set_metadata">
+<h3 class="declaration"><code>W.set_metadata(key, val)</code></h3>
+<p>Set metadata field <code>key</code> to <code>val</code>.</p>
+</div>
+
+<div class="section"  id="W.add_metadata">
+<h3 class="declaration"><code>W.add_metadata(key, val)</code></h3>
+<p>Add <code>val</code> to an array in metadata field <code>key</code>.</p>
+</div>
+
+<div class="section"  id="W.get_metadata">
+<h3 class="declaration"><code>W.get_metadata()</code></h3>
+<p>Return metadata table.</p>
+</div>
+
+<div class="section"  id="W.space">
+<h3 class="declaration"><code>W.space</code></h3>
+<p>A space (string).</p>
+</div>
+
+<div class="section"  id="W.start_document">
+<h3 class="declaration"><code>W.start_document()</code></h3>
+<p>Setup tasks at beginning of document.</p>
+</div>
+
+<div class="section"  id="W.stop_document">
+<h3 class="declaration"><code>W.stop_document()</code></h3>
+<p>Finalization tasks at end of document.</p>
+</div>
+
+<div class="section"  id="W.plain">
+<h3 class="declaration"><code>W.plain(s)</code></h3>
+<p>Plain text block (not formatted as a pragraph).</p>
+</div>
+
+<div class="section"  id="W.linebreak">
+<h3 class="declaration"><code>W.linebreak</code></h3>
+<p>A line break (string).</p>
+</div>
+
+<div class="section"  id="W.interblocksep">
+<h3 class="declaration"><code>W.interblocksep</code></h3>
+<p>Line breaks to use between block elements.</p>
+</div>
+
+<div class="section"  id="W.containersep">
+<h3 class="declaration"><code>W.containersep</code></h3>
+<p>Line breaks to use between a container (like a <code>&lt;div&gt;</code> tag) and the adjacent block element.</p>
+</div>
+
+<div class="section"  id="W.ellipsis">
+<h3 class="declaration"><code>W.ellipsis</code></h3>
+<p>Ellipsis (string).</p>
+</div>
+
+<div class="section"  id="W.mdash">
+<h3 class="declaration"><code>W.mdash</code></h3>
+<p>Em dash (string).</p>
+</div>
+
+<div class="section"  id="W.ndash">
+<h3 class="declaration"><code>W.ndash</code></h3>
+<p>En dash (string).</p>
+</div>
+
+<div class="section"  id="W.singlequoted">
+<h3 class="declaration"><code>W.singlequoted(s)</code></h3>
+<p>String in curly single quotes.</p>
+</div>
+
+<div class="section"  id="W.doublequoted">
+<h3 class="declaration"><code>W.doublequoted(s)</code></h3>
+<p>String in curly double quotes.</p>
+</div>
+
+<div class="section"  id="W.string">
+<h3 class="declaration"><code>W.string(s)</code></h3>
+<p>String, escaped as needed for the output format.</p>
+</div>
+
+<div class="section"  id="W.code">
+<h3 class="declaration"><code>W.code(s)</code></h3>
+<p>Inline (verbatim) code.</p>
+</div>
+
+<div class="section"  id="W.link">
+<h3 class="declaration"><code>W.link(label, uri, title)</code></h3>
+<p>A link with link text <code>label</code>, uri <code>uri</code>, and title <code>title</code>.</p>
+</div>
+
+<div class="section"  id="W.image">
+<h3 class="declaration"><code>W.image(label, src, title)</code></h3>
+<p>An image link with alt text <code>label</code>, source <code>src</code>, and title <code>title</code>.</p>
+</div>
+
+<div class="section"  id="W.paragraph">
+<h3 class="declaration"><code>W.paragraph(s)</code></h3>
+<p>A paragraph.</p>
+</div>
+
+<div class="section"  id="W.bulletlist">
+<h3 class="declaration"><code>W.bulletlist(items,tight)</code></h3>
+<p>A bullet list with contents <code>items</code> (an array). If <code>tight</code> is true, returns a “tight” list (with minimal space between items).</p>
+</div>
+
+<div class="section"  id="W.orderedlist">
+<h3 class="declaration"><code>W.orderedlist(items,tight,startnum)</code></h3>
+<p>An ordered list with contents <code>items</code> (an array). If <code>tight</code> is true, returns a “tight” list (with minimal space between items). If optional number <code>startnum</code> is present, use it as the number of the first list item.</p>
+</div>
+
+<div class="section"  id="W.inline_html">
+<h3 class="declaration"><code>W.inline_html(s)</code></h3>
+<p>Inline HTML.</p>
+</div>
+
+<div class="section"  id="W.display_html">
+<h3 class="declaration"><code>W.display_html(s)</code></h3>
+<p>Display HTML (HTML block).</p>
+</div>
+
+<div class="section"  id="W.emphasis">
+<h3 class="declaration"><code>W.emphasis(s)</code></h3>
+<p>Emphasized text.</p>
+</div>
+
+<div class="section"  id="W.strong">
+<h3 class="declaration"><code>W.strong(s)</code></h3>
+<p>Strongly emphasized text.</p>
+</div>
+
+<div class="section"  id="W.blockquote">
+<h3 class="declaration"><code>W.blockquote(s)</code></h3>
+<p>Block quotation.</p>
+</div>
+
+<div class="section"  id="W.verbatim">
+<h3 class="declaration"><code>W.verbatim(s)</code></h3>
+<p>Verbatim block.</p>
+</div>
+
+<div class="section"  id="W.header">
+<h3 class="declaration"><code>W.header(s, level)</code></h3>
+<p>Header level <code>level</code>, with text <code>s</code>.</p>
+</div>
+
+<div class="section"  id="W.hrule">
+<h3 class="declaration"><code>W.hrule</code></h3>
+<p>Horizontal rule.</p>
+</div>
+
+<div class="section"  id="W.note">
+<h3 class="declaration"><code>W.note(contents)</code></h3>
+<p>A footnote or endnote.</p>
+</div>
+
+<div class="section"  id="W.definitionlist">
+<h3 class="declaration"><code>W.definitionlist(items, tight)</code></h3>
+<p>A definition list. <code>items</code> is an array of tables, each of the form <code>{ term = t, definitions = defs, tight = tight }</code>, where <code>t</code> is a string and <code>defs</code> is an array of strings. <code>tight</code> is a boolean, true if it is a tight list.</p>
+</div>
+
+<div class="section"  id="W.template">
+<h3 class="declaration"><code>W.template</code></h3>
+<p>A cosmo template to be used in producing a standalone document. <code>$body</code> is replaced with the document body, <code>$title</code> with the title, and so on.</p>
+</div>
+
+</div>
+<div id="index">
+
+<p><a href="lunamark.html">lunamark</a></p>
+
+<p><a href="lunamark.entities.html">lunamark.entities</a></p>
+
+<p><a href="lunamark.reader.html">lunamark.reader</a></p>
+
+<p><a href="lunamark.util.html">lunamark.util</a></p>
+
+<p><a href="lunamark.writer.html">lunamark.writer</a></p>
+
+<p><a href="lunamark.reader.markdown.html">lunamark.reader.markdown</a></p>
+
+<p><a href="lunamark.writer.context.html">lunamark.writer.context</a></p>
+
+<p><a href="lunamark.writer.docbook.html">lunamark.writer.docbook</a></p>
+
+<p><a href="lunamark.writer.dzslides.html">lunamark.writer.dzslides</a></p>
+
+<p><a href="lunamark.writer.generic.html">lunamark.writer.generic</a></p>
+
+<p><a href="lunamark.writer.groff.html">lunamark.writer.groff</a></p>
+
+<p><a href="lunamark.writer.html.html">lunamark.writer.html</a></p>
+
+<p><a href="lunamark.writer.html5.html">lunamark.writer.html5</a></p>
+
+<p><a href="lunamark.writer.latex.html">lunamark.writer.latex</a></p>
+
+<p><a href="lunamark.writer.man.html">lunamark.writer.man</a></p>
+
+<p><a href="lunamark.writer.tex.html">lunamark.writer.tex</a></p>
+
+<p><a href="lunamark.writer.xml.html">lunamark.writer.xml</a></p>
+
+</div>
+</body>
+</html>

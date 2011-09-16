@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<!-- template for HTML versions of man pages -->
+<html>
+<head>
+<meta charset="utf-8">
+<title>lunadoc(1)</title>
+<style type="text/css">
+  body { margin-left: 80px; margin-right: 80px; font-family: Georgia, serif; }
+  h1, h2 { font-size: 120%; margin-left: -40px; }
+  h1.title { font-size: 200%; margin-left: -40px; }
+  footer { text-align: center; color: #555; font-size: 80%; }
+</style>
+</head>
+<body>
+<h1 class="title">lunadoc(1)</h1>
+<h1>NAME</h1>
+
+<p>lunadoc - simple markdown documentation for lua modules</p>
+
+<h1>SYNOPSIS</h1>
+
+<p>luadoc [options] [file..]</p>
+
+<h1>DESCRIPTION</h1>
+
+<p>This program reads a number of source files, scans them for special comment blocks beginning with &#39;---&#39;, and writes an HTML file documenting each module to the doc directory. There must be blank space between the opening dashes and any following text.</p>
+
+<p>If the comment block immediately precedes a declaration of a function or variable, the name is extracted automatically and placed at the top of the comment block in the output. Example:</p>
+
+<pre><code>--- This function frobs a brib.
+-- `brib` is the brib to frob.
+-- `smorg` turns on smorging if true.
+function M.frob_a_brib(brib)
+</code></pre>
+
+<p>Each file is assumed to be a module. The &#39;module&#39; keyword need not be used. The <code>M.</code> prefix on declarations will be removed, as it is assumed that this is used to put definitions in the module&#39;s namespace.</p>
+
+<p>Documentation is parsed as markdown, with definition lists and smart typography extensions.</p>
+
+<p>Module names in square brackets automatically create links to the module&#39;s documentation. For example:</p>
+
+<pre><code>-- See [lunamark.util].
+</code></pre>
+
+<h1>OPTIONS</h1>
+
+<dl>
+<dt><code>--dir,-d</code> PATH</dt>
+<dd>Output directory (default &#39;doc&#39;). Directory will be created if it does not exist.</dd>
+<dt><code>--css,-c</code> PATH</dt>
+<dd>Path of CSS file to use. If not specified, a default CSS file will be used.</dd>
+<dt><code>--template,-T</code> PATH</dt>
+<dd>Path of a cosmo template to be used for module documentation. If not specified, a default template will be used.</dd>
+<dt><code>--version,-V</code></dt>
+<dd>Print version information.</dd>
+<dt><code>--help,-h</code></dt>
+<dd>This message</dd>
+</dl>
+
+<h1>AUTHORS</h1>
+
+<p>John MacFarlane.</p>
+<footer>
+lunamark 0.2 09/16/2011
+</footer>
+</body>
+</html>

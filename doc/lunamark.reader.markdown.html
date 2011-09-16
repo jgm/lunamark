@@ -1,0 +1,96 @@
+<html>
+<head>
+<title>lunamark.reader.markdown</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="lunadoc.css" type="text/css" />
+</head>
+<body>
+<div id="content">
+<h1 class="module"><code>lunamark.reader.markdown</code></h1>
+
+<div class="section"  id="new">
+<h3 class="declaration"><code>new(writer, options)</code></h3>
+<p>Create a new markdown parser.</p>
+
+<ul>
+<li><p><code>writer</code> is a writer table (see <a href="lunamark.writer.generic.html">lunamark.writer.generic</a>).</p></li>
+<li><p><code>options</code> is a table with parsing options. The following fields are significant:</p>
+
+<dl>
+<dt><code>alter_syntax</code></dt>
+<dd>
+<p>Function from syntax table to syntax table, allowing the user to change or extend the markdown syntax. For an example, see the documentation for <code>lunamark</code>.</p>
+</dd>
+<dt><code>references</code></dt>
+<dd>
+<p>A table of references to be used in resolving links in the document. The keys should be all lowercase, with spaces and newlines collapsed into single spaces. Example:</p>
+
+<pre><code>{ foo: { url = &quot;/url&quot;, title = &quot;my title&quot; },
+  bar: { url = &quot;http://fsf.org&quot; } }
+</code></pre>
+</dd>
+<dt><code>preserve_tabs</code></dt>
+<dd>
+<p>Preserve tabs instead of converting to spaces.</p>
+</dd>
+<dt><code>smart</code></dt>
+<dd>
+<p>Parse quotation marks, dashes, ellipses intelligently.</p>
+</dd>
+<dt><code>startnum</code></dt>
+<dd>
+<p>Make the opening number in an ordered list significant.</p>
+</dd>
+<dt><code>notes</code></dt>
+<dd>
+<p>Enable footnotes as in pandoc.</p>
+</dd>
+<dt><code>definition_lists</code></dt>
+<dd>
+<p>Enable definition lists as in pandoc.</p>
+</dd>
+</dl></li>
+<li><p>Returns a converter function that converts a markdown string using <code>writer</code>, returning the parsed document as first result, and a table containing any extracted metadata as the second result. The converter assumes that the input has unix line endings (newline). If the input might have DOS line endings, a simple <code>gsub(&quot;\r&quot;,&quot;&quot;)</code> should take care of them.</p></li>
+</ul>
+</div>
+
+</div>
+<div id="index">
+
+<p><a href="lunamark.html">lunamark</a></p>
+
+<p><a href="lunamark.entities.html">lunamark.entities</a></p>
+
+<p><a href="lunamark.reader.html">lunamark.reader</a></p>
+
+<p><a href="lunamark.util.html">lunamark.util</a></p>
+
+<p><a href="lunamark.writer.html">lunamark.writer</a></p>
+
+<p><a href="lunamark.reader.markdown.html">lunamark.reader.markdown</a></p>
+
+<p><a href="lunamark.writer.context.html">lunamark.writer.context</a></p>
+
+<p><a href="lunamark.writer.docbook.html">lunamark.writer.docbook</a></p>
+
+<p><a href="lunamark.writer.dzslides.html">lunamark.writer.dzslides</a></p>
+
+<p><a href="lunamark.writer.generic.html">lunamark.writer.generic</a></p>
+
+<p><a href="lunamark.writer.groff.html">lunamark.writer.groff</a></p>
+
+<p><a href="lunamark.writer.html.html">lunamark.writer.html</a></p>
+
+<p><a href="lunamark.writer.html5.html">lunamark.writer.html5</a></p>
+
+<p><a href="lunamark.writer.latex.html">lunamark.writer.latex</a></p>
+
+<p><a href="lunamark.writer.man.html">lunamark.writer.man</a></p>
+
+<p><a href="lunamark.writer.tex.html">lunamark.writer.tex</a></p>
+
+<p><a href="lunamark.writer.xml.html">lunamark.writer.xml</a></p>
+
+</div>
+</body>
+</html>

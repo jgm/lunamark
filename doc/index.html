@@ -1,0 +1,133 @@
+<html>
+<head>
+<title>lunamark</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="lunadoc.css" type="text/css" />
+</head>
+<body>
+<div id="content">
+<h1 class="module"><code>lunamark</code></h1>
+
+<div class="section"  id="">
+<h3 class="declaration"><code></code></h3>
+<p>Copyright © 2009–2011 John MacFarlane.</p>
+
+<p>Released under the MIT license (see LICENSE in the source for details).</p>
+
+<h2>Description</h2>
+
+<p>Lunamark is a lua library for conversion of markdown to other textual formats. Currently HTML, Docbook, ConTeXt, LaTeX, and Groff man are the supported output formats, but lunamark’s modular architecture makes it easy to add writers and modify the markdown parser (written with a PEG grammar).</p>
+
+<p>Lunamark’s markdown parser currently supports the following extensions (which can be turned on or off individually):</p>
+
+<ul>
+<li>Smart typography (fancy quotes, dashes, ellipses)</li>
+<li>Significant start numbers in ordered lists</li>
+<li>Footnotes</li>
+<li>Definition lists</li>
+</ul>
+
+<p>More extensions will be supported in later versions.</p>
+
+<p>The library is as portable as lua and has very good performance. It is slightly faster than the author’s own C library <a href="http://github.com/jgm/peg-markdown">peg-markdown</a>.</p>
+
+<h2>Simple usage example</h2>
+
+<pre><code>local lunamark = require(&quot;lunamark&quot;)
+local writer = lunamark.writer.html.new()
+local parse = lunamark.reader.markdown.new(writer, { smart = true })
+local result, metadata = parse(&quot;Here&#39;s &#39;my *text*&#39;...&quot;)
+print(result)
+assert(result == &#39;Here’s ‘my &lt;em&gt;text&lt;/em&gt;’…&#39;)
+</code></pre>
+
+<h2>Customizing the writer</h2>
+
+<p>Render emphasized text as ALL CAPS, rather than italics:</p>
+
+<pre><code>local unicode = require(&quot;unicode&quot;)
+local utf8 = unicode.utf8
+function writer.emphasis(s)
+  return utf8.upper(s)
+end
+local parse = lunamark.reader.markdown.new(writer, { smart = true })
+local result, metadata = parse(&quot;*Beiß* nicht in die Hand, die dich *füttert*.&quot;)
+print(result)
+assert(result == &#39;BEIß nicht in die Hand, die dich FÜTTERT.&#39;)
+</code></pre>
+
+<p>Eliminate hyperlinks:</p>
+
+<pre><code>function writer.link(lab,url,tit)
+  return lab
+end
+local parse = lunamark.reader.markdown.new(writer, { smart = true })
+local result, metadata = parse(&quot;[hi](/url) there&quot;)
+print(result)
+assert(result == &#39;hi there&#39;)
+</code></pre>
+
+<h2>Customizing the parser</h2>
+
+<p>Parse CamelCase words as wikilinks:</p>
+
+<pre><code>lpeg = require(&quot;lpeg&quot;)
+local writer = lunamark.writer.html.new()
+function add_wikilinks(syntax)
+  local capword = lpeg.R(&quot;AZ&quot;)^1 * lpeg.R(&quot;az&quot;)^1
+  local parse_wikilink = lpeg.C(capword^2)
+                       / function(wikipage)
+                           return writer.link(writer.string(wikipage),
+                                              &quot;/&quot; .. wikipage,
+                                              &quot;Go to &quot; .. wikipage)
+                         end
+  syntax.Inline = parse_wikilink + syntax.Inline
+  return syntax
+end
+local parse = lunamark.reader.markdown.new(writer, { alter_syntax = add_wikilinks })
+local result, metadata = parse(&quot;My text with WikiLinks.\n&quot;)
+print(result)
+assert(result == &#39;My text with &lt;a href=&quot;/WikiLinks&quot; title=&quot;Go to WikiLinks&quot;&gt;WikiLinks&lt;/a&gt;.&#39;)
+</code></pre>
+</div>
+
+</div>
+<div id="index">
+
+<p><a href="lunamark.html">lunamark</a></p>
+
+<p><a href="lunamark.entities.html">lunamark.entities</a></p>
+
+<p><a href="lunamark.reader.html">lunamark.reader</a></p>
+
+<p><a href="lunamark.util.html">lunamark.util</a></p>
+
+<p><a href="lunamark.writer.html">lunamark.writer</a></p>
+
+<p><a href="lunamark.reader.markdown.html">lunamark.reader.markdown</a></p>
+
+<p><a href="lunamark.writer.context.html">lunamark.writer.context</a></p>
+
+<p><a href="lunamark.writer.docbook.html">lunamark.writer.docbook</a></p>
+
+<p><a href="lunamark.writer.dzslides.html">lunamark.writer.dzslides</a></p>
+
+<p><a href="lunamark.writer.generic.html">lunamark.writer.generic</a></p>
+
+<p><a href="lunamark.writer.groff.html">lunamark.writer.groff</a></p>
+
+<p><a href="lunamark.writer.html.html">lunamark.writer.html</a></p>
+
+<p><a href="lunamark.writer.html5.html">lunamark.writer.html5</a></p>
+
+<p><a href="lunamark.writer.latex.html">lunamark.writer.latex</a></p>
+
+<p><a href="lunamark.writer.man.html">lunamark.writer.man</a></p>
+
+<p><a href="lunamark.writer.tex.html">lunamark.writer.tex</a></p>
+
+<p><a href="lunamark.writer.xml.html">lunamark.writer.xml</a></p>
+
+</div>
+</body>
+</html>

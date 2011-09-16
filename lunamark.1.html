@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<!-- template for HTML versions of man pages -->
+<html>
+<head>
+<meta charset="utf-8">
+<title>lunamark(1)</title>
+<style type="text/css">
+  body { margin-left: 80px; margin-right: 80px; font-family: Georgia, serif; }
+  h1, h2 { font-size: 120%; margin-left: -40px; }
+  h1.title { font-size: 200%; margin-left: -40px; }
+  footer { text-align: center; color: #555; font-size: 80%; }
+</style>
+</head>
+<body>
+<h1 class="title">lunamark(1)</h1>
+<h1>NAME</h1>
+
+<p>lunamark - converts markdown to many formats</p>
+
+<h1>SYNOPSIS</h1>
+
+<p>lunamark [options] [file..]</p>
+
+<h1>DESCRIPTION</h1>
+
+<p>Lunamark is a lua library and command-line program for conversion of markdown to other textual formats. Currently HTML, Docbook, ConTeXt, LaTeX, and Groff man are the supported output formats, but it is easy to add new writers or modify existing ones. The markdown parser is written using a PEG grammar and can also be modified by the user.</p>
+
+<p>Lunamark&#39;s markdown parser currently supports the following extensions (which can be turned on or off individually):</p>
+
+<ul>
+<li>Smart typography (fancy quotes, dashes, ellipses)</li>
+<li>Significant start numbers in ordered lists</li>
+<li>Footnotes</li>
+<li>Definition lists</li>
+</ul>
+
+<p>More extensions will be supported in later versions.</p>
+
+<p>The library is as portable as lua and has very good performance. It is slightly faster than the author&#39;s own C library <a href="http://github.com/jgm/peg-markdown">peg-markdown</a>.</p>
+
+<h1>OPTIONS</h1>
+
+<dl>
+<dt><code>--to,-t</code> <em>format</em></dt>
+<dd>Specify format for output. <em>format</em> can be <code>html</code>, <code>html5</code>, <code>dzslides</code>, <code>docbook</code>, <code>latex</code>, <code>context</code>, or <code>man</code>.</dd>
+<dt><code>--layout,-l</code> <em>layout</em></dt>
+<dd>Control whitespace in output. <em>layout</em> can be <code>default</code> (blank lines between block-level elements), <code>compact</code> (avoid unnecessary blank lines), or <code>minimize</code> (avoid all unnecessary space).</dd>
+<dt><code>--extensions,-X</code> <em>extensions</em></dt>
+<dd>Use the specified syntax extensions in parsing markdown. <em>extensions</em> is a comma-separated list of extensions, each optionally prefixed by <code>+</code> (enable) or <code>-</code> (disable). See EXTENSIONS, below, for a list of supported extensions. The keyword &#39;all&#39; may also be used, to set all extensions simultaneously.</dd>
+<dt><code>--output,-o</code> <em>file</em></dt>
+<dd>Write output to <em>file</em>.</dd>
+<dt><code>--standalone,-s</code></dt>
+<dd>Add header and footer to the document, so that it is a functional standalone document, not a fragment. Use the default template for the writer, unless <code>--template,-T</code> is used.</dd>
+<dt><code>--template,-T</code> <em>file</em></dt>
+<dd>Insert converted text and metadata into a template. See TEMPLATES, below, for template format. Implies <code>--standalone,-s</code>.</dd>
+<dt><code>--data,-d</code> <em>key=value[,key=value..]</em></dt>
+<dd>Set metadata fields to be passed to template. Argument is a list of <em>key=value</em> pairs, separated by commas. If keys are repeated, an array value will be formed.</dd>
+<dt><code>--strict,-0</code></dt>
+<dd>Disable all markdown extensions.</dd>
+<dt><code>--version,-V</code></dt>
+<dd>Print version information.</dd>
+<dt><code>--help,-h</code></dt>
+<dd>This message</dd>
+</dl>
+
+<h1>EXTENSIONS</h1>
+
+<p>The following extensions are defined, with the default setting given in parentheses:</p>
+
+<dl>
+<dt><code>(-) containers</code></dt>
+<dd>
+<p>Put sections in containers (<code>div</code> tags for <code>html</code> writer, <code>section</code> tags for <code>html5</code> or <code>dzslides</code>).</p>
+</dd>
+<dt><code>(-) slides</code></dt>
+<dd>
+<p>Like <code>containers</code>, but do not allow containers to nest. The container for a section will end before the container for a subsection begins. This is usually what is wanted for HTML5 slide shows (and is selected by default for <code>dzslides</code>).</p>
+</dd>
+<dt><code>(-) startnum</code></dt>
+<dd>
+<p>Start number of an ordered list is significant. In standard markdown, the starting number is irrelevant. If this extension is selected, the starting number determines the starting number of the list in the output. (The subsequent numbers are ignored, as in standard markdown.)</p>
+</dd>
+<dt><code>(-) smart</code></dt>
+<dd>
+<p>Smart typography. Straight quotes are turned into curly quotes, <code>--</code> into en dashes, <code>---</code> into em dashes, <code>...</code> into an ellipsis character.</p>
+</dd>
+<dt><code>(-) preserve_tabs</code></dt>
+<dd>
+<p>Don&#39;t expand tabs to spaces. Standard markdown expands all tabs, using a tabstop of 4 spaces. This extension allows tabs to be preserved in literal code contexts.</p>
+</dd>
+<dt><code>(-) notes</code></dt>
+<dd>
+<p>Footnotes. A footnote marker is like a markdown bracketed reference, but beginning with a circumflex (<code>^</code>). The note itself goes in a separate block, which begins with the marker, followed by a colon and space, and ends with a blank line. The note can contain multiple paragraphs or other block elements, but each block must be indented four spaces. Example:</p>
+
+<pre><code>Here is a note.[^mynote]
+
+[^mynote]: This note has two paragraphs.
+
+    Here is the second one.
+</code></pre>
+</dd>
+<dt><code>(-) definition_lists</code></dt>
+<dd>
+<p>Definition lists. A list item consists of a term, on a single line, followed by one or more definitions. Each definition begins with a colon (<code>:</code>), but is otherwise indented four spaces. A definition may contain multiple block elements. The colon need not be flush-left, but may be preceded by one or two spaces. Alternatively, a tilde (<code>~</code>) may be used instead of a colon. Example:</p>
+
+<pre><code>rake
+:   a tool for gathering leaves.
+
+    (paragraph two of definition one.)
+
+:   a ruby build system.
+</code></pre>
+</dd>
+</dl>
+
+<h1>TEMPLATES</h1>
+
+<p>By default, lunamark will produce a fragment. If the <code>--standalone</code> or <code>--template</code> options are specified, it will insert this fragment into a template, producing a standalone document with appropriate header and footer. <code>--standalone</code> uses the default template built into the writer, while <code>--template</code> specifies a custom template, which is sought first in the working directory, then in <code>templates</code>, and finally in <code>$HOME/lunamark/templates</code>. If no extension is given, the name of the writer will be used as an extension. So, for example, one can put the template <code>letter.html</code> in the <code>$HOME?lunamark/templates</code> directory, and use it anywhere with <code>lunamark --template letter</code>.</p>
+
+<p>The templates are <a href="http://cosmo.luaforge.net/">cosmo</a> templates. Conditionals are enabled, so you can use the <code>$if</code> keyword as follows:</p>
+
+<pre><code>$if{ #people == 1 }[[There is only one.]][[There are many.]]
+</code></pre>
+
+<p>A <code>sepby</code> keyword is also enabled:</p>
+
+<pre><code>$sepby{ people }[[$it]][[ and ]]
+</code></pre>
+
+<p>will render &quot;<code>Sid</code>&quot; if <code>people == {&quot;Sid&quot;}</code> and &quot;<code>Sid and Nancy</code>&quot; if <code>people == {&quot;Sid&quot;,&quot;Nancy&quot;}</code>.</p>
+
+<p>The following variables are set by default; others may be set by the reader (if metadata extensions are used) or through the <code>--data</code> option:</p>
+
+<dl>
+<dt><code>body</code></dt>
+<dd>the fragment converted from markdown</dd>
+<dt><code>sources</code></dt>
+<dd>array of the source files specified on the command line</dd>
+<dt><code>timestamp</code></dt>
+<dd>the current time</dd>
+</dl>
+
+<h1>EXAMPLES</h1>
+
+<pre><code>lunamark
+</code></pre>
+
+<p>acts as a filter, reading markdown from stdin and writing HTML to stdout.</p>
+
+<pre><code>lunamark -Xsmart,definition_lists -t latex
+</code></pre>
+
+<p>acts as a filter, reading markdown with smart typography and definition list extensions from stdin, and writing LaTeX to stdout.</p>
+
+<pre><code>lunamark -t latex -s -o mybook.tex ch{1,2,3}.txt references.txt
+</code></pre>
+
+<p>reads <code>ch1.txt</code>, <code>ch2.txt</code>, <code>ch3.txt</code>, and <code>references.txt</code>, concatenates them, and converts the result from markdown to LaTeX, using the default template and saving the result as <code>mybook.tex</code>.</p>
+
+<pre><code>lunamark -Xall --template letter -d cc=Smith,cc=&quot;Jim Jones&quot;,sign=&quot;yes&quot; \
+  -t context -o myletter.ctx myletter.txt
+</code></pre>
+
+<p>produces a ConTeXt file using the template <code>letter.context</code>, and setting the variable <code>cc</code> to <code>{&quot;Smith&quot;,&quot;Jim Jones&quot;}</code> and <code>sign</code> to <code>&quot;yes&quot;</code>. All lunamark etensions are enabled.</p>
+
+<h1>AUTHORS</h1>
+
+<p>Most of lunamark is written by John MacFarlane. Hans Hagen made some major performance improvements to the markdown parser. Khaled Hosny added the original ConTeXt writer.</p>
+<footer>
+lunamark 0.2 09/16/2011
+</footer>
+</body>
+</html>

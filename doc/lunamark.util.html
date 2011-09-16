@@ -1,0 +1,80 @@
+<html>
+<head>
+<title>lunamark.util</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="lunadoc.css" type="text/css" />
+</head>
+<body>
+<div id="content">
+<h1 class="module"><code>lunamark.util</code></h1>
+
+<div class="section"  id="">
+<h3 class="declaration"><code></code></h3>
+<p>Utility functions for lunamark.</p>
+</div>
+
+<div class="section"  id="find_template">
+<h3 class="declaration"><code>find_template(name)</code></h3>
+<p>Find a template and return its contents (or <code>false</code> if not found). The template is sought first in the working directory, then in <code>templates</code>, then in <code>$HOME/.lunamark/templates</code>, then in the Windows <code>APPDATA</code> directory.</p>
+</div>
+
+<div class="section"  id="sepby">
+<h3 class="declaration"><code>sepby(arg)</code></h3>
+<p>Implements a <code>sepby</code> directive for cosmo templates. <code>$sepby{ myarray }[[$it]][[, ]]</code> will render the elements of <code>myarray</code> separated by commas. If <code>myarray</code> is a string, it will be treated as an array with one element. If it is <code>nil</code>, it will be treated as an empty array.</p>
+</div>
+
+<div class="section"  id="err">
+<h3 class="declaration"><code>err(msg, exit_code)</code></h3>
+<p>Print error message and exit.</p>
+</div>
+
+<div class="section"  id="table_copy">
+<h3 class="declaration"><code>table_copy(t)</code></h3>
+<p>Shallow table copy including metatables.</p>
+</div>
+
+<div class="section"  id="expand_tabs_in_line">
+<h3 class="declaration"><code>expand_tabs_in_line(s, tabstop)</code></h3>
+<p>Expand tabs in a line of text. <code>s</code> is assumed to be a single line of text. From <em>Programming Lua</em>.</p>
+</div>
+
+</div>
+<div id="index">
+
+<p><a href="lunamark.html">lunamark</a></p>
+
+<p><a href="lunamark.entities.html">lunamark.entities</a></p>
+
+<p><a href="lunamark.reader.html">lunamark.reader</a></p>
+
+<p><a href="lunamark.util.html">lunamark.util</a></p>
+
+<p><a href="lunamark.writer.html">lunamark.writer</a></p>
+
+<p><a href="lunamark.reader.markdown.html">lunamark.reader.markdown</a></p>
+
+<p><a href="lunamark.writer.context.html">lunamark.writer.context</a></p>
+
+<p><a href="lunamark.writer.docbook.html">lunamark.writer.docbook</a></p>
+
+<p><a href="lunamark.writer.dzslides.html">lunamark.writer.dzslides</a></p>
+
+<p><a href="lunamark.writer.generic.html">lunamark.writer.generic</a></p>
+
+<p><a href="lunamark.writer.groff.html">lunamark.writer.groff</a></p>
+
+<p><a href="lunamark.writer.html.html">lunamark.writer.html</a></p>
+
+<p><a href="lunamark.writer.html5.html">lunamark.writer.html5</a></p>
+
+<p><a href="lunamark.writer.latex.html">lunamark.writer.latex</a></p>
+
+<p><a href="lunamark.writer.man.html">lunamark.writer.man</a></p>
+
+<p><a href="lunamark.writer.tex.html">lunamark.writer.tex</a></p>
+
+<p><a href="lunamark.writer.xml.html">lunamark.writer.xml</a></p>
+
+</div>
+</body>
+</html>
