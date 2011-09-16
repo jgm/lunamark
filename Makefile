@@ -25,7 +25,7 @@ ${testfile}: ${benchtext}
 	done
 
 bench: ${testfile}
-	time ${PROG} < ${testfile} > /dev/null
+	time --format "real %es  user %Us  sys %Ss" ${PROG} < ${testfile} > /dev/null
 
 %.1: bin/%
 	sed '1,/^@startman/d;/^@stopman/,$$d' $< | bin/lunamark -Xdefinition_lists,notes,-smart -t man -s -d section=1,title=$$prog,center_header="${version}",date="${date}" -o $(subst .1,,$@).1
