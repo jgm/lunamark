@@ -315,7 +315,7 @@ for x in extensions_opt:gmatch("[%+%-]?[%a_]+") do
       extensions[k] = val
     end
   elseif type(extensions[x]) ~= "boolean" then
-    lunamark.util.err("Unrecognized extension: ", x)
+    lunamark.util.err("Unrecognized extension: " .. x, 15)
   else
     extensions[x] = val
   end
