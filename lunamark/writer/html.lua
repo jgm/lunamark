@@ -32,6 +32,7 @@ function M.new(options)
   local Html = xml.new(options)
   local options = options or {}
   local endnotes = {}
+  Html.container = "div"
 
   --  {1,2} means: a second level header inside a first-level
   local header_level_stack = {}
@@ -117,7 +118,7 @@ function M.new(options)
 
   local function start_section(level)
     header_level_stack[#header_level_stack + 1] = level
-    return "<div>"
+    return "<" .. Html.container .. ">"
   end
 
   local function stop_section(level)
@@ -129,7 +130,7 @@ function M.new(options)
       local res = {}
       while last >= level do
         header_level_stack[len] = nil
-        table.insert(res, "</div>")
+        table.insert(res, "</" .. Html.container .. ">")
         len = len - 1
         last = (len > 0 and header_level_stack[len]) or 0
       end

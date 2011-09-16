@@ -18,10 +18,9 @@ function M.new(options)
   local options = options or {}
   local Html5 = html.new(options)
 
+  Html5.container = "section"
+
   function Html5.section(s,level)
-    -- TODO if options.containers then
-    --  return format("<section>%s<h%d>%s</h%d>%s%s%s</section>", Html5.containersep, level, s, level, Html5.interblocksep, contents, Html5.containersep)
-    -- else
     return format("<h%d>%s</h%d>",level,s,level)
   end
 
