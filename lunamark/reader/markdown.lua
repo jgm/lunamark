@@ -249,19 +249,19 @@ function M.new(writer, options)
 
   -- in balanced brackets, parentheses, quotes:
   local bracketed     = P{ lbracket
-                         * ((anyescaped - (lbracket + rbracket)) + V(1))^0
+                         * ((anyescaped - (lbracket + rbracket + blankline^2)) + V(1))^0
                          * rbracket }
 
   local inparens      = P{ lparent
-                         * ((anyescaped - (lparent + rparent)) + V(1))^0
+                         * ((anyescaped - (lparent + rparent + blankline^2)) + V(1))^0
                          * rparent }
 
   local squoted       = P{ squote * alphanumeric
-                         * ((anyescaped-squote) + V(1))^0
+                         * ((anyescaped - (squote + blankline^2)) + V(1))^0
                          * squote }
 
   local dquoted       = P{ dquote * alphanumeric
-                         * ((anyescaped-dquote) + V(1))^0
+                         * ((anyescaped - (dquote + blankline^2)) + V(1))^0
                          * dquote }
 
   -- bracketed 'tag' for markdown links, allowing nested brackets:
@@ -269,7 +269,7 @@ function M.new(writer, options)
                       * Cs((alphanumeric^1
                            + bracketed
                            + inticks
-                           + (anyescaped-rbracket))^0)
+                           + (anyescaped - (rbracket + blankline^2)))^0)
                       * rbracket
 
   -- url for markdown links, allowing balanced parentheses:
