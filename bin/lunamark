@@ -81,7 +81,7 @@ The following extensions are defined, with the default setting given in parenthe
 :   Like `containers`, but do not allow containers to nest.
     The container for a section will end before the container for
     a subsection begins.  This is usually what is wanted
-    for HTML5 slide shows.
+    for HTML5 slide shows (and is selected by default for `dzslides`).
 
 `(-) startnum`
 :   Start number of an ordered list is significant. In standard
