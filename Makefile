@@ -1,5 +1,5 @@
-version=$(bin/lunamark --version)
-date=$(date "%Y-%m-%d")
+version=$(shell bin/lunamark --version | head -1)
+date=$(shell date +%x)
 luas=lunamark.lua lunamark/*.lua lunamark/*/*.lua
 testfile=tmptest.txt
 benchtext=benchtext.txt
@@ -28,7 +28,10 @@ bench: ${testfile}
 	time -p ${PROG} < ${testfile} > /dev/null
 
 %.1: bin/%
-	sed '1,/^@startman/d;/^@stopman/,$$d' $< | bin/lunamark -Xdefinition_lists,notes,-smart -t man -s -d section=1,title=$$prog,center_header="${version}",date="${date}" -o $(subst .1,,$@).1
+	sed '1,/^@startman/d;/^@stopman/,$$d' $< | bin/lunamark -Xdefinition_lists,notes,-smart -t man -s -d section=1,title=$(subst bin/,,$<),left_footer="${version}",date="${date}" -o $@
+
+%.1.html: bin/% man.html
+	sed '1,/^@startman/d;/^@stopman/,$$d' $< | bin/lunamark -Xdefinition_lists,notes,-smart -t html5 --template man.html -s -d section=1,title=$(subst bin/,,$<),left_footer="${version}",date="${date}" -o $@
 
 docs: doc lunamark.1 lunadoc.1
 
