@@ -115,15 +115,40 @@ function M.new(options)
     return format("<pre><code>%s</code></pre>", Html.string(s))
   end
 
+  local function start_section(level)
+    header_level_stack[#header_level_stack + 1] = level
+    return "<div>"
+  end
+
+  local function stop_section(level)
+    local len = #header_level_stack
+    if len == 0 then
+      return ""
+    else
+      local last = header_level_stack[len]
+      local res = {}
+      while last >= level do
+        header_level_stack[len] = nil
+        table.insert(res, "</div>")
+        len = len - 1
+        last = (len > 0 and header_level_stack[len]) or 0
+      end
+      return table.concat(res, Html.containersep)
+    end
+  end
+
   function Html.header(s,level)
-    return format("<h%d>%s</h%d>",level,s,level)
-    -- TODO
-    -- if options.containers then
-    --   return format("<div>%s<h%d>%s</h%d>%s%s%s</div>", Html.containersep,
-    --        level, s, level, Html.interblocksep, contents, Html.containersep)
-    -- else
-    --   return format("<h%d>%s</h%d>%s%s",level,s,level,Html.interblocksep,contents)
-    -- end
+    local sep = ""
+    local stop
+    if options.slides or options.containers then
+      local lev = (options.slides and 1) or level
+      local stop = stop_section(lev)
+      if stop ~= "" then
+        stop = stop .. Html.interblocksep
+      end
+      sep = stop .. start_section(lev) .. Html.containersep
+    end
+    return format("%s<h%d>%s</h%d>",sep,level,s,level)
   end
 
   Html.hrule = "<hr />"
@@ -142,10 +167,12 @@ function M.new(options)
   end
 
   function Html.stop_document()
+    local stop = stop_section(1) -- close section containers
+    if stop ~= "" then stop = Html.containersep .. stop end
     if #endnotes == 0 then
-      return ""
+      return stop
     else
-      return format('%s<hr />%s<ol class="notes">%s%s%s</ol>', Html.interblocksep, Html.interblocksep,
+      return format('%s%s<hr />%s<ol class="notes">%s%s%s</ol>', stop, Html.interblocksep, Html.interblocksep,
          Html.containersep, table.concat(endnotes, Html.interblocksep), Html.containersep)
     end
   end
