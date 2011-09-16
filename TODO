@@ -1,3 +1,11 @@
+* TODO replace section with header in all writers
+* TODO new mechanism for containers, slides in writers
+  -- keep track of current header level in variable
+  -- if containers, put in div or whatever before header
+  -- also put in closing div or divs before that
+  -- adjust header level
+  -- put in closing divs at end of document if needed
+
 * BUG 1:  bin/lunamark tmptest.txt > tmptest.html
   It's only converting the last part!
 
