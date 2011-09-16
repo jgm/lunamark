@@ -203,9 +203,6 @@ parser.  Khaled Hosny added the original ConTeXt writer.
 @stopman
 --]===]
 
--- load luarocks.loader if it's installed...
-pcall(function() require("luarocks.loader") end)
-
 local lunamark = require("lunamark")
 local alt_getopt = require("alt_getopt")
 local cosmo = require("cosmo")

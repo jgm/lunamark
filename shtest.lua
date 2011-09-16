@@ -1,8 +1,5 @@
 #!/usr/bin/env lua
 
--- load luarocks.loader if it's installed...
-pcall(function() require("luarocks.loader") end)
-
 local lfs = require("lfs")
 local diff = require("diff")
 local utf8 = require("unicode").utf8
