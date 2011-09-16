@@ -26,7 +26,6 @@ function M.new(options)
 <head>
 <meta charset="utf-8">
 <title>$title</title>
-<meta charset="utf-8" />
 </head>
 <body>
 $body
