@@ -747,7 +747,8 @@ function M.new(writer, options)
 
       Blocks                = Blank^0 / "" *
                               Block^-1 *
-                              (Blank^0 / writer.interblocksep * Block)^0,
+                              (Blank^0 / writer.interblocksep * Block)^0 *
+                              (Blank^0 * eof / ""),
 
       Blank                 = Blank,
 
@@ -828,7 +829,7 @@ function M.new(writer, options)
 
   local inlines_t = util.table_copy(syntax)
   inlines_t[1] = "Inlines"
-  inlines_t.Inlines = Inline^0
+  inlines_t.Inlines = Inline^0 * (spacing^0 * eof / "")
   inlines = Cs(inlines_t)
 
   ------------------------------------------------------------------------------
