@@ -736,11 +736,15 @@ function M.new(writer, options)
     end
   end
 
+  local function strip_atx_end(s)
+    return s:gsub("[#%s]*\n$","")
+  end
+
   -- parse atx header of maximum level maxlev
   local function AtxHeader(maxlev)
     return ( Cg(HeadingStart(maxlev),"level")
            * optionalspace
-           * Cs((Inline - HeadingStop)^1)
+           * (C(line) / strip_atx_end / parse_inlines)
            * Cb("level")
            * HeadingStop )
   end
