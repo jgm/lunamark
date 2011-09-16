@@ -1,4 +1,3 @@
-* TODO replace section with header in all writers
 * TODO new mechanism for containers, slides in writers
   -- keep track of current header level in variable
   -- if containers, put in div or whatever before header
@@ -8,15 +7,6 @@
 
 * BUG 1:  bin/lunamark tmptest.txt > tmptest.html
   It's only converting the last part!
-
-* BUG 2:  bin/lunamark pandoc2.txt
-  Error lua: ./lunamark/reader/markdown.lua:92: too many pending calls/choices
-  goes away if you do -Xslides
-  goes away if you get rid of SetextHeader in Header(maxlev)
-  goes away if you get rid of SectionMax >= 4.
-  can also be fixed by: lpeg.setmaxstack(1000)
-  but it would be better to rethink the header parsers.  perhaps have
-  a 'start section' and 'end section' writer?
 
 * TODO code comments/cleanup for lunadoc
 
