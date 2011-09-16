@@ -201,14 +201,9 @@ function M.new(options)
     return s
   end
 
-  --- Section of level `level`, with `header` and optionally
-  -- contents `contents`.
-  function W.section(header, level, contents)
-    if contents then
-      return header .. W.interblocksep .. contents
-    else
-      return header
-    end
+  --- Header level `level`, with text `s`.
+  function W.header(s, level)
+    return s
   end
 
   --- Horizontal rule.

@@ -85,7 +85,7 @@ function M.new(options)
     return format("\\starttyping\n%s\\stoptyping", s)
   end
 
-  function ConTeXt.section(s,level,contents)
+  function ConTeXt.header(s,level)
     local cmd
     if level == 1 then
       cmd = "\\section"
@@ -100,7 +100,7 @@ function M.new(options)
     else
       cmd = ""
     end
-    return format("%s{%s}%s%s", cmd, s, ConTeXt.interblocksep, contents)
+    return format("%s{%s}", cmd, s)
   end
 
   ConTeXt.hrule = "\\hairline"

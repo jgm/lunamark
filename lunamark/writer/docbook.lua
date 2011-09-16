@@ -97,10 +97,9 @@ function M.new(options)
     return format("<programlisting>%s</programlisting>", Docbook.string(s))
   end
 
-  function Docbook.section(s,level,contents)
-    return format("<section>%s<title>%s</title>%s%s%s</section>",
-                Docbook.containersep, s, Docbook.containersep, contents,
-                Docbook.containersep)
+  function Docbook.header(s,level)
+    -- TODO - end section
+    return format("<section>%s<title>%s</title>", Docbook.containersep, s)
   end
 
   Docbook.hrule = ""

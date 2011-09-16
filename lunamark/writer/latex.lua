@@ -67,7 +67,7 @@ function M.new(options)
     return format("\\begin{verbatim}\n%s\\end{verbatim}", s)
   end
 
-  function LaTeX.section(s,level,contents)
+  function LaTeX.header(s,level)
     local cmd
     if level == 1 then
       cmd = "\\section"
@@ -82,7 +82,7 @@ function M.new(options)
     else
       cmd = ""
     end
-    return format("%s{%s}%s%s", cmd, s, LaTeX.interblocksep, contents)
+    return format("%s{%s}", cmd, s)
   end
 
   LaTeX.hrule = "\\hspace{\\fill}\\rule{.6\\linewidth}{0.4pt}\\hspace{\\fill}"

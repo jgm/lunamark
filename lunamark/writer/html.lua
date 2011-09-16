@@ -31,8 +31,10 @@ function M.new(options)
   local options = options or {}
   local Html = xml.new(options)
   local options = options or {}
-
   local endnotes = {}
+
+  --  {1,2} means: a second level header inside a first-level
+  local header_level_stack = {}
 
   Html.linebreak = "<br/>"
 

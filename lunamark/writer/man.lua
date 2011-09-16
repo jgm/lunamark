@@ -69,10 +69,10 @@ function M.new(options)
     return format(".IP\n.nf\n\\f[C]\n%s.fi",s)
   end
 
-  function Man.section(s,level,contents)
+  function Man.header(s,level)
     local hcode = ".SS"
     if level == 1 then hcode = ".SH" end
-    return format("%s %s\n%s", hcode, s, contents)
+    return format("%s %s", hcode, s)
   end
 
   Man.hrule = ".PP\n * * * * *"
