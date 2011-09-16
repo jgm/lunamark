@@ -17,11 +17,16 @@ local gsub = string.gsub
 --`options` is a table that can contain the following fields:
 --
 -- `containers`
--- :    Put sections in `<div>` tags.
+-- :   Put sections in `<div>` tags.
+--
+-- `slides`
+-- :   Do not allow containers to nest; when a subsection begins,
+--     close the section's container and start a new one.
+--
 -- `layout`
--- :    `minimize` removes semantically insignificant white space.
--- :    `compact` removes unneeded blank lines.
--- :    `default` puts blank lines between block elements.
+-- :   `minimize` removes semantically insignificant white space.
+-- :   `compact` removes unneeded blank lines.
+-- :   `default` puts blank lines between block elements.
 function M.new(options)
   local options = options or {}
   local Html = xml.new(options)
@@ -108,13 +113,15 @@ function M.new(options)
     return format("<pre><code>%s</code></pre>", Html.string(s))
   end
 
-  function Html.section(s,level,contents)
-    if options.containers then
-      return format("<div>%s<h%d>%s</h%d>%s%s%s</div>", Html.containersep,
-           level, s, level, Html.interblocksep, contents, Html.containersep)
-    else
-      return format("<h%d>%s</h%d>%s%s",level,s,level,Html.interblocksep,contents)
-    end
+  function Html.header(s,level)
+    return format("<h%d>%s</h%d>",level,s,level)
+    -- TODO
+    -- if options.containers then
+    --   return format("<div>%s<h%d>%s</h%d>%s%s%s</div>", Html.containersep,
+    --        level, s, level, Html.interblocksep, contents, Html.containersep)
+    -- else
+    --   return format("<h%d>%s</h%d>%s%s",level,s,level,Html.interblocksep,contents)
+    -- end
   end
 
   Html.hrule = "<hr />"

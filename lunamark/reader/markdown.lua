@@ -60,10 +60,6 @@ end
 --     `definition_lists`
 --     :   Enable definition lists as in pandoc.
 --
---     `slides`
---     :   Do not allow containers to nest; when a subsection begins,
---         close the section's container and start a new one.
---
 -- *   Returns a converter function that converts a markdown string
 --     using `writer`, returning the parsed document as first result,
 --     and a table containing any extracted metadata as the second
@@ -718,69 +714,28 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   -- parse Atx heading start and return level
-  local function HeadingStart(maxlev)
-    return (#hash * C(hash^-(maxlev)) * -hash / length)
-  end
+  local HeadingStart = #hash * C(hash^-6) * -hash / length
 
-  -- optional end of Atx header ### header ###
-  local HeadingStop = optionalspace * hash^0 * optionalspace * newline
-
-  -- parse setext header ending of max level maxlev and return level
-  local function HeadingLevel(maxlev)
-    if maxlev == 1 then
-      return (equal^1 * Cc(1))
-    elseif maxlev == 2 then
-      return (equal^1 * Cc(1) + dash^1 * Cc(2))
-    else
-      error("Illegal level for setext heading")
-    end
-  end
+  -- parse setext header ending and return level
+  local HeadingLevel = equal^1 * Cc(1) + dash^1 * Cc(2)
 
   local function strip_atx_end(s)
     return s:gsub("[#%s]*\n$","")
   end
 
-  -- parse atx header of maximum level maxlev
-  local function AtxHeader(maxlev)
-    return ( Cg(HeadingStart(maxlev),"level")
-           * optionalspace
-           * (C(line) / strip_atx_end / parse_inlines)
-           * Cb("level")
-           * HeadingStop )
-  end
+  -- parse atx header
+  local AtxHeader = Cg(HeadingStart,"level")
+                     * optionalspace
+                     * (C(line) / strip_atx_end / parse_inlines)
+                     * Cb("level")
+                     / writer.header
 
-  -- parse setext header of maximum level maxlev
-  local function SetextHeader(maxlev)
-    local markers
-    if maxlev == 1 then marker = P("=") else marker = S("=-") end
-    return (#(line * marker) * Cs(line / parse_inlines)
-            * HeadingLevel(maxlev) *  optionalspace * newline)
-  end
-
-  -- parse a heading of level maxlev or lower
-  local function Header(maxlev)
-    if maxlev <= 2 then
-      return (AtxHeader(maxlev) + SetextHeader(maxlev))
-    else
-      return AtxHeader(maxlev)
-    end
-  end
-
-  local function SectionMax(maxlev)
-    local secblock = Block - Header(maxlev)
-    return Header(maxlev) * Cs(Blank^0 / "" * secblock^-1 *
-       (Blank^0 / writer.interblocksep * secblock)^0) / writer.section
-  end
-
-  local Section
-
-  if options.slides then
-    -- if slide show, don't nest sections
-    Section = SectionMax(6)
-  else
-    Section = SectionMax(1) + SectionMax(2) + SectionMax(3) +
-                SectionMax(4) + SectionMax(5) + SectionMax(6)
-  end
+  -- parse setext header
+  local SetextHeader = #(line * S("=-"))
+                     * Cs(line / parse_inlines)
+                     * HeadingLevel
+                     * optionalspace * newline
+                     / writer.header
 
 
   ------------------------------------------------------------------------------
@@ -801,7 +756,7 @@ function M.new(writer, options)
                             + V("HorizontalRule")
                             + V("BulletList")
                             + V("OrderedList")
-                            + V("Section")
+                            + V("Header")
                             + V("DefinitionList")
                             + V("DisplayHtml")
                             + V("Paragraph")
@@ -812,7 +767,7 @@ function M.new(writer, options)
       HorizontalRule        = HorizontalRule,
       BulletList            = BulletList,
       OrderedList           = OrderedList,
-      Section               = Section,
+      Header                = AtxHeader + SetextHeader,
       DefinitionList        = DefinitionList,
       DisplayHtml           = DisplayHtml,
       Paragraph             = Paragraph,
