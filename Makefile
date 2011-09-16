@@ -11,7 +11,7 @@ all:
 
 .PHONY: test bench docs clean run-code-examples install
 test:
-	-lua shtest.lua -p `pwd`/bin/lunamark $@
+	-lua shtest.lua -p "${PROG}" $@
 
 ${benchtext}:
 	for i in tests/Markdown_1.0.3/*.test; do sed -e '1,/<<</d;/>>>/,$$d' "$$i" >> $@; echo >> $@.txt; done
