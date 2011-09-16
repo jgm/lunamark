@@ -1,5 +1,6 @@
 * BUG 1:  bin/lunamark tmptest.txt > tmptest.html
   It's only converting the last part!
+  more minimal case, see bt5.txt
 
 * TODO code comments/cleanup for lunadoc
 
