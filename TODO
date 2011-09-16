@@ -1,6 +1,6 @@
-* TODO code comments/cleanup for lunadoc
+* TODO tweak dzslides configuration; make it easier to modify css?
 
-* TODO slides: split slides on hrule
+* TODO code comments/cleanup for lunadoc
 
 * TODO test some diverse documents with default templates,
   to make sure everything works
