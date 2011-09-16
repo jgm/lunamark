@@ -44,4 +44,4 @@ install: ${luas}
 	luarocks make
 
 clean:
-	-rm -rf doc ${testfile} lunamark.1 lunadoc.1
+	-rm -rf doc ${testfile} ${benchtext} lunamark.1 lunadoc.1
