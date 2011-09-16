@@ -18,8 +18,6 @@
   but it would be better to rethink the header parsers.  perhaps have
   a 'start section' and 'end section' writer?
 
-* BUG 4: on linux, setext headers don't seem to work with -Xslides
-
 * TODO code comments/cleanup for lunadoc
 
 * TODO slides: split slides on hrule
