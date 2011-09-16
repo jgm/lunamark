@@ -33,7 +33,7 @@ bench: ${testfile}
 %.1.html: bin/% man.html
 	sed '1,/^@startman/d;/^@stopman/,$$d' $< | bin/lunamark -Xdefinition_lists,notes,-smart -t html5 --template man.html -s -d section=1,title=$(subst bin/,,$<),left_footer="${version}",date="${date}" -o $@
 
-docs: doc lunamark.1 lunadoc.1
+docs: doc lunamark.1 lunadoc.1 lunamark.1.html lunadoc.1.html
 
 doc: ${luas} run-code-examples
 	mkdir -p doc

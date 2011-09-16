@@ -3,15 +3,19 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>$title</title>
+<title>$title($section)</title>
 <style type="text/css">
-  body { margin-left: 10em; }
+  body { margin-left: 80px; margin-right: 80px; font-family: Georgia, serif; }
+  h1, h2 { font-size: 120%; margin-left: -40px; }
+  h1.title { font-size: 200%; margin-left: -40px; }
+  footer { text-align: center; color: #555; font-size: 80%; }
 </style>
 </head>
 <body>
+<h1 class="title">$title($section)</h1>
 $body
 <footer>
-$center_header $date
+$left_footer $date
 </footer>
 </body>
 </html>
