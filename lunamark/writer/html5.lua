@@ -20,10 +20,6 @@ function M.new(options)
 
   Html5.container = "section"
 
-  function Html5.section(s,level)
-    return format("<h%d>%s</h%d>",level,s,level)
-  end
-
   Html5.template = [[
 <!DOCTYPE html>
 <html>

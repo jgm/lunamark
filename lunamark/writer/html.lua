@@ -32,11 +32,8 @@ function M.new(options)
   local Html = xml.new(options)
   local options = options or {}
   local endnotes = {}
+
   Html.container = "div"
-
-  --  {1,2} means: a second level header inside a first-level
-  local header_level_stack = {}
-
   Html.linebreak = "<br/>"
 
   function Html.code(s)
@@ -116,38 +113,16 @@ function M.new(options)
     return format("<pre><code>%s</code></pre>", Html.string(s))
   end
 
-  local function start_section(level)
-    header_level_stack[#header_level_stack + 1] = level
-    return "<" .. Html.container .. ">"
-  end
-
-  local function stop_section(level)
-    local len = #header_level_stack
-    if len == 0 then
-      return ""
-    else
-      local last = header_level_stack[len]
-      local res = {}
-      while last >= level do
-        header_level_stack[len] = nil
-        table.insert(res, "</" .. Html.container .. ">")
-        len = len - 1
-        last = (len > 0 and header_level_stack[len]) or 0
-      end
-      return table.concat(res, Html.containersep)
-    end
-  end
-
   function Html.header(s,level)
     local sep = ""
     local stop
     if options.slides or options.containers then
       local lev = (options.slides and 1) or level
-      local stop = stop_section(lev)
+      local stop = Html.stop_section(lev)
       if stop ~= "" then
         stop = stop .. Html.interblocksep
       end
-      sep = stop .. start_section(lev) .. Html.containersep
+      sep = stop .. Html.start_section(lev) .. Html.containersep
     end
     return format("%s<h%d>%s</h%d>",sep,level,s,level)
   end
@@ -168,7 +143,7 @@ function M.new(options)
   end
 
   function Html.stop_document()
-    local stop = stop_section(1) -- close section containers
+    local stop = Html.stop_section(1) -- close section containers
     if stop ~= "" then stop = Html.containersep .. stop end
     if #endnotes == 0 then
       return stop

@@ -97,9 +97,24 @@ function M.new(options)
     return format("<programlisting>%s</programlisting>", Docbook.string(s))
   end
 
+  function Docbook.stop_document()
+    local stop = Docbook.stop_section(1) -- close section containers
+    if stop ~= "" then stop = Docbook.containersep .. stop end
+    return stop
+  end
+
   function Docbook.header(s,level)
-    -- TODO - end section
-    return format("<section>%s<title>%s</title>", Docbook.containersep, s)
+    local sep = ""
+    local stop
+    if options.slides or options.containers then
+      local lev = (options.slides and 1) or level
+      local stop = Docbook.stop_section(lev)
+      if stop ~= "" then
+        stop = stop .. Docbook.interblocksep
+      end
+      sep = stop .. Docbook.start_section(lev) .. Docbook.containersep
+    end
+    return format("%s<title>%s</title>",sep,level,s,level)
   end
 
   Docbook.hrule = ""
