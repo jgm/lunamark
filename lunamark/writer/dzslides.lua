@@ -14,11 +14,11 @@ local format = string.format
 
 --- Returns a new dzslides writer.
 -- `options` is as in `lunamark.writer.html5`. However,
--- `options.containers` is ignored and set to `true`.
+-- `options.slides` is ignored and set to `true`.
 -- For a list of fields, see [lunamark.writer.generic].
 function M.new(options)
   local options = options or {}
-  options.containers = true
+  options.slides = true
   local DZSlides = html5.new(options)
 
   DZSlides.template = [===[
