@@ -130,6 +130,7 @@ function M.new(options)
 \setcounter{secnumdepth}{0}
 
 \title{$title}
+\author{$sepby{author}[=[$it]=][=[ \and ]=]}
 
 \begin{document}
 
