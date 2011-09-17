@@ -1,0 +1,20 @@
+markdown
+<<<
+1.  Just a small test
+
+        This is some code
+
+            and some indented code
+
+     and this is the end
+>>>
+<ol>
+<li><p>Just a small test</p>
+
+<pre><code>This is some code
+
+    and some indented code
+</code></pre>
+
+<p>and this is the end</p></li>
+</ol>
