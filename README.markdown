@@ -18,14 +18,14 @@ faster than `markdown.lua`.
 + [Source code repository]
 + [Issue tracker]
 + [Website]
-+ [API documentation]API documentation]
++ [API documentation]
 + [lunamark(1)]
 + [lunadoc(1)]
 
 [Source code repository]: https://github.com/jgm/lunamark
 [Issue tracker]: https://github.com/jgm/lunamark/issues
 [Website]: http:jgm.github.com/lunamark
-[API documentation]API documentation]: http://jgm.github.com/lunamark/doc/
+[API documentation]: http://jgm.github.com/lunamark/doc/
 [lunamark(1)]: http://jgm.github.com/lunamark/lunamark.1.html
 [lunadoc(1)]: http://jgm.github.com/lunamark/lunadoc.1.html
 [dzslides]: http://paulrouget.com/dzslides/ 
