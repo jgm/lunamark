@@ -131,6 +131,7 @@ function M.new(options)
 
 \title{$title}
 \author{$sepby{author}[=[$it]=][=[ \and ]=]}
+\date{$date}
 
 \begin{document}
 
