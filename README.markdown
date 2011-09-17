@@ -13,6 +13,7 @@ can be turned on or off individually):
   - Significant start numbers in ordered lists
   - Footnotes
   - Definition lists
+  - Flexible metadata
 
 More extensions will be supported in later versions.
 
