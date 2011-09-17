@@ -88,11 +88,10 @@ tests for lunamark-specific features and additional corner cases.
 
 To run the tests, use `bin/shtest`.
 
-    `bin/shtest --help`             # get usage
-    `bin/shtest`                    # run all tests
-    `bin/shtest indent`             # run all tests matching "indent"
-    `bin/shtest -p Markdown.pl` -n  # run all tests using Markdown.pl,
-                                    # and normalizing whitespace
+    bin/shtest --help            # get usage
+    bin/shtest                   # run all tests
+    bin/shtest indent            # run all tests matching "indent"
+    bin/shtest -p Markdown.pl -n # run all tests using Markdown.pl, and normalizing whitespace & entities
 
 Lunamark currently fails a few of the PHP Markdown tests.
 In most cases I disagree with the interpretation of markdown
