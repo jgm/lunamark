@@ -83,11 +83,10 @@ print(parse(&quot;Here&#39;s my *text*&quot;))
 
 <p>To run the tests, use <code>bin/shtest</code>.</p>
 
-<pre><code>`bin/shtest --help`             # get usage
-`bin/shtest`                    # run all tests
-`bin/shtest indent`             # run all tests matching &quot;indent&quot;
-`bin/shtest -p Markdown.pl` -n  # run all tests using Markdown.pl,
-                                # and normalizing whitespace
+<pre><code>bin/shtest --help            # get usage
+bin/shtest                   # run all tests
+bin/shtest inden             # run all tests matching &quot;indent&quot;
+bin/shtest -p Markdown.pl -n # run all tests using Markdown.pl, and normalizing whitespace &amp; entities
 </code></pre>
 
 <p>Lunamark currently fails a few of the PHP Markdown tests. In most cases I disagree with the interpretation of markdown syntax that these tests reflect.</p>
