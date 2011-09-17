@@ -63,10 +63,11 @@ end
 --     `lua_metadata`
 --     :   Enable lua metadata.  This is an HTML comment block
 --         that starts with `<!--@` and contains lua code.
---         Variable declarations are added to the metadata.
---         Strings are parsed as inlines, or, if they begin with
---         a newline, as blocks. Other data types are preserved
---         as is.
+--         The lua code is interpreted in a sandbox, and
+--         any variables defined are added to the metadata.
+--         The function `markdown` (also `m`) is defined and can
+--         be used to ensure that string fields are parsed
+--         as markdown; otherwise, they will be read literally.
 --
 -- *   Returns a converter function that converts a markdown string
 --     using `writer`, returning the parsed document as first result,
@@ -713,7 +714,7 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   local function lua_metadata(s)  -- run lua code in comment in sandbox
-    local env = {}
+    local env = { m = parse_markdown, markdown = parse_blocks }
     local scode = s:match("^<!%-%-@%s*(.*)%-%->")
     local untrusted_table, message = loadstring(scode)
     if not untrusted_table then
@@ -725,17 +726,7 @@ function M.new(writer, options)
       util.err(msg)
     end
     for k,v in pairs(env) do
-      local val
-      if type(v) == "string" then
-        if v:sub(1,1) == "\n" then
-          val = parse_blocks(v:sub(2))  -- strip initial newline, parse as block
-        else
-          val = parse_inlines(v)
-        end
-      else
-        val = v
-      end
-      writer.set_metadata(k,val)
+      writer.set_metadata(k,v)
     end
     return ""
   end

@@ -1,12 +1,3 @@
-* TODO change metadata conversion
-  instead of converting metadata before putting it in metada table,
-  don't convert it.
-  convert it if needed before applying to the template
-  go through tables recursively, converting strings, also numbers, etc.
-  make sure everything is escaped properly.
-  this way if people want to do things outside templates, they can
-  have normal lua types
-
 * TODO release
   [ ] email to luarocks list
   [ ] email to lua list

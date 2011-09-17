@@ -133,15 +133,14 @@ The following extensions are defined, with the default setting given in parenthe
 
 `(-) lua_metadata`
 :   Lua metadata.  An HTML comment beginning `<!--@` and containing
-    lua variable declarations is treated as metadata.  String variables
-    not beginning with a newline are parsed as inlines; string variables
-    beginning with a newline are parsed as blocks; and other variables
-    are left as is.  Lua metadata can occur anywhere in a document.
-    Example:
+    lua variable declarations is treated as metadata.  Note that strings
+    are read literally unless they are explicitly marked as markdown
+    using the `markdown` (or `m`) function. Lua metadata can occur anywhere
+    in a document. Example:
 
         <!--@
-        title = "My title"
-        abstract = [[
+        title = m"My title with *italics*"
+        abstract = m[[
           This is my abstract.
 
           * point one
