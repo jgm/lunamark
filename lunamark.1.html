@@ -32,6 +32,8 @@
 <li>Significant start numbers in ordered lists</li>
 <li>Footnotes</li>
 <li>Definition lists</li>
+<li>Metadata</li>
+<li>Pandoc title blocks</li>
 </ul>
 
 <p>More extensions will be supported in later versions.</p>
@@ -65,7 +67,7 @@
 
 <h1>EXTENSIONS</h1>
 
-<p>The following extensions are defined, with the default setting given in parentheses:</p>
+<p>The following extensions are defined, with the default setting given in parentheses. The defaults can be changed locally by defining an environment variable <code>LUNAMARK_EXTENSIONS</code> (see ENVIRONMENT below).</p>
 
 <dl>
 <dt><code>(-) containers</code></dt>
@@ -109,6 +111,33 @@
     (paragraph two of definition one.)
 
 :   a ruby build system.
+</code></pre>
+</dd>
+<dt><code>(-) lua_metadata</code></dt>
+<dd>
+<p>Lua metadata. An HTML comment beginning <code>&lt;!--@</code> and containing lua variable declarations is treated as metadata. Note that strings are read literally unless they are explicitly marked as markdown using the <code>markdown</code> (or <code>m</code>) function. Lua metadata can occur anywhere in a document. Example:</p>
+
+<pre><code>&lt;!--@
+title = m&quot;My title with *italics*&quot;
+abstract = m[[
+  This is my abstract.
+
+  * point one
+  * point two
+  ]]
+author = { &quot;Me&quot;, &quot;You&quot; }
+--&gt;
+</code></pre>
+</dd>
+<dt><code>(-) pandoc_title_blocks</code></dt>
+<dd>
+<p>Pandoc style title blocks at the beginning of a document:</p>
+
+<pre><code>% Title
+% Author1; Author2
+% Date
+
+content starts here...
 </code></pre>
 </dd>
 </dl>
@@ -163,11 +192,15 @@
 
 <p>produces a ConTeXt file using the template <code>letter.context</code>, and setting the variable <code>cc</code> to <code>{&quot;Smith&quot;,&quot;Jim Jones&quot;}</code> and <code>sign</code> to <code>&quot;yes&quot;</code>. All lunamark etensions are enabled.</p>
 
+<h1>ENVIRONMENT</h1>
+
+<p>The environment variable <code>LUNAMARK_EXTENSIONS</code> can contain a comma-separated list of extensions, optionally prefixed by <code>+</code> or <code>-</code>, that will serve as defaults. These defaults can be overridden using the command-line option <code>--extensions</code>.</p>
+
 <h1>AUTHORS</h1>
 
 <p>Most of lunamark is written by John MacFarlane. Hans Hagen made some major performance improvements to the markdown parser. Khaled Hosny added the original ConTeXt writer.</p>
 <footer>
-lunamark 0.2 09/16/2011
+lunamark 0.2 09/17/2011
 </footer>
 </body>
 </html>
