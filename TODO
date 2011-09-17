@@ -5,8 +5,6 @@
 * TODO test some diverse documents with default templates,
   to make sure everything works
 
-* TODO add lunadoc to rock? or better to make it a separate rock/repo?
-
 * TODO metadata as yaml-style set off by --- ---
   or, why not lua itself, instead of yaml? then we don't need a yaml
   parser.

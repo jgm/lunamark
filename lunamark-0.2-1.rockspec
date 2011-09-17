@@ -2,19 +2,18 @@ package = "lunamark"
 version = "0.2-1"
 source = {
    url = "http://github.com/jgm/lunamark/tarball/0.2",
---   md5 = "",
---   file = "jgm-lunamark-43bf6475ac5c9600dcdd66f34afb29bc8d48a50a.tar.gz"
 }
 description = {
    summary = "General markup format converter using lpeg.",
    detailed = [[
-     Lunamark is a lua library and command-line program for conversion of markdown
-     to other textual formats. Currently HTML, Docbook, ConTeXt, LaTeX, and Groff man
-     are the supported output formats, but it is easy to add new writers or modify
-     existing ones. The markdown parser is written using a PEG grammar and can also
+     Lunamark is a lua library and command-line program for conversion of
+     markdown to other textual formats. Currently HTML, Docbook, ConTeXt,
+     LaTeX, dzslides, and Groff man are the supported output formats,
+     but it is easy to add new writers or modify existing ones.
+     The markdown parser is written using a PEG grammar and can also
      be modified by the user.
    ]],
-   homepage = "http://github.com/jgm/lunamark",
+   homepage = "http://jgm.github.com/lunamark",
    license = "MIT/X11",
 }
 dependencies = {
@@ -30,6 +29,7 @@ build = {
    install = {
      bin = {
        ["lunamark"]                 = "bin/lunamark",
+       ["lunadoc"]                  = "bin/lunadoc",
        },
      lua = {
        ["lunamark"]                 = "lunamark.lua",
