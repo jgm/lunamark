@@ -28,7 +28,7 @@ Benchmarks (converting a 1M test file consisting of 25 copies of the
 markdown test suite concatenated together):
 
 * `discount` 0.14s
-* `lunamark` 0.43s
+* `lunamark` 0.42s
 * `peg-markdown` 0.50s
 * `pandoc` 4.97s
 * `Markdown.pl` (1.0.2b8) 56.75s
@@ -78,6 +78,24 @@ Lunamark comes with a simple lua library documentation tool, `lunadoc`.
 For usage instructions, see the [lunadoc(1)] man page.
 `lunadoc` reads source files and parses specially marked markdown
 comment blocks.  [Here][API documentation] is an example of the result.
+
+# Tests
+
+The source directory contains a large test suite in `tests`.
+This includes existing Markdown and PHP Markdown tests, plus more
+tests for lunamark-specific features and additional corner cases.
+
+To run the tests, use `bin/shtest`.
+
+    `bin/shtest --help`             # get usage
+    `bin/shtest`                    # run all tests
+    `bin/shtest indent`             # run all tests matching "indent"
+    `bin/shtest -p Markdown.pl` -n  # run all tests using Markdown.pl,
+                                    # and normalizing whitespace
+
+Lunamark currently fails a few of the PHP Markdown tests.
+In most cases I disagree with the interpretation of markdown
+syntax that these tests reflect.
 
 # Authors
 
