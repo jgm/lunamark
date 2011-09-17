@@ -1,3 +1,6 @@
+* TODO add environment variable to store default extensions,
+  so users can customize?  LUNAMARK_EXTENSIONS
+
 * TODO release
   [ ] email to luarocks list
   [ ] email to lua list
@@ -32,7 +35,6 @@
     + info on options
   - lunamark.util exports several functions which need documentation
 * TODO add config file?
-* TODO add man page
 
 * TODO # in ordered lists extension
 
@@ -44,9 +46,6 @@
 * TODO make epub tool
 * TODO make pdf tool
 * TODO documentation, including extending writer + parser
-
-* TODO add command-line arguments to lunadoc
-* TODO add templates for lunadoc (html, latex using cosmo)
 
 Notes on a possible macro system:  Simply add a function
 to the writer:
