@@ -1,3 +1,5 @@
+* TODO pandoc title block extension
+
 * TODO release
   [ ] email to luarocks list
   [ ] email to lua list
@@ -5,24 +7,17 @@
 
 * TODO fenced code block extension
 
-* TODO pandoc title block extension
-
-* TODO Use leg for lunadoc
-  /Users/jgm/Downloads/leg/doc/grammar.html 
-  and also consider leg's method of making the grammar modifiable
-
-* TODO alternative indented block with metadata?
+* TODO alternative indented code block with metadata?
 
   This is text.
 
      code {
        in indented = block
        }
-  (haskell)
+  --- haskell
 
   More text.
 
-* TODO other metadata?
 * TODO math extension
 
 * TODO add library documentation
@@ -36,7 +31,6 @@
 * TODO # in ordered lists extension
 
 * TODO layout: indentation options?
-* TODO Add metadata, return table as second value
 * TODO latex reader - write peg
 * TODO mathml - look at pandoc2?
 
