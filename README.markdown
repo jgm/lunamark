@@ -65,7 +65,7 @@ simple examples are given in the [API documentation].
 You can install the latest development version of
 lunamark using [luarocks](http://www.luarocks.org):
 
-    git pull http://github.com/jgm/lunamark.git
+    git clone http://github.com/jgm/lunamark.git
     cd lunamark
     luarocks make
 
