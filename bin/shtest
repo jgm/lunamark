@@ -389,7 +389,7 @@ Options:
   --dir,-d PATH      Directory containing .test files (default 'tests')
   --prog,-p CMD      Program to run for tests
   --opts,-o OPTS     Command-line options to use in tests
-  --normalize,-n     Normalize whitespace in output
+  --normalize,-n     Normalize whitespace and entities in output
   --version,-V       Version information
   --help,-h          This message
 ]]
