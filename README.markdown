@@ -6,6 +6,32 @@ Docbook, ConTeXt, LaTeX, and Groff man are the supported output formats, but
 it is easy to add new writers or modify existing ones. The markdown parser is
 written using a PEG grammar and can also be modified by the user.
 
+The library is as portable as lua and has very good performance.
+It is slightly faster than the author's own C library
+[peg-markdown](http://github.com/jgm/peg-markdown), an order of
+magnitude faster than pandoc, two orders of magnitude
+faster than `Markdown.pl`, and three orders of magnitude
+faster than `markdown.lua`.
+
+# Links
+
++ [Source code repository]
++ [Issue tracker]
++ [Website]
++ [API documentation]API documentation]
++ [lunamark(1)]
++ [lunadoc(1)]
+
+[Source code repository]: https://github.com/jgm/lunamark
+[Issue tracker]: https://github.com/jgm/lunamark/issues
+[Website]: http:jgm.github.com/lunamark
+[API documentation]API documentation]: http://jgm.github.com/lunamark/doc/
+[lunamark(1)]: http://jgm.github.com/lunamark/lunamark.1.html
+[lunadoc(1)]: http://jgm.github.com/lunamark/lunadoc.1.html
+[dzslides]: http://paulrouget.com/dzslides/ 
+
+# Extensions
+
 Lunamark's markdown parser currently supports the following extensions (which
 can be turned on or off individually):
 
@@ -18,12 +44,7 @@ can be turned on or off individually):
 
 More extensions will be supported in later versions.
 
-The library is as portable as lua and has very good performance.
-It is slightly faster than the author's own C library
-[peg-markdown](http://github.com/jgm/peg-markdown), an order of
-magnitude faster than pandoc, two orders of magnitude
-faster than `Markdown.pl`, and three orders of magnitude
-faster than `markdown.lua`.
+# Benchmarks
 
 Benchmarks (converting a 1M test file consisting of 25 copies of the
 markdown test suite concatenated together):
@@ -105,10 +126,6 @@ Most of the library is written by John MacFarlane.  Hans Hagen
 made some major performance improvements.  Khaled Hosny added the
 original ConTeXt writer.
 
-The dzslides HTML, CSS, and javascript code is by Paul Rouget, released under
+The [dzslides] HTML, CSS, and javascript code is by Paul Rouget, released under
 the DWTFYWT Public License.
 
-[API documentation]: http://jgm.github.com/lunamark/doc/
-[lunamark(1)]: http://jgm.github.com/lunamark/lunamark.1.html
-[lunadoc(1)]: http://jgm.github.com/lunamark/lunadoc.1.html
-[dzslides]: http://paulrouget.com/dzslides/ 
