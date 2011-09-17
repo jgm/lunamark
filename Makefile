@@ -13,7 +13,7 @@ all:
 
 .PHONY: test bench docs clean run-code-examples install website
 test:
-	LUNAMARK_EXTENSIONS="" lua shtest.lua -p ${PROG} ${OPTS}
+	LUNAMARK_EXTENSIONS="" bin/shtest -p ${PROG} ${OPTS}
 
 ${benchtext}:
 	for i in tests/Markdown_1.0.3/*.test; do sed -e '1,/<<</d;/>>>/,$$d' "$$i" >> $@; echo >> $@.txt; done
