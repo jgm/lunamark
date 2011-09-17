@@ -2,9 +2,6 @@
 
 * TODO code comments/cleanup for lunadoc
 
-* TODO test some diverse documents with default templates,
-  to make sure everything works
-
 * TODO metadata as yaml-style set off by --- ---
   or, why not lua itself, instead of yaml? then we don't need a yaml
   parser.
