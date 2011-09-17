@@ -60,6 +60,14 @@ end
 --     `definition_lists`
 --     :   Enable definition lists as in pandoc.
 --
+--     `lua_metadata`
+--     :   Enable lua metadata.  This is an HTML comment block
+--         that starts with `<!--@` and contains lua code.
+--         Variable declarations are added to the metadata.
+--         Strings are parsed as inlines, or, if they begin with
+--         a newline, as blocks. Other data types are preserved
+--         as is.
+--
 -- *   Returns a converter function that converts a markdown string
 --     using `writer`, returning the parsed document as first result,
 --     and a table containing any extracted metadata as the second
@@ -701,12 +709,50 @@ function M.new(writer, options)
                           ) / writer.definitionlist
 
   ------------------------------------------------------------------------------
+  -- Lua metadata
+  ------------------------------------------------------------------------------
+
+  local function lua_metadata(s)  -- run lua code in comment in sandbox
+    local env = {}
+    local scode = s:match("^<!%-%-@%s*(.*)%-%->")
+    local untrusted_table, message = loadstring(scode)
+    if not untrusted_table then
+      util.err(message, 37)
+    end
+    setfenv(untrusted_table, env)
+    local ok, msg = pcall(untrusted_table)
+    if not ok then
+      util.err(msg)
+    end
+    for k,v in pairs(env) do
+      local val
+      if type(v) == "string" then
+        if v:sub(1,1) == "\n" then
+          val = parse_blocks(v:sub(2))  -- strip initial newline, parse as block
+        else
+          val = parse_inlines(v)
+        end
+      else
+        val = v
+      end
+      writer.set_metadata(k,val)
+    end
+    return ""
+  end
+
+  local LuaMeta = fail
+  if options.lua_metadata then
+    LuaMeta = #P("<!--@") * htmlcomment / lua_metadata
+  end
+
+  ------------------------------------------------------------------------------
   -- Blank
   ------------------------------------------------------------------------------
 
-  local Blank          = blankline
-                       + NoteBlock
-                       + Reference
+  local Blank          = blankline / ""
+                       + LuaMeta
+                       + NoteBlock / ""
+                       + Reference / ""
                        + (tightblocksep / "\n")
 
   ------------------------------------------------------------------------------
@@ -737,7 +783,6 @@ function M.new(writer, options)
                      * optionalspace * newline
                      / writer.header
 
-
   ------------------------------------------------------------------------------
   -- Syntax specification
   ------------------------------------------------------------------------------
@@ -745,10 +790,11 @@ function M.new(writer, options)
   syntax =
     { "Blocks",
 
-      Blocks                = Blank^0 / "" *
+      Blocks                = Blank^0 *
                               Block^-1 *
                               (Blank^0 / writer.interblocksep * Block)^0 *
-                              (Blank^0 * eof / ""),
+                              Blank^0 *
+                              eof,
 
       Blank                 = Blank,
 

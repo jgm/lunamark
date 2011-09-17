@@ -1,33 +1,3 @@
-* TODO metadata as yaml-style set off by --- ---
-  or, why not lua itself, instead of yaml? then we don't need a yaml
-  parser.
-  {
-  title = "My great book",
-  author = "John",
-  abstract: [[
-    This is the abstract. It is pretty
-    long.]]
-  }
-  I suppose some kind of sandboxing would be needed to prevent
-  running of arbitrary code. see http://lua-users.org/wiki/SandBoxes
-  see sand.lua, which allows:
-  ---
-  title = "My book"
-  author = "John"
-  io.write("doesn't print")
-  ---
-  This technique could be extended to things like:
-  ---
-  title = "My book"
-  bibliography = loadbib("mybib.bib")
-  ---
-  or
-  ---
-  bibliography = { book1: { ... },
-                   book2: { ... } }
-  ---
-  would be nice to allow metadata at end of document, too.
-
 * TODO release
   [ ] email to luarocks list
   [ ] email to lua list
