@@ -1,6 +1,3 @@
-* TODO add environment variable to store default extensions,
-  so users can customize?  LUNAMARK_EXTENSIONS
-
 * TODO release
   [ ] email to luarocks list
   [ ] email to lua list

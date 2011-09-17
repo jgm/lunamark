@@ -72,7 +72,9 @@ It is slightly faster than the author's own C library
 
 # EXTENSIONS
 
-The following extensions are defined, with the default setting given in parentheses:
+The following extensions are defined, with the default setting given in
+parentheses.  The defaults can be changed locally by defining an
+environment variable `LUNAMARK_EXTENSIONS` (see ENVIRONMENT below).
 
 `(-) containers`
 :   Put sections in containers (`div` tags for `html` writer,
@@ -213,6 +215,13 @@ produces a ConTeXt file using the template `letter.context`,
 and setting the variable `cc` to `{"Smith","Jim Jones"}`
 and `sign` to `"yes"`.  All lunamark etensions are enabled.
 
+# ENVIRONMENT
+
+The environment variable `LUNAMARK_EXTENSIONS` can contain
+a comma-separated list of extensions, optionally prefixed by
+`+` or `-`, that will serve as defaults. These defaults can
+be overridden using the command-line option `--extensions`.
+
 # AUTHORS
 
 Most of lunamark is written by John MacFarlane.  Hans Hagen
@@ -270,6 +279,8 @@ with the default setting given in parentheses:
   (-) notes             Footnotes
   (-) definition_lists  Definition lists
 The keyword 'all' may also be used, to set all extensions simultaneously.
+Setting the environment variable LUNAMARK_EXTENSIONS can change the
+defaults.
 ]]
 
 local long_opts = {
@@ -320,7 +331,8 @@ if optarg["0"] then
   extensions = {}
 end
 
-local extensions_opt = optarg.X or ""
+local default_extensions = os.getenv("LUNAMARK_EXTENSIONS") or ""
+local extensions_opt = default_extensions .. "," .. (optarg.X or "")
 for x in extensions_opt:gmatch("[%+%-]?[%a_]+") do
   local val = true
   if x:sub(1,1) == "+" then
