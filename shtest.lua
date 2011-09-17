@@ -25,7 +25,10 @@ local function do_matching_tests(path, patt, fun)
         local cmd, inp, out = contents:match("^([^\n]*)\n<<<[ \t]*\n(.-\n)>>>[ \t]*\n(.*)$")
         assert(cmd ~= nil, "Command not found in " .. f)
         if cmdname then
-          cmd = cmdname
+          cmd = cmd:gsub("^%S+",cmdname)
+        end
+        if testopts then
+          cmd = cmd:gsub("%-.*$", testopts)
         end
         fun({ name = f:match("^(.*)%.test$"), path = fpath,
               command = cmd, input = inp or "", output = out or ""})
@@ -385,6 +388,7 @@ Usage: shtest.lua [options] [pattern] - run shell tests
 Options:
   --dir,-d PATH      Directory containing .test files (default 'tests')
   --prog,-p CMD      Program to run for tests
+  --opts,-o OPTS     Command-line options to use in tests
   --normalize,-n     Normalize whitespace in output
   --version,-V       Version information
   --help,-h          This message
@@ -393,12 +397,13 @@ Options:
 local long_opts = {
   dir = "d",
   prog = "p",
+  opts = "o",
   normalize = "n",
   version = "V",
   help = "h"
 }
 
-local short_opts = "d:p:nVh"
+local short_opts = "d:p:o:nVh"
 local optarg,optind = alt_getopt.get_opts(arg, short_opts, long_opts)
 
 if optarg.h then
@@ -414,6 +419,7 @@ end
 local testdir = optarg.d or "tests"
 local pattern = arg[optind]
 cmdname = optarg.p
+testopts = optarg.o
 normalize = optarg.n
 
 do_matching_tests(testdir, pattern, run_test)
