@@ -378,12 +378,12 @@ end
 -- main program
 
 local version = [[
-shtest.lua 0.1
+shtest 0.1
 Copyright (C) 2009-2011 John MacFarlane
 ]]
 
 local usage = [[
-Usage: shtest.lua [options] [pattern] - run shell tests
+Usage: shtest [options] [pattern] - run shell tests
 
 Options:
   --dir,-d PATH      Directory containing .test files (default 'tests')
