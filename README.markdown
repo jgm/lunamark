@@ -13,7 +13,8 @@ can be turned on or off individually):
   - Significant start numbers in ordered lists
   - Footnotes
   - Definition lists
-  - Flexible metadata
+  - Pandoc-style title blocks
+  - Flexible metadata using lua declarations
 
 More extensions will be supported in later versions.
 

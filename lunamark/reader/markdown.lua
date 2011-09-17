@@ -60,6 +60,13 @@ end
 --     `definition_lists`
 --     :   Enable definition lists as in pandoc.
 --
+--    `pandoc_title_blocks`
+--    :    Parse pandoc-style title block at the beginning of document:
+--
+--            % Title
+--            % Author1; Author2
+--            % Date
+--
 --     `lua_metadata`
 --     :   Enable lua metadata.  This is an HTML comment block
 --         that starts with `<!--@` and contains lua code.
@@ -114,6 +121,7 @@ function M.new(writer, options)
   -- Generic parsers
   ------------------------------------------------------------------------------
 
+  local percent                = P("%")
   local asterisk               = P("*")
   local dash                   = P("-")
   local plus                   = P("+")
@@ -739,6 +747,27 @@ function M.new(writer, options)
   end
 
   ------------------------------------------------------------------------------
+  -- Pandoc title block parser
+  ------------------------------------------------------------------------------
+
+  local pandoc_title =
+      percent * optionalspace
+    * C(line * (spacechar * nonemptyline)^0) / parse_inlines
+  local pandoc_author =
+      spacechar * optionalspace
+    * C((anyescaped - newline - semicolon)^0)
+    * (semicolon + newline)
+  local pandoc_authors =
+    percent * Ct((pandoc_author / parse_inlines)^0) * newline^-1
+  local pandoc_date =
+    percent * optionalspace * C(line) / parse_inlines
+  local pandoc_title_block =
+      (pandoc_title + Cc(""))
+    * (pandoc_authors + Cc({}))
+    * (pandoc_date + Cc(""))
+    * C(P(1)^0)
+
+  ------------------------------------------------------------------------------
   -- Blank
   ------------------------------------------------------------------------------
 
@@ -880,6 +909,13 @@ function M.new(writer, options)
   return function(inp)
       references = options.references or {}
       lpegmatch(referenceparser,inp)
+      if options.pandoc_title_blocks then
+        local title, authors, date, rest = lpegmatch(pandoc_title_block, inp)
+        writer.set_metadata("title",title)
+        writer.set_metadata("author",authors)
+        writer.set_metadata("date",date)
+        inp = rest
+      end
       local result = writer.start_document() .. parse_blocks(inp)
                        .. writer.stop_document()
       return result, writer.get_metadata()

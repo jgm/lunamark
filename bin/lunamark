@@ -27,6 +27,7 @@ can be turned on or off individually):
   - Footnotes
   - Definition lists
   - Metadata
+  - Pandoc title blocks
 
 More extensions will be supported in later versions.
 
@@ -150,6 +151,15 @@ environment variable `LUNAMARK_EXTENSIONS` (see ENVIRONMENT below).
           ]]
         author = { "Me", "You" }
         -->
+
+`(-) pandoc_title_blocks`
+:   Pandoc style title blocks at the beginning of a document:
+
+        % Title
+        % Author1; Author2
+        % Date
+
+        content starts here...
 
 # TEMPLATES
 
@@ -325,6 +335,7 @@ local extensions = {  -- defaults
   notes = false,
   definition_lists = false,
   lua_metadata = false,
+  pandoc_title_blocks = false,
 }
 
 if optarg["0"] then
