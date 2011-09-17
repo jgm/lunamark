@@ -32,14 +32,6 @@
   ---
   would be nice to allow metadata at end of document, too.
 
-* TODO update readme
-
-* TODO gh-pages website
-  [ ] README/description page
-  [ ] include benchmarks
-  [ ] pages for library API
-  [ ] man pages
-
 * TODO release
   [ ] email to luarocks list
   [ ] email to lua list
