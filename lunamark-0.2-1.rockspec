@@ -1,7 +1,8 @@
 package = "lunamark"
 version = "0.2-1"
 source = {
-   url = "https://nodeload.github.com/jgm/lunamark/tarball/0.2",
+  url = "git://github.com/jgm/lunamark.git",
+  branch = "0.2",
 }
 description = {
    summary = "General markup format converter using lpeg.",
