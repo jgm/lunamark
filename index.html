@@ -10,7 +10,7 @@
 <h1 class="title"></h1>
 <h1>Lunamark</h1>
 
-<p>Lunamark is a lua library and command-line program for conversion of markdown to other textual formats. Currently HTML, [dzslides] (HTML5 slides), Docbook, ConTeXt, LaTeX, and Groff man are the supported output formats, but it is easy to add new writers or modify existing ones. The markdown parser is written using a PEG grammar and can also be modified by the user.</p>
+<p>Lunamark is a lua library and command-line program for conversion of markdown to other textual formats. Currently HTML, <a href="http://paulrouget.com/dzslides/">dzslides</a> (HTML5 slides), Docbook, ConTeXt, LaTeX, and Groff man are the supported output formats, but it is easy to add new writers or modify existing ones. The markdown parser is written using a PEG grammar and can also be modified by the user.</p>
 
 <p>The library is as portable as lua and has very good performance. It is slightly faster than the author’s own C library <a href="http://github.com/jgm/peg-markdown">peg-markdown</a>, an order of magnitude faster than pandoc, two orders of magnitude faster than <code>Markdown.pl</code>, and three orders of magnitude faster than <code>markdown.lua</code>.</p>
 
@@ -20,12 +20,10 @@
 <li><a href="https://github.com/jgm/lunamark">Source code repository</a></li>
 <li><a href="https://github.com/jgm/lunamark/issues">Issue tracker</a></li>
 <li><a href="http:jgm.github.com/lunamark">Website</a></li>
-<li>[API documentation]API documentation]</li>
-<li>[lunamark(1)]</li>
-<li>[lunadoc(1)]</li>
+<li><a href="http://jgm.github.com/lunamark/doc/">API documentation</a></li>
+<li><a href="http://jgm.github.com/lunamark/lunamark.1.html">lunamark(1)</a></li>
+<li><a href="http://jgm.github.com/lunamark/lunadoc.1.html">lunadoc(1)</a></li>
 </ul>
-
-<p>[API documentation]API documentation]: http://jgm.github.com/lunamark/doc/ [lunamark(1)]: http://jgm.github.com/lunamark/lunamark.1.html [lunadoc(1)]: http://jgm.github.com/lunamark/lunadoc.1.html [dzslides]: http://paulrouget.com/dzslides/ </p>
 
 <h1>Extensions</h1>
 
@@ -55,7 +53,7 @@
 <li><code>markdown.lua</code> 996.14s</li>
 </ul>
 
-<p>It is very easy to extend the library by modifying the writers, adding new writers, and even modifying the markdown parser. Some simple examples are given in the [API documentation].</p>
+<p>It is very easy to extend the library by modifying the writers, adding new writers, and even modifying the markdown parser. Some simple examples are given in the <a href="http://jgm.github.com/lunamark/doc/">API documentation</a>.</p>
 
 <h1>Installing</h1>
 
@@ -84,15 +82,15 @@ local parse = lunamark.reader.markdown.new(writer, opts)
 print(parse(&quot;Here&#39;s my *text*&quot;))
 </code></pre>
 
-<p>For more examples, see [API documentation].</p>
+<p>For more examples, see <a href="http://jgm.github.com/lunamark/doc/">API documentation</a>.</p>
 
 <h1>The <code>lunamark</code> executable</h1>
 
-<p>The <code>lunamark</code> executable allows easy markdown conversion from the command line. For usage instructions, see the [lunamark(1)] man page.</p>
+<p>The <code>lunamark</code> executable allows easy markdown conversion from the command line. For usage instructions, see the <a href="http://jgm.github.com/lunamark/lunamark.1.html">lunamark(1)</a> man page.</p>
 
 <h1>The <code>lunadoc</code> executable</h1>
 
-<p>Lunamark comes with a simple lua library documentation tool, <code>lunadoc</code>. For usage instructions, see the [lunadoc(1)] man page. <code>lunadoc</code> reads source files and parses specially marked markdown comment blocks. [Here][API documentation] is an example of the result.</p>
+<p>Lunamark comes with a simple lua library documentation tool, <code>lunadoc</code>. For usage instructions, see the <a href="http://jgm.github.com/lunamark/lunadoc.1.html">lunadoc(1)</a> man page. <code>lunadoc</code> reads source files and parses specially marked markdown comment blocks. <a href="http://jgm.github.com/lunamark/doc/">Here</a> is an example of the result.</p>
 
 <h1>Tests</h1>
 
@@ -114,7 +112,7 @@ bin/shtest -p Markdown.pl -n # run all tests using Markdown.pl, and normalizing 
 
 <p>Most of the library is written by John MacFarlane. Hans Hagen made some major performance improvements. Khaled Hosny added the original ConTeXt writer.</p>
 
-<p>The [dzslides] HTML, CSS, and javascript code is by Paul Rouget, released under the DWTFYWT Public License.</p>
+<p>The <a href="http://paulrouget.com/dzslides/">dzslides</a> HTML, CSS, and javascript code is by Paul Rouget, released under the DWTFYWT Public License.</p>
 <footer>
 
 </footer>
