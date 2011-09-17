@@ -1,7 +1,7 @@
 # Lunamark
 
 Lunamark is a lua library and command-line program for conversion of markdown
-to other textual formats. Currently HTML, dzslides (HTML5 slides),
+to other textual formats. Currently HTML, [dzslides] (HTML5 slides),
 Docbook, ConTeXt, LaTeX, and Groff man are the supported output formats, but
 it is easy to add new writers or modify existing ones. The markdown parser is
 written using a PEG grammar and can also be modified by the user.
@@ -66,32 +66,17 @@ Simple usage example:
 
 For more examples, see [API documentation].
 
-## The lunamark executable
+## The `lunamark` executable
 
 The `lunamark` executable allows easy markdown conversion from the command
-line.  For usage instructions, do `lunamark --help`.
+line.  For usage instructions, see the [lunamark(1)] man page.
 
-Usage examples:
+## The `lunadoc` executable
 
-    lunamark
-
-reads markdown from stdin and writes html to stdout.
-
-    lunamark -t man -s -o prog.1 -Xsmart,notes prog.txt
-
-converts `prog.txt` from markdown to groff man (`-t man`),
-producing a standalone file with header and footer (`-s`)
-called `prog.1` (`-o prog.1`), and enabling the
-smart typography and notes extensions `-Xsmart,notes`.
-
-    lunamark -t man -o prog.1 --template custom \
-      -d section=1,date="July 2011" -Xsmart,notes prog.txt
-
-As before, but uses the custom template `custom.man`
-(which it will seek first in the working directory,
-then in `templates`, then in `~/.lunamark/templates`),
-setting the `section` variable to `1` and the
-`date` variable to `July 2011`.
+Lunamark comes with a simple lua library documentation tool, `lunadoc`.
+For usage instructions, see the [lunadoc(1)] man page.
+`lunadoc` reads source files and parses specially marked markdown
+comment blocks.  [Here][API documentation] is an example of the result.
 
 # Authors
 
@@ -104,5 +89,7 @@ original ConTeXt writer.
 The dzslides HTML, CSS, and javascript code is by Paul Rouget, released under
 the DWTFYWT Public License.
 
-[API documentation]: jgm.github.com/lunamark/doc/
-
+[API documentation]: http://jgm.github.com/lunamark/doc/
+[lunamark(1)]: http://jgm.github.com/lunamark/lunamark.1.html
+[lunadoc(1)]: http://jgm.github.com/lunamark/lunadoc.1.html
+[dzslides]: http://paulrouget.com/dzslides/ 
