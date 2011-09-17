@@ -50,7 +50,7 @@ install: ${luas}
 
 website: docs ${web}/index.html
 
-%.html: %.txt ${templatesdir}/web.html
+${web}/index.html: README.markdown ${templatesdir}/web.html
 	bin/lunamark -Xdefinition_lists,notes,smart --template ${templatesdir}/web.html -o $@ $<
 
 clean:
