@@ -3,13 +3,15 @@ date=$(shell date +%x)
 luas=lunamark.lua lunamark/*.lua lunamark/*/*.lua
 testfile=tmptest.txt
 benchtext=benchtext.txt
+web=website
+templatesdir=templates
 PROG ?= bin/lunamark
 NUM ?= 25
 
 all:
 	@echo Targets: test bench docs run-code-examples install clean
 
-.PHONY: test bench docs clean run-code-examples install
+.PHONY: test bench docs clean run-code-examples install website
 test:
 	-lua shtest.lua -p "${PROG}" $@
 
@@ -30,8 +32,8 @@ bench: ${testfile}
 %.1: bin/%
 	sed '1,/^@startman/d;/^@stopman/,$$d' $< | bin/lunamark -Xdefinition_lists,notes,-smart -t man -s -d section=1,title=$(subst bin/,,$<),left_footer="${version}",date="${date}" -o $@
 
-%.1.html: bin/% man.html
-	sed '1,/^@startman/d;/^@stopman/,$$d' $< | bin/lunamark -Xdefinition_lists,notes,-smart -t html5 --template templates/man.html -s -d section=1,title=$(subst bin/,,$<),left_footer="${version}",date="${date}" -o $@
+%.1.html: bin/% ${templatesdir}/man.html
+	sed '1,/^@startman/d;/^@stopman/,$$d' $< | bin/lunamark -Xdefinition_lists,notes,-smart -t html5 --template ${templatesdir}/man.html -s -d section=1,title=$(subst bin/,,$<),left_footer="${version}",date="${date}" -o $@
 
 docs: doc lunamark.1 lunadoc.1 lunamark.1.html lunadoc.1.html
 
@@ -45,6 +47,11 @@ run-code-examples: lunamark.lua
 
 install: ${luas}
 	luarocks make
+
+website: docs ${web}/index.html
+
+%.html: %.txt ${templatesdir}/web.html
+	bin/lunamark -Xdefinition_lists,notes,smart --template ${templatesdir}/web.html -o $@ $<
 
 clean:
 	-rm -rf doc ${testfile} ${benchtext} lunamark.1 lunadoc.1
