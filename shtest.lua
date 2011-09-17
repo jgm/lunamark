@@ -25,7 +25,7 @@ local function do_matching_tests(path, patt, fun)
         local cmd, inp, out = contents:match("^([^\n]*)\n<<<[ \t]*\n(.-\n)>>>[ \t]*\n(.*)$")
         assert(cmd ~= nil, "Command not found in " .. f)
         if cmdname then
-          cmd = cmd:gsub("^(%S+)",cmdname)
+          cmd = cmdname
         end
         fun({ name = f:match("^(.*)%.test$"), path = fpath,
               command = cmd, input = inp or "", output = out or ""})
