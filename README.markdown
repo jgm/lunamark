@@ -39,7 +39,7 @@ It is very easy to extend the library by modifying the writers,
 adding new writers, and even modifying the markdown parser. Some
 simple examples are given in the [API documentation].
 
-## Installing
+# Installing
 
 You can install the latest development version of
 lunamark using [luarocks](http://www.luarocks.org):
@@ -56,7 +56,7 @@ repository, so you should be able to install them using:
 There may be a short delay between the release and the
 luarocks upload.
 
-## Using the library
+# Using the library
 
 Simple usage example:
 
@@ -68,12 +68,12 @@ Simple usage example:
 
 For more examples, see [API documentation].
 
-## The `lunamark` executable
+# The `lunamark` executable
 
 The `lunamark` executable allows easy markdown conversion from the command
 line.  For usage instructions, see the [lunamark(1)] man page.
 
-## The `lunadoc` executable
+# The `lunadoc` executable
 
 Lunamark comes with a simple lua library documentation tool, `lunadoc`.
 For usage instructions, see the [lunadoc(1)] man page.
