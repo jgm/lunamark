@@ -628,7 +628,7 @@ function M.new(writer, options)
   local Paragraph      = nonindentspace * Cs(Inline^1) * newline * blankline^1
                        / writer.paragraph
 
-  local Plain          = Cs(Inline^1) / writer.plain
+  local Plain          = nonindentspace * Cs(Inline^1) / writer.plain
 
   ------------------------------------------------------------------------------
   -- Lists
