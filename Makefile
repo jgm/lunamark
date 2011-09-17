@@ -5,7 +5,6 @@ testfile=tmptest.txt
 benchtext=benchtext.txt
 web=website
 templatesdir=templates
-PROG ?= bin/lunamark
 NUM ?= 25
 
 all:
@@ -13,7 +12,7 @@ all:
 
 .PHONY: test bench docs clean run-code-examples install website
 test:
-	LUNAMARK_EXTENSIONS="" lua shtest.lua -p ${PROG} ${OPTS}
+	LUNAMARK_EXTENSIONS="" lua shtest.lua ${OPTS}
 
 ${benchtext}:
 	for i in tests/Markdown_1.0.3/*.test; do sed -e '1,/<<</d;/>>>/,$$d' "$$i" >> $@; echo >> $@.txt; done
