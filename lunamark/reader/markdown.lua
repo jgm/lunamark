@@ -649,12 +649,14 @@ function M.new(writer, options)
   local ListContinuationBlock = blanklines * (indent / "") * ListBlock
 
   local function TightListItem(starter)
-      return (Cs(starter / "" * ListBlock * NestedList^-1) / parse_blocks)
+      return -HorizontalRule
+             * (Cs(starter / "" * ListBlock * NestedList^-1) / parse_blocks)
              * -(blanklines * indent)
   end
 
   local function LooseListItem(starter)
-      return Cs( starter / "" * ListBlock * Cc("\n")
+      return -HorizontalRule
+             * Cs( starter / "" * ListBlock * Cc("\n")
                * (NestedList + ListContinuationBlock^0)
                * (blanklines / "\n\n")
                ) / parse_blocks
