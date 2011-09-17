@@ -1,7 +1,3 @@
-* TODO tweak dzslides configuration; make it easier to modify css?
-
-* TODO code comments/cleanup for lunadoc
-
 * TODO metadata as yaml-style set off by --- ---
   or, why not lua itself, instead of yaml? then we don't need a yaml
   parser.
