@@ -43,14 +43,14 @@
 
 <p>Benchmarks (converting a 1M test file consisting of 25 copies of the markdown test suite concatenated together):</p>
 
-<ul>
-<li><code>discount</code> 0.14s</li>
-<li><code>lunamark</code> 0.42s</li>
-<li><code>peg-markdown</code> 0.50s</li>
-<li><code>pandoc</code> 4.97s</li>
-<li><code>Markdown.pl</code> (1.0.2b8) 56.75s</li>
-<li><code>markdown.lua</code> 996.14s</li>
-</ul>
+<pre><code>     0.03s   sundown
+     0.14s   discount
+ -&gt;  0.42s   lunamark
+     0.50s   peg-markdown
+     4.97s   pandoc
+    56.75s   Markdown.pl
+   996.14s   markdown.lua
+</code></pre>
 
 <p>It is very easy to extend the library by modifying the writers, adding new writers, and even modifying the markdown parser. Some simple examples are given in the <a href="http://jgm.github.com/lunamark/doc/">API documentation</a>.</p>
 
