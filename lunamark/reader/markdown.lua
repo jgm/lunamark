@@ -60,12 +60,12 @@ end
 --     `definition_lists`
 --     :   Enable definition lists as in pandoc.
 --
---    `pandoc_title_blocks`
---    :    Parse pandoc-style title block at the beginning of document:
+--     `pandoc_title_blocks`
+--     :   Parse pandoc-style title block at the beginning of document:
 --
---            % Title
---            % Author1; Author2
---            % Date
+--             % Title
+--             % Author1; Author2
+--             % Date
 --
 --     `lua_metadata`
 --     :   Enable lua metadata.  This is an HTML comment block
