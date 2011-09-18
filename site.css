@@ -1,4 +1,6 @@
 @import url("http://fonts.googleapis.com/css?family=Megrim");
+@import url("http://fonts.googleapis.com/css?family=Inconsolata");
 
 body { font-family: Georgia, serif; line-height: 1.2em; max-width: 42em; margin: 40px; }
 h1 { font-family: Megrim, Georgia, serif; font-size: 140%; color: #aaa; border-bottom: 1px solid #aaa; }
+code { font-family: Inconsolata, monospace; }
