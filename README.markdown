@@ -42,7 +42,9 @@ can be turned on or off individually):
   - Pandoc-style title blocks
   - Flexible metadata using lua declarations
 
-More extensions will be supported in later versions.
+It is very easy to extend the library by modifying the writers,
+adding new writers, and even modifying the markdown parser. Some
+simple examples are given in the [API documentation].
 
 # Benchmarks
 
@@ -56,10 +58,6 @@ markdown test suite concatenated together):
          4.97s   pandoc
         56.75s   Markdown.pl
        996.14s   markdown.lua
-
-It is very easy to extend the library by modifying the writers,
-adding new writers, and even modifying the markdown parser. Some
-simple examples are given in the [API documentation].
 
 # Installing
 
