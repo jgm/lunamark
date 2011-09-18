@@ -49,30 +49,21 @@
 <dd>
 <p>Enable definition lists as in pandoc.</p>
 </dd>
-</dl></li>
-</ul>
-
-<dl>
-<dt> <code>pandoc_title_blocks</code></dt>
+<dt><code>pandoc_title_blocks</code></dt>
 <dd>
-<pre><code>Parse pandoc-style title block at the beginning of document:
+<p>Parse pandoc-style title block at the beginning of document:</p>
 
-   % Title
-   % Author1; Author2
-   % Date
+<pre><code>% Title
+% Author1; Author2
+% Date
 </code></pre>
-
-<dl>
+</dd>
 <dt><code>lua_metadata</code></dt>
 <dd>
 <p>Enable lua metadata. This is an HTML comment block that starts with <code>&lt;!--@</code> and contains lua code. The lua code is interpreted in a sandbox, and any variables defined are added to the metadata. The function <code>markdown</code> (also <code>m</code>) is defined and can be used to ensure that string fields are parsed as markdown; otherwise, they will be read literally.</p>
 </dd>
-</dl>
-</dd>
-</dl>
-
-<ul>
-<li>Returns a converter function that converts a markdown string using <code>writer</code>, returning the parsed document as first result, and a table containing any extracted metadata as the second result. The converter assumes that the input has unix line endings (newline). If the input might have DOS line endings, a simple <code>gsub(&quot;\r&quot;,&quot;&quot;)</code> should take care of them.</li>
+</dl></li>
+<li><p>Returns a converter function that converts a markdown string using <code>writer</code>, returning the parsed document as first result, and a table containing any extracted metadata as the second result. The converter assumes that the input has unix line endings (newline). If the input might have DOS line endings, a simple <code>gsub(&quot;\r&quot;,&quot;&quot;)</code> should take care of them.</p></li>
 </ul>
 </div>
 
