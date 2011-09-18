@@ -90,12 +90,12 @@ Simple usage example:
 
 For more examples, see [API documentation].
 
-# The `lunamark` executable
+# lunamark
 
 The `lunamark` executable allows easy markdown conversion from the command
 line.  For usage instructions, see the [lunamark(1)] man page.
 
-# The `lunadoc` executable
+# lunadoc
 
 Lunamark comes with a simple lua library documentation tool, `lunadoc`.
 For usage instructions, see the [lunadoc(1)] man page.
