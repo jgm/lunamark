@@ -49,12 +49,13 @@ More extensions will be supported in later versions.
 Benchmarks (converting a 1M test file consisting of 25 copies of the
 markdown test suite concatenated together):
 
-    discount        0.14s
-    lunamark        0.42s
-    peg-markdown    0.50s
-    pandoc          4.97s
-    Markdown.pl    56.75s
-    markdown.lua  996.14s
+         0.03s   sundown
+         0.14s   discount
+     ->  0.42s   lunamark
+         0.50s   peg-markdown
+         4.97s   pandoc
+        56.75s   Markdown.pl
+       996.14s   markdown.lua
 
 It is very easy to extend the library by modifying the writers,
 adding new writers, and even modifying the markdown parser. Some
