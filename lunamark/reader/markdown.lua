@@ -633,7 +633,11 @@ function M.new(writer, options)
 
   local Reference      = define_reference_parser / ""
 
-  local Paragraph      = nonindentspace * Cs(Inline^1) * newline * blankline^1
+  local Paragraph      = nonindentspace * Cs(Inline^1) * newline
+                       * ( blankline^1
+                         + #hash
+                         + #(nonindentspace * more * space^-1)
+                         )
                        / writer.paragraph
 
   local Plain          = nonindentspace * Cs(Inline^1) / writer.plain
