@@ -7,13 +7,14 @@ web=website
 templatesdir=templates
 NUM ?= 25
 PROG ?= bin/lunamark
+TESTOPTS ?= --tidy
 
 all:
 	@echo Targets: test bench docs run-code-examples install clean
 
 .PHONY: test bench docs clean run-code-examples install website
 test:
-	LUNAMARK_EXTENSIONS="" bin/shtest -p ${PROG} ${OPTS}
+	LUNAMARK_EXTENSIONS="" bin/shtest ${TESTOPTS} -p ${PROG} ${OPTS}
 
 ${benchtext}:
 	for i in tests/Markdown_1.0.3/*.test; do sed -e '1,/<<</d;/>>>/,$$d' "$$i" >> $@; echo >> $@.txt; done
