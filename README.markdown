@@ -111,11 +111,28 @@ To run the tests, use `bin/shtest`.
     bin/shtest --help            # get usage
     bin/shtest                   # run all tests
     bin/shtest indent            # run all tests matching "indent"
-    bin/shtest -p Markdown.pl -n # run all tests using Markdown.pl, and normalizing whitespace & entities
+    bin/shtest -p Markdown.pl -t # run all tests using Markdown.pl, and normalize using 'tidy'
 
-Lunamark currently fails a few of the PHP Markdown tests.
-In most cases I disagree with the interpretation of markdown
-syntax that these tests reflect.
+Lunamark currently fails four of the PHP Markdown tests:
+
+* `tests/PHP_Markdown/Quotes in attributes.test`:  Here the HTML is semantically
+  equivalent; using the `-t/--tidy` option to `bin/shtest` makes the test pass.
+
+* `tests/PHP_Markdown/Email auto links.test`:  Here too the HTML is semantically
+  equivalent; PHP markdown does entity obfuscation, and lunamark does not.  This
+  feature could be added easily enough, but the test would still fail, because
+  the obfuscation involves randomness.  Again, using the `-t/--tidy` option
+  makes the test pass.
+
+* `tests/PHP_Markdown/Ins & del.test`:  This concerns the interaction between
+  paragraphs and `<ins>` and `<del>` tags.  Here lunamark produces bad HTML
+  and needs to be fixed.
+
+* `tests/PHP_Markdown/Emphasis.test`:  A bunch of corner cases with nested
+  strong and emphasized text.  These corner cases are left undecided by
+  the markdown spec, so in my view the PHP test suite is not normative here;
+  I think lunamark's behavior is perfectly reasonable, and I see no reason
+  to change.
 
 # Authors
 
