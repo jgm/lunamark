@@ -439,16 +439,19 @@ function M.new(writer, options)
 
   local block_keyword =
       keyword_exact("address") + keyword_exact("blockquote") +
-      keyword_exact("center") + keyword_exact("dir") + keyword_exact("div") +
+      keyword_exact("center") + keyword_exact("del") +
+      keyword_exact("dir") + keyword_exact("div") +
       keyword_exact("p") + keyword_exact("pre") + keyword_exact("li") +
       keyword_exact("ol") + keyword_exact("ul") + keyword_exact("dl") +
       keyword_exact("dd") + keyword_exact("form") + keyword_exact("fieldset") +
-      keyword_exact("isindex") + keyword_exact("menu") + keyword_exact("noframes") +
+      keyword_exact("isindex") + keyword_exact("ins") +
+      keyword_exact("menu") + keyword_exact("noframes") +
       keyword_exact("frameset") + keyword_exact("h1") + keyword_exact("h2") +
       keyword_exact("h3") + keyword_exact("h4") + keyword_exact("h5") +
       keyword_exact("h6") + keyword_exact("hr") + keyword_exact("script") +
-      keyword_exact("noscript") + keyword_exact("table") + keyword_exact("tbody") +
-      keyword_exact(  "tfoot") + keyword_exact("thead") + keyword_exact("th") +
+      keyword_exact("noscript") + keyword_exact("table") +
+      keyword_exact("tbody") + keyword_exact("tfoot") +
+      keyword_exact("thead") + keyword_exact("th") +
       keyword_exact("td") + keyword_exact("tr")
 
   -- There is no reason to support bad html, so we expect quoted attributes
