@@ -366,9 +366,9 @@ function M.new(writer, options)
        + nonemptyline^1
        + blankline^1)^0)
 
-  -- lookup link reference and return either a link or image.
-  -- if the reference is not found, return the bracketed label.
-  local function indirect_link(img,label,sps,tag)
+  -- lookup link reference and return either
+  -- the link or nil and fallback text.
+  local function lookup_reference(label,sps,tag)
       local tagpart
       if not tag then
           tag = label
@@ -383,26 +383,34 @@ function M.new(writer, options)
         tagpart = sps .. tagpart
       end
       local r = references[normalize_tag(tag)]
-      if r and img then
-        return writer.image(parse_inlines(label), r.url, r.title)
-      elseif r and not img then
-        return writer.link(parse_inlines(label), r.url, r.title)
+      if r then
+        return r
       else
-        return ("[" .. parse_inlines(label) .. "]" .. tagpart)
+        return nil, "[" .. parse_inlines(label) .. "]" .. tagpart
       end
   end
 
-  local function direct_link(img,label,url,title)
-    if img then
-      return writer.image(label,url,title)
-    else
-      return writer.link(label,url,title)
-    end
+  -- lookup link reference and return a link, if the reference is found,
+  -- or a bracketed label otherwise.
+  local function indirect_link(label,sps,tag)
+      local r,fallback = lookup_reference(label,sps,tag)
+      if r then
+        return writer.link(parse_inlines(label), r.url, r.title)
+      else
+        return fallback
+      end
   end
 
-  -- parse an exclamation mark and return true, or return false
-  local image_marker = Cc(true) * exclamation
-                     + Cc(false)
+  -- lookup image reference and return an image, if the reference is found,
+  -- or a bracketed label otherwise.
+  local function indirect_image(label,sps,tag)
+      local r,fallback = lookup_reference(label,sps,tag)
+      if r then
+        return writer.image(writer.string(label), r.url, r.title)
+      else
+        return "!" .. fallback
+      end
+  end
 
   ------------------------------------------------------------------------------
   -- HTML
@@ -575,22 +583,31 @@ function M.new(writer, options)
                       * more
                       / function(email) return writer.link(writer.string(email),"mailto:"..email) end
 
-  local DirectLink    = image_marker 
+  local DirectLink    = (tag / parse_inlines)
+                      * spnl
+                      * lparent
+                      * (url + Cc(""))  -- link can be empty [foo]()
+                      * optionaltitle
+                      * rparent
+                      / writer.link
+
+  local IndirectLink = tag * (C(spnl) * tag)^-1 / indirect_link
+
+  -- parse a link or image (direct or indirect)
+  local Link          = DirectLink + IndirectLink
+
+  local DirectImage   = exclamation
                       * (tag / parse_inlines)
                       * spnl
                       * lparent
                       * (url + Cc(""))  -- link can be empty [foo]()
                       * optionaltitle
                       * rparent
-                      / direct_link
+                      / writer.image
 
-   local IndirectLink = image_marker
-                      * tag
-                      * (C(spnl) * tag)^-1
-                      / indirect_link
+  local IndirectImage  = exclamation * tag * (C(spnl) * tag)^-1 / indirect_image
 
-  -- parse a link or image (direct or indirect)
-  local Link          = DirectLink + IndirectLink
+  local Image         = DirectImage + IndirectImage
 
   -- avoid parsing long strings of * or _ as emph/strong
   local UlOrStarLine  = asterisk^4 + underscore^4 / writer.string
@@ -854,6 +871,7 @@ function M.new(writer, options)
                             + V("Emph")
                             + V("NoteRef")
                             + V("Link")
+                            + V("Image")
                             + V("Code")
                             + V("AutoLinkUrl")
                             + V("AutoLinkEmail")
@@ -871,6 +889,7 @@ function M.new(writer, options)
       Emph                  = Emph,
       NoteRef               = NoteRef,
       Link                  = Link,
+      Image                 = Image,
       Code                  = Code,
       AutoLinkUrl           = AutoLinkUrl,
       AutoLinkEmail         = AutoLinkEmail,
