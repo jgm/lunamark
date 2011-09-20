@@ -79,28 +79,26 @@ local function show_diff(expected, actual)
   end
 end
 
-local function normalize_output(s)
+-- runs cmd on file containing inp and returns result
+local function pipe(cmd, inp)
   local tmp = os.tmpname()
   local tmph = io.open(tmp, "w")
-  tmph:write(s)
+  tmph:write(inp)
   tmph:close()
-  local outh = io.popen("tidy --show-body-only yes --show-warnings no -utf8 -quiet " .. tmp, "r")
-  local tidied = outh:read("*all")
+  local outh = io.popen(cmd .. " " .. tmp,"r")
+  local result = outh:read("*all")
   outh:close()
-  return tidied
+  os.remove(tmp)
+  return result
+end
+
+local function normalize_output(s)
+  return pipe("tidy --show-body-only yes --show-warnings no -utf8 -quiet", s)
 end
 
 local function run_test(test)
-  local tmp = os.tmpname()
-  local tmph = io.open(tmp, "w")
-  tmph:write(test.input)
-  tmph:close()
-  local cmd = test.command .. " " .. tmp
-  local outh = io.popen(cmd, "r")
-  local actual = outh:read("*all")
   local expected = test.output
-  outh:close()
-  os.remove(tmp)
+  local actual = pipe(test.command, test.input)
   if normalize then
     actual = normalize_output(actual)
     expected = normalize_output(expected)
