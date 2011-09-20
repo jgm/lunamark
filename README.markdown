@@ -115,27 +115,19 @@ To run the tests, use `bin/shtest`.
 
 Lunamark currently fails four of the PHP Markdown tests:
 
-  * `tests/PHP_Markdown/Quotes in attributes.test`: Here the HTML is
+  * `tests/PHP_Markdown/Quotes in attributes.test`: The HTML is
     semantically equivalent; using the `-t/--tidy` option to `bin/shtest` makes
     the test pass.
 
-  * `tests/PHP_Markdown/Email auto links.test`: Here too the HTML is
-    semantically equivalent; PHP markdown does entity obfuscation, and
+  * `tests/PHP_Markdown/Email auto links.test`: The HTML is
+    semantically equivalent. PHP markdown does entity obfuscation, and
     lunamark does not. This feature could be added easily enough, but the test
     would still fail, because the obfuscation involves randomness. Again,
     using the `-t/--tidy` option makes the test pass.
 
-*   `tests/PHP_Markdown/Ins & del.test`:  PHP markdown renders
-
-        <ins>hello</ins>
-
-    as
-
-        <p><ins>hello</ins></p>
-
-    while lunamark renders it
-
-        <ins>hello</ins>
+*   `tests/PHP_Markdown/Ins & del.test`:  PHP markdown puts extra `<p>`
+    tags around `<ins>hello</ins>`, while lunamark does not.  It's hard
+    to tell from the markdown spec which behavior is correct.
 
 *   `tests/PHP_Markdown/Emphasis.test`:  A bunch of corner cases with nested
     strong and emphasized text.  These corner cases are left undecided by
