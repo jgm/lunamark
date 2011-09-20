@@ -117,6 +117,15 @@ function M.new(writer, options)
         end
     end
 
+  parse_inlines_no_link =
+    function(str)
+      local res = lpegmatch(inlines_no_link, str)
+      if res == nil
+        then error(format("parse_inlines_no_link failed on:\n%s", str:sub(1,20)))
+        else return res
+        end
+    end
+
   ------------------------------------------------------------------------------
   -- Generic parsers
   ------------------------------------------------------------------------------
@@ -395,7 +404,7 @@ function M.new(writer, options)
   local function indirect_link(label,sps,tag)
       local r,fallback = lookup_reference(label,sps,tag)
       if r then
-        return writer.link(parse_inlines(label), r.url, r.title)
+        return writer.link(parse_inlines_no_link(label), r.url, r.title)
       else
         return fallback
       end
@@ -583,7 +592,7 @@ function M.new(writer, options)
                       * more
                       / function(email) return writer.link(writer.string(email),"mailto:"..email) end
 
-  local DirectLink    = (tag / parse_inlines)
+  local DirectLink    = (tag / parse_inlines_no_link)  -- no links inside links
                       * spnl
                       * lparent
                       * (url + Cc(""))  -- link can be empty [foo]()
@@ -922,6 +931,10 @@ function M.new(writer, options)
   inlines_t[1] = "Inlines"
   inlines_t.Inlines = Inline^0 * (spacing^0 * eof / "")
   inlines = Cs(inlines_t)
+
+  inlines_no_link_t = util.table_copy(inlines_t)
+  inlines_no_link_t.Link = fail
+  inlines_no_link = Cs(inlines_no_link_t)
 
   ------------------------------------------------------------------------------
   -- Exported conversion function
