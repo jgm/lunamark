@@ -7,7 +7,7 @@
 
 local M = {}
 
-local gsub = string.gsub
+local util = require("lunamark.util")
 local generic = require("lunamark.writer.generic")
 local entities = require("lunamark.entities")
 local format = string.format
@@ -56,18 +56,18 @@ function M.new(options)
      ["]"] = "{]}",
    }
 
-  local escaped_utf8_triplet = {
-    ["\226\128\156"] = "``",
-    ["\226\128\157"] = "''",
-    ["\226\128\152"] = "`",
-    ["\226\128\153"] = "'",
-    ["\226\128\148"] = "---",
-    ["\226\128\147"] = "--",
-  }
+  local escapes = TeX.escaped
+  escapes["\226\128\156"] = "``"
+  escapes["\226\128\157"] = "''"
+  escapes["\226\128\152"] = "`"
+  escapes["\226\128\153"] = "'"
+  escapes["\226\128\148"] = "---"
+  escapes["\226\128\147"] = "--"
+  escapes["\194\160"]     = "~"
 
-  function TeX.string(s)
-    return s:gsub(".",TeX.escaped):gsub("\226\128.",escaped_utf8_triplet):gsub("\194\160","~")
-  end
+  local escaper = util.escaper(escapes)
+
+  TeX.string = escaper
 
   function TeX.inline_html(s)
     return ""

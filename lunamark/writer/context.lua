@@ -8,7 +8,6 @@ local M = {}
 
 local tex = require("lunamark.writer.tex")
 local util = require("lunamark.util")
-local gsub = string.gsub
 local format = string.format
 
 --- Returns a new ConTeXt writer
@@ -18,9 +17,8 @@ function M.new(options)
   local ConTeXt = tex.new(options)
 
   -- we don't try to escape utf-8 characters in context
-  function ConTeXt.string(s)
-    return s:gsub(".",ConTeXt.escaped)
-  end
+  local escape = util.escaper(ConTeXt.escaped)
+  ConTeXt.string = escape
 
   function ConTeXt.singlequoted(s)
     return format("\\quote{%s}",s)

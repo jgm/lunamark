@@ -8,7 +8,6 @@ local M = {}
 
 local tex = require("lunamark.writer.tex")
 local util = require("lunamark.util")
-local gsub = string.gsub
 local format = string.format
 
 --- Returns a new LaTeX writer.
