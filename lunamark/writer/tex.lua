@@ -56,16 +56,17 @@ function M.new(options)
      ["]"] = "{]}",
    }
 
-  local escapes = TeX.escaped
-  escapes["\226\128\156"] = "``"
-  escapes["\226\128\157"] = "''"
-  escapes["\226\128\152"] = "`"
-  escapes["\226\128\153"] = "'"
-  escapes["\226\128\148"] = "---"
-  escapes["\226\128\147"] = "--"
-  escapes["\194\160"]     = "~"
+  local str_escaped = {
+     ["\226\128\156"] = "``",
+     ["\226\128\157"] = "''",
+     ["\226\128\152"] = "`",
+     ["\226\128\153"] = "'",
+     ["\226\128\148"] = "---",
+     ["\226\128\147"] = "--",
+     ["\194\160"]     = "~",
+   }
 
-  local escaper = util.escaper(escapes)
+  local escaper = util.escaper(TeX.escaped, str_escaped)
 
   TeX.string = escaper
 

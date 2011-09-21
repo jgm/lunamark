@@ -99,16 +99,23 @@ function M.expand_tabs_in_line(s, tabstop)
         end))
 end
 
---- Given a table `escapes` of escapable characters (or
--- byte sequences) and their escaped versions,
--- returns a function that escapes a string.
+--- Given a table `char_escapes` mapping escapable characters onto
+-- their escaped versions and optionally `string_escapes` mapping
+-- escapable strings (or multibyte UTF-8 characters) onto their
+-- escaped versions, returns a function that escapes a string.
 -- This function uses lpeg and is faster than gsub.
-function M.escaper(escapes)
-  local escapable = any
-  for k,v in pairs(escapes) do
-    escapable = P(k) / v + escapable
+function M.escaper(char_escapes, string_escapes)
+  local char_escapes_list = ""
+  for i,_ in pairs(char_escapes) do
+    char_escapes_list = char_escapes_list .. i
   end
-  local escape_string = Cs(escapable^0)
+  local escapable = S(char_escapes_list) / char_escapes
+  if string_escapes then
+    for k,v in pairs(string_escapes) do
+      escapable = P(k) / v + escapable
+    end
+  end
+  local escape_string = Cs((escapable + any)^0)
   return function(s) return lpegmatch(escape_string, s) end
 end
 

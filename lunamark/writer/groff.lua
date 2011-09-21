@@ -8,7 +8,7 @@
 local M = {}
 
 local format = string.format
-local gsub = string.gsub
+local util = require("lunamark.util")
 local generic = require("lunamark.writer.generic")
 local entities = require("lunamark.entities")
 
@@ -50,11 +50,12 @@ function M.new(options)
     ["\226\128\153"] = "'",
     ["\226\128\148"] = "\\[em]",
     ["\226\128\147"] = "\\[en]",
+    ["\194\160"]     = "\\ ",
   }
 
-  function Groff.string(s)
-    return s:gsub(".",Groff.escaped):gsub("\226\128.",escaped_utf8_triplet):gsub("\194\160","\\ ")
-  end
+  local escape = util.escaper(Groff.escaped, escaped_utf8_triplet)
+
+  Groff.string = escape
 
   function Groff.inline_html(s)
   end

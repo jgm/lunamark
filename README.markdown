@@ -53,7 +53,7 @@ markdown test suite concatenated together):
 
          0.03s   sundown
          0.14s   discount
-     ->  0.42s   lunamark
+     ->  0.36s   lunamark
          0.50s   peg-markdown
          4.97s   pandoc
         56.75s   Markdown.pl
