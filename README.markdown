@@ -32,8 +32,8 @@ faster than `markdown.lua`.
 
 # Extensions
 
-Lunamark's markdown parser currently supports the following extensions (which
-can be turned on or off individually):
+Lunamark's markdown parser currently supports a number of extensions
+(which can be turned on or off individually), including:
 
   - Smart typography (fancy quotes, dashes, ellipses)
   - Significant start numbers in ordered lists
@@ -41,6 +41,8 @@ can be turned on or off individually):
   - Definition lists
   - Pandoc-style title blocks
   - Flexible metadata using lua declarations
+
+See the [lunamark man page](lunamark.1.html) for a complete list.
 
 It is very easy to extend the library by modifying the writers,
 adding new writers, and even modifying the markdown parser. Some
