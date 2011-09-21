@@ -7,6 +7,9 @@ local M = {}
 local cosmo = require("cosmo")
 local rep  = string.rep
 local insert = table.insert
+local lpeg = require("lpeg")
+local Cs, S, lpegmatch = lpeg.Cs, lpeg.S, lpeg.match
+local any = lpeg.P(1)
 
 --- Find a template and return its contents (or `false` if
 -- not found). The template is sought first in the
@@ -94,6 +97,19 @@ function M.expand_tabs_in_line(s, tabstop)
           corr = corr - 1 + sp
           return rep(" ",sp)
         end))
+end
+
+--- Given a table `escapes` of escapable characters and their
+-- escaped versions, returns a function that escapes a string.
+-- This function uses lpeg and is faster than gsub.
+function M.escaper(escapes)
+  local escapables = ""
+  for k,_ in pairs(escapes) do
+    escapables = escapables .. k
+  end
+  local escapable_char = S(escapables) / escapes -- function(c) return escapes[c] end
+  local escape_string = Cs((escapable_char + any)^0)
+  return function(s) return lpegmatch(escape_string, s) end
 end
 
 return M

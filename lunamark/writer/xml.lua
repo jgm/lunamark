@@ -9,6 +9,7 @@ local M = {}
 
 local gsub = string.gsub
 local generic = require("lunamark.writer.generic")
+local util = require("lunamark.util")
 
 --- Returns a new XML writer.
 -- For a list of fields, see [lunamark.writer.generic].
@@ -44,7 +45,7 @@ function M.new(options)
 
   Xml.linebreak = "<linebreak />"
 
-  local escaped = {
+  local escape = util.escaper {
      ["<" ] = "&lt;",
      [">" ] = "&gt;",
      ["&" ] = "&amp;",
@@ -52,9 +53,7 @@ function M.new(options)
      ["'" ] = "&#39;"
   }
 
-  function Xml.string(s)
-    return s:gsub(".",escaped)
-  end
+  Xml.string = escape
 
   return Xml
 end
