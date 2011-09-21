@@ -7,7 +7,6 @@
 
 local M = {}
 
-local gsub = string.gsub
 local generic = require("lunamark.writer.generic")
 local util = require("lunamark.util")
 
