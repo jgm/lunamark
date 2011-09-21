@@ -1,3 +1,8 @@
+* TODO make groff writer use escaper
+
+* TODO latex gives wrong output for '%' - escaping wrong?
+  test escapes for unicode too
+
 * TODO fenced code block extension
 
 * TODO alternative indented code block with metadata?
