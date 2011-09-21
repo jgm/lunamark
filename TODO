@@ -31,8 +31,6 @@
   - lunamark.util exports several functions which need documentation
 * TODO add config file?
 
-* TODO # in ordered lists extension
-
 * TODO layout: indentation options?
 * TODO latex reader - write peg
 * TODO mathml - look at pandoc2?

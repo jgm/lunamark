@@ -84,6 +84,10 @@ end
 --     :   Require a blank line between a paragraph and a following
 --         header.
 --
+--     `hash_enumerators`
+--     :   Allow `#` instead of a digit for an ordered list enumerator
+--         (equivalent to `1`).
+--
 -- *   Returns a converter function that converts a markdown string
 --     using `writer`, returning the parsed document as first result,
 --     and a table containing any extracted metadata as the second
@@ -252,7 +256,11 @@ function M.new(writer, options)
                      + space * space * space * bulletchar * #spacing
                      ) * -bulletchar
 
-  local dig        = R("09")
+  if options.hash_enumerators then
+    dig = digit + hash
+  else
+    dig = digit
+  end
 
   local enumerator = C(dig^3 * period) * #spacing
                    + C(dig^2 * period) * #spacing * (tab + space^1)

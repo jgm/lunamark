@@ -167,6 +167,10 @@ environment variable `LUNAMARK_EXTENSIONS` (see ENVIRONMENT below).
 `(-) require_blank_before_header`
 :   Require a blank line between a paragraph and a following header.
 
+`(-) hash_enumerators`
+:   Allow `#` instead of a digit for an ordered list enumerator
+    (equivalent to `1`).
+
 # TEMPLATES
 
 By default, lunamark will produce a fragment.  If the
@@ -344,6 +348,7 @@ local extensions = {  -- defaults
   pandoc_title_blocks = false,
   require_blank_before_blockquote = false,
   require_blank_before_header = false,
+  hash_enumerators = false,
 }
 
 if optarg["0"] then
