@@ -252,12 +252,14 @@ function M.new(writer, options)
                      + space * space * space * bulletchar * #spacing
                      ) * -bulletchar
 
-  local enumerator = C(digit^3 * period) * #spacing
-                   + C(digit^2 * period) * #spacing * (tab + space^1)
-                   + C(digit * period) * #spacing * (tab + space^-2)
-                   + space * C(digit^2 * period) * #spacing
-                   + space * C(digit * period) * #spacing * (tab + space^-1)
-                   + space * space * C(digit^1 * period) * #spacing
+  local dig        = R("09")
+
+  local enumerator = C(dig^3 * period) * #spacing
+                   + C(dig^2 * period) * #spacing * (tab + space^1)
+                   + C(dig * period) * #spacing * (tab + space^-2)
+                   + space * C(dig^2 * period) * #spacing
+                   + space * C(dig * period) * #spacing * (tab + space^-1)
+                   + space * space * C(dig^1 * period) * #spacing
 
   -----------------------------------------------------------------------------
   -- Parsers used for markdown code spans
@@ -732,7 +734,7 @@ function M.new(writer, options)
 
   local function ordered_list(s,tight,startnum)
     if options.startnum then
-      startnum = tonumber(listtype)
+      startnum = tonumber(listtype) or 1  -- fallback for '#'
     else
       startnum = nil
     end
