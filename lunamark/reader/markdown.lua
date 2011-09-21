@@ -351,7 +351,7 @@ function M.new(writer, options)
   local NoteBlock
 
   if options.notes then
-    NoteBlock = nonindentspace * RawNoteRef * colon * spnl * indented_blocks(chunk)
+    NoteBlock = leader * RawNoteRef * colon * spnl * indented_blocks(chunk)
   else
     NoteBlock = fail
   end
@@ -650,13 +650,13 @@ function M.new(writer, options)
 
   -- strip off leading > and indents, and run through blocks
   local Blockquote     = Cs((
-            ((nonindentspace * more * space^-1)/"" * linechar^0 * newline)^1
+            ((leader * more * space^-1)/"" * linechar^0 * newline)^1
           * (-blankline * linechar^1 * newline)^0
           * blankline^0
           )^1) / parse_blocks / writer.blockquote
 
   local function lineof(c)
-      return (nonindentspace * (P(c) * optionalspace)^3 * newline * blankline^1)
+      return (leader * (P(c) * optionalspace)^3 * newline * blankline^1)
   end
 
   local HorizontalRule = ( lineof(asterisk)
@@ -669,7 +669,7 @@ function M.new(writer, options)
   local Paragraph      = nonindentspace * Cs(Inline^1) * newline
                        * ( blankline^1
                          + #hash
-                         + #(nonindentspace * more * space^-1)
+                         + #(leader * more * space^-1)
                          )
                        / writer.paragraph
 
