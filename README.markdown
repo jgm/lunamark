@@ -7,7 +7,7 @@ it is easy to add new writers or modify existing ones. The markdown parser is
 written using a PEG grammar and can also be modified by the user.
 
 The library is as portable as lua and has very good performance.
-It is slightly faster than the author's own C library
+It is significantly faster than the author's own C library
 [peg-markdown](http://github.com/jgm/peg-markdown), an order of
 magnitude faster than pandoc, two orders of magnitude
 faster than `Markdown.pl`, and three orders of magnitude
@@ -53,7 +53,7 @@ markdown test suite concatenated together):
 
          0.03s   sundown
          0.14s   discount
-     ->  0.36s   lunamark
+     ->  0.35s   lunamark
          0.50s   peg-markdown
          4.97s   pandoc
         56.75s   Markdown.pl
