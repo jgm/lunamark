@@ -86,11 +86,15 @@ function M.new(writer, options)
   local options = options or {}
 
   local function expandtabs(s)
-    if not options.preserve_tabs and s:find("\t") then
+    if s:find("\t") then
       return s:gsub("[^\n]*",expand_tabs_in_line)
     else
       return s
     end
+  end
+
+  if options.preserve_tabs then
+    expandtabs = function(s) return s end
   end
 
   ------------------------------------------------------------------------------
