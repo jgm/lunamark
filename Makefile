@@ -30,6 +30,9 @@ ${testfile}: ${benchtext}
 bench: ${testfile}
 	time -p ${PROG} < ${testfile} > /dev/null
 
+prof:
+	PROG='lua -luatrace.profile ${PROG}' make bench
+
 %.1: bin/%
 	sed '1,/^@startman/d;/^@stopman/,$$d' $< | bin/lunamark -Xdefinition_lists,notes,-smart -t man -s -d section=1,title=$(subst bin/,,$<),left_footer="${version}",date="${date}" -o $@
 
