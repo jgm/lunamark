@@ -370,7 +370,7 @@ function M.new(writer, options)
 
   -- parse a reference definition:  [foo]: /bar "title"
   local define_reference_parser =
-    leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^0
+    leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^1
 
   local referenceparser =
     -- need the Ct or we get a stack overflow
