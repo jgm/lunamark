@@ -33,6 +33,11 @@ bench: ${testfile}
 prof:
 	PROG='lua -luatrace.profile ${PROG}' make bench
 
+coverage:
+	-rm luacov.stats.out ; \
+	LUNAMARK_EXTENSIONS="" bin/shtest ${TESTOPTS} -p "lua -lluacov ${PROG}" ${OPTS} ; \
+	luacov
+
 %.1: bin/%
 	sed '1,/^@startman/d;/^@stopman/,$$d' $< | bin/lunamark -Xdefinition_lists,notes,-smart -t man -s -d section=1,title=$(subst bin/,,$<),left_footer="${version}",date="${date}" -o $@
 
