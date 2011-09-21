@@ -1,0 +1,6 @@
+lunamark -Xrequire_blank_before_header
+<<<
+Hi
+# No header
+>>>
+<p>Hi # No header</p>

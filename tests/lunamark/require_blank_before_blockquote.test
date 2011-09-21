@@ -1,0 +1,6 @@
+lunamark -Xrequire_blank_before_blockquote
+<<<
+Hi
+> no quote
+>>>
+<p>Hi &gt; no quote</p>

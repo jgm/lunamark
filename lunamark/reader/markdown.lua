@@ -76,6 +76,14 @@ end
 --         be used to ensure that string fields are parsed
 --         as markdown; otherwise, they will be read literally.
 --
+--     `require_blank_before_blockquote`
+--     :   Require a blank line between a paragraph and a following
+--         block quote.
+--
+--     `require_blank_before_header`
+--     :   Require a blank line between a paragraph and a following
+--         header.
+--
 -- *   Returns a converter function that converts a markdown string
 --     using `writer`, returning the parsed document as first result,
 --     and a table containing any extracted metadata as the second
@@ -559,14 +567,24 @@ function M.new(writer, options)
 
   local Code      = inticks / writer.code
 
+  local bqstart      = more
+  local headerstart  = hash
+                     + (line * (equal^1 + dash^1) * optionalspace * newline)
+
+  if options.require_blank_before_blockquote then
+    bqstart = fail
+  end
+
+  if options.require_blank_before_header then
+    headerstart = fail
+  end
+
   local Endline   = newline * -( -- newline, but not before...
                         blankline -- paragraph break
                       + tightblocksep  -- nested list
                       + eof       -- end of document
-                      + more      -- blockquote
-                      + hash      -- atx header
-                      + ( line * (equal^1 + dash^1)
-                        * optionalspace * newline )  -- setext header
+                      + bqstart
+                      + headerstart
                     ) * spacechar^0 / writer.space
 
   local Space     = spacechar^2 * Endline / writer.linebreak

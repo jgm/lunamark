@@ -161,6 +161,12 @@ environment variable `LUNAMARK_EXTENSIONS` (see ENVIRONMENT below).
 
         content starts here...
 
+`(-) require_blank_before_blockquote`
+:   Require a blank line between a paragraph and a following blockquote.
+
+`(-) require_blank_before_header`
+:   Require a blank line between a paragraph and a following header.
+
 # TEMPLATES
 
 By default, lunamark will produce a fragment.  If the
@@ -336,6 +342,8 @@ local extensions = {  -- defaults
   definition_lists = false,
   lua_metadata = false,
   pandoc_title_blocks = false,
+  require_blank_before_blockquote = false,
+  require_blank_before_header = false,
 }
 
 if optarg["0"] then
