@@ -52,6 +52,7 @@ Benchmarks (converting a 1M test file consisting of 25 copies of the
 markdown test suite concatenated together):
 
          0.03s   sundown
+         0.13s   redcarpet
          0.14s   discount
      ->  0.35s   lunamark
          0.50s   peg-markdown
