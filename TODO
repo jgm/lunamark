@@ -1,5 +1,6 @@
+* TODO citations using independent citeproc program
+* TODO math in $, $$
 * TODO fenced code block extension
-
 * TODO alternative indented code block with metadata?
 
   This is text.
@@ -15,8 +16,6 @@
   [haskell]
 
   More text.
-
-* TODO math extension
 
 * TODO layout: indentation options?
 * TODO latex reader - write peg
