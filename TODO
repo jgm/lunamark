@@ -1,4 +1,7 @@
 * TODO citations using independent citeproc program
+  - might need two passes for this, one to generate the list of
+    citations, which can then be passed to citeproc for processing
+    on the next pass.  otherwise footnotes will be screwed up.
 * TODO math in $, $$
 * TODO fenced code block extension
 * TODO alternative indented code block with metadata?
