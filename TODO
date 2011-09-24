@@ -1,6 +1,7 @@
-* TODO fix other writers to use new ropes
-
 * TODO add tests for other writers
+
+* TODO Notes:  still not quite right.  If captions are notes,
+  then won't we get out of order numbering?
 
 * TODO citations using independent citeproc program
   - might need two passes for this, one to generate the list of
