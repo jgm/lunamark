@@ -105,7 +105,7 @@ function M.new(options)
   end
 
   function Html.header(s,level)
-    local sep = ""
+    local sep = {}
     local stop
     if options.slides or options.containers then
       local lev = (options.slides and 1) or level
@@ -113,7 +113,7 @@ function M.new(options)
       if stop ~= "" then
         stop = stop .. Html.interblocksep
       end
-      sep = stop .. Html.start_section(lev) .. Html.containersep
+      sep = {stop, Html.start_section(lev), Html.containersep}
     end
     return {sep, "<h", level, ">", s, "</h", level, ">"}
   end
