@@ -140,6 +140,31 @@ M.rope_to_string = rope_to_string
 assert(rope_to_string{"one","two"} == "onetwo")
 assert(rope_to_string{"one",{"1","2"},"three"} == "one12three")
 
+--- Given an array `ary`, return a new array with `x`
+-- interspersed between elements of `ary`.
+function M.intersperse(ary, x)
+  local new = {}
+  local l = #ary
+  for i,v in ipairs(ary) do
+    local n = #new
+    new[n + 1] = v
+    if i ~= l then
+      new[n + 2] = x
+    end
+  end
+  return new
+end
+
+--- Given an array `ary`, return a new array with each
+-- element `x` of `ary` replaced by `f(x)`.
+function M.map(ary, f)
+  local new = {}
+  for i,v in ipairs(ary) do
+    new[i] = f(v)
+  end
+  return new
+end
+
 --- Given a table `char_escapes` mapping escapable characters onto
 -- their escaped versions and optionally `string_escapes` mapping
 -- escapable strings (or multibyte UTF-8 characters) onto their

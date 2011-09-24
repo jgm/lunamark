@@ -9,6 +9,7 @@ local M = {}
 local xml = require("lunamark.writer.xml")
 local util = require("lunamark.util")
 local gsub = string.gsub
+local intersperse, map = util.intersperse, util.map
 
 --- Return a new HTML writer.
 -- For a list of all fields in the writer, see [lunamark.writer.generic].
@@ -63,18 +64,12 @@ function M.new(options)
     return {"<p>", s, "</p>"}
   end
 
-  local util = require("lunamark.util") -- TODO
   local function listitem(s)
     return {"<li>", s, "</li>"}
   end
 
   function Html.bulletlist(items,tight)
-    local buffer = {}
-    for _,item in ipairs(items) do
-      buffer[#buffer + 1] = listitem(item)
-      buffer[#buffer + 1] = containersep
-    end
-    return {"<ul>", containersep, buffer, containersep, "</ul>"}
+    return {"<ul>", containersep, intersperse(map(items, listitem), containersep), containersep, "</ul>"}
   end
 
   function Html.orderedlist(items,tight,startnum)
@@ -82,12 +77,7 @@ function M.new(options)
     if startnum and startnum ~= 1 then
       start = " start=\"" .. startnum .. "\""
     end
-    local buffer = {}
-    for _,item in ipairs(items) do
-      buffer[#buffer + 1] = listitem(item)
-      buffer[#buffer + 1] = containersep
-    end
-    return {"<ol", start, ">", containersep, buffer, containersep, "</ol>"}
+    return {"<ol", start, ">", containersep, intersperse(map(items, listitem), containersep), containersep, "</ol>"}
   end
 
   function Html.inline_html(s)
@@ -167,12 +157,11 @@ function M.new(options)
     for _,item in ipairs(items) do
       local defs = {}
       for _,def in ipairs(item.definitions) do
-        defs[#defs + 1] = {"<dd>", sep, def, sep, "</dd>", containersep}
+        defs[#defs + 1] = {"<dd>", sep, def, sep, "</dd>"}
       end
-      buffer[#buffer + 1] = {"<dt>", item.term, "</dt>", containersep, defs} -- table.concat(defs, containersep)
+      buffer[#buffer + 1] = {"<dt>", item.term, "</dt>", containersep, intersperse(defs, containersep)}
     end
-    -- local contents = table.concat(buffer, Html.containersep)
-    return {"<dl>", containersep, buffer, containersep, "</dl>"}
+    return {"<dl>", containersep, intersperse(buffer, containersep), containersep, "</dl>"}
   end
 
   Html.template = [[
