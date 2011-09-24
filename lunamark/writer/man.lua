@@ -81,20 +81,14 @@ function M.new(options)
 
   function Man.definitionlist(items,tight)
     local buffer = {}
-    local fmt
-    if tight then
-      fmt = ".TP\n.B %s\n%s\n.RS\n.RE"
-    else
-      fmt = ".TP\n.B %s\n.RS\n%s\n.RE"
-    end
     for _,item in ipairs(items) do
       if tight then
-        buffer[#buffer + 1] = {".TP\n.B ", item.term, "\n", intersperse(item.definitions, "\n.RS\n.RE\n"), "\n.RS\n.RE"}
+        buffer[#buffer + 1] = {".TP\n.B ", item.term, "\n", intersperse(item.definitions, "\n.RS\n.RE"), "\n.RS\n.RE"}
       else
-        buffer[#buffer + 1] = {".TP\n.B ", item.term, "\n.RS\n", intersperse(item.definitions, "\n.RE\n"), "\n.RS\n.RE"}
+        buffer[#buffer + 1] = {".TP\n.B ", item.term, "\n.RS\n", intersperse(item.definitions, "\n.RS\n.RE"), "\n.RE"}
       end
     end
-    return intersperse(contents, "\n")
+    return intersperse(buffer, "\n")
   end
 
   function Man.start_document()
