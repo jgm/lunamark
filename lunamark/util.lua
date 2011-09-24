@@ -128,17 +128,54 @@ end
 
 M.walk = walk
 
+--- Flatten an array `ary`.
+local function flatten(ary)
+  local new = {}
+  for i,v in ipairs(ary) do
+    if type(v) == "table" then
+      for j,w in ipairs(flatten(v)) do
+        new[#new + 1] = w
+      end
+    else
+      new[#new + 1] = v
+    end
+  end
+  return new
+end
+
+M.flatten = flatten
+
 --- Convert a rope to a string.
 local function rope_to_string(rope)
-    local buffer = {}
-    walk(rope, function(x) buffer[#buffer + 1] = x end)
-    return table.concat(buffer)
+  local buffer = {}
+  walk(rope, function(x) buffer[#buffer + 1] = x end)
+  return table.concat(buffer)
 end
 
 M.rope_to_string = rope_to_string
 
 assert(rope_to_string{"one","two"} == "onetwo")
 assert(rope_to_string{"one",{"1","2"},"three"} == "one12three")
+
+--- Return the last item in a rope.
+local function rope_last(rope)
+  if #rope == 0 then
+    return nil
+  else
+    local l = rope[#rope]
+    if type(l) == "table" then
+      return rope_last(l)
+    else
+      return l
+    end
+  end
+end
+
+assert(rope_last{"one","two"} == "two")
+assert(rope_last{} == nil)
+assert(rope_last{"one",{"2",{"3","4"}}} == "4")
+
+M.rope_last = rope_last
 
 --- Given an array `ary`, return a new array with `x`
 -- interspersed between elements of `ary`.
