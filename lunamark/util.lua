@@ -99,7 +99,10 @@ function M.expand_tabs_in_line(s, tabstop)
         end))
 end
 
--- ropes implementation
+--- Walk a rope `t`, applying a function `f` to each element in order.
+-- A rope is an array whose elements may be ropes, strings, numbers,
+-- or functions. If an element is a function, call it and get the return value
+-- before proceeding.
 local function walk(t, f)
     local typ = type(t)
     if typ == "string" then
@@ -110,12 +113,14 @@ local function walk(t, f)
       n = t[i]
       while n do
         walk(n, f)
-        i = i +1
+        i = i + 1
         n = t[i]
       end
     elseif typ == "function" then
       local ok, val = pcall(t)
-      if ok then walk(val,f) end
+      if ok then
+        walk(val,f)
+      end
     else
       f(tostring(t))
     end
@@ -123,17 +128,17 @@ end
 
 M.walk = walk
 
-
-local function tie(rope)
+--- Convert a rope to a string.
+local function rope_to_string(rope)
     local buffer = {}
     walk(rope, function(x) buffer[#buffer + 1] = x end)
     return table.concat(buffer)
 end
 
-M.tie = tie
+M.rope_to_string = rope_to_string
 
-assert(tie{"one","two"} == "onetwo")
-assert(tie{"one",{"1","2"},"three"} == "one12three")
+assert(rope_to_string{"one","two"} == "onetwo")
+assert(rope_to_string{"one",{"1","2"},"three"} == "one12three")
 
 --- Given a table `char_escapes` mapping escapable characters onto
 -- their escaped versions and optionally `string_escapes` mapping

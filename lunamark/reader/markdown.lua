@@ -18,12 +18,12 @@ local utf8 = unicode.utf8
 
 local M = {}
 
-local tie = util.tie
+local rope_to_string = util.rope_to_string
 
 -- Normalize a markdown reference tag.  (Make lowercase, and collapse
 -- adjacent whitespace characters.)
 local function normalize_tag(tag)
-  return utf8.lower(gsub(tie(tag), "[ \n\r\t]+", " "))
+  return utf8.lower(gsub(rope_to_string(tag), "[ \n\r\t]+", " "))
 end
 
 --- Create a new markdown parser.
@@ -999,7 +999,7 @@ function M.new(writer, options)
         inp = rest
       end
       local result = { writer.start_document(), parse_blocks(inp), writer.stop_document() }
-      return tie(result), writer.get_metadata()
+      return rope_to_string(result), writer.get_metadata()
   end
 
 end
