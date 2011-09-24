@@ -35,7 +35,7 @@ function M.new(options)
   function Docbook.image(lab,src,tit)
     local titattr, altattr
     if tit and string.len(tit) > 0
-       then titattr = "<objectinfo><title>" .. Docbook.string(tit) .. </title></objectinfo>"
+       then titattr = "<objectinfo><title>" .. Docbook.string(tit) .. "</title></objectinfo>"
        else titattr = ""
        end
     return "<inlinemediaobject><imageobject>" .. titattr .. "<imagedata fileref=\"" .. Docbook.string(src) .. "\" /></imageobject></inlinemediaobject>"
@@ -52,11 +52,11 @@ function M.new(options)
   end
 
   function Docbook.bulletlist(items)
-    return {"<itemizedlist>", Docbook.containersep, interperse(map(items, listitem), Docbook.containersep), Docbook.containersep, "</itemizedlist>"}
+    return {"<itemizedlist>", Docbook.containersep, intersperse(map(items, listitem), Docbook.containersep), Docbook.containersep, "</itemizedlist>"}
   end
 
   function Docbook.orderedlist(items)
-    return {"<orderedlist>", Docbook.containersep, interperse(map(items, listitem), Docbook.containersep), Docbook.containersep, "</orderedlist>"}
+    return {"<orderedlist>", Docbook.containersep, intersperse(map(items, listitem), Docbook.containersep), Docbook.containersep, "</orderedlist>"}
   end
 
   function Docbook.inline_html(s)
@@ -85,12 +85,12 @@ function M.new(options)
 
   function Docbook.stop_document()
     local stop = Docbook.stop_section(1) -- close section containers
-    if stop ~= "" then stop = {Docbook.containersep, stop} end
+    if stop ~= "" then stop = Docbook.containersep .. stop end
     return stop
   end
 
   function Docbook.header(s,level)
-    local sep = ""
+    local sep = {}
     local stop
     if options.slides or options.containers then
       local lev = (options.slides and 1) or level
@@ -98,16 +98,15 @@ function M.new(options)
       if stop ~= "" then
         stop = stop .. Docbook.interblocksep
       end
-      sep = stop .. Docbook.start_section(lev) .. Docbook.containersep
+      sep = {stop, Docbook.start_section(lev), Docbook.containersep}
     end
-    return format("%s<title>%s</title>",sep,level,s,level)
+    return {sep, "<title>", s, "</title>"}
   end
 
   Docbook.hrule = ""
 
   function Docbook.note(contents)
-    return format("<footnote>%s%s%s</footnote>", Docbook.containersep, contents,
-                Docbook.containersep)
+    return {"<footnote>", Docbook.containersep, contents, Docbook.containersep, "</footnote>"}
   end
 
   function Docbook.definitionlist(items)
@@ -115,13 +114,12 @@ function M.new(options)
     for _,item in ipairs(items) do
       local defs = {}
       for _,def in ipairs(item.definitions) do
-        defs[#defs + 1] = format("<listitem>%s%s%s</listitem>", Docbook.containersep, def, Docbook.containersep)
+        defs[#defs + 1] = {"<listitem>", Docbook.containersep, def, Docbook.containersep, "</listitem>"}
       end
-      buffer[#buffer + 1] = format("<varlistentry>%s<term>%s</term>%s%s%s</varlistentry>", Docbook.containersep,
-         item.term, Docbook.containersep, table.concat(defs, Docbook.containersep), Docbook.containersep)
+      buffer[#buffer + 1] = {"<varlistentry>", Docbook.containersep, "<term>", item.term, "</term>", Docbook.containersep, intersperse(defs, Docbook.containersep), Docbook.containersep, "</varlistentry>"}
     end
-    local contents = table.concat(buffer, Docbook.containersep)
-    return format("<variablelist>%s%s%s</variablelist>",Docbook.containersep, contents, Docbook.containersep)
+    local contents = intersperse(buffer, Docbook.containersep)
+    return {"<variablelist>", Docbook.containersep, contents, Docbook.containersep, "</variablelist>"}
   end
 
   Docbook.template = [[
