@@ -31,11 +31,11 @@ function M.new(options)
   Groff.ndash = "\\[en]"
 
   function Groff.singlequoted(s)
-    return format("`%s'",s)
+    return {"`", s, "'"}
   end
 
   function Groff.doublequoted(s)
-    return format("\\[lq]%s\\[rq]",s)
+    return {"\\[lq]",s,"\\[rq]"}
   end
 
   Groff.escaped = {
@@ -64,15 +64,15 @@ function M.new(options)
   end
 
   function Groff.code(s)
-    return format("\\f[C]%s\\f[]",s)
+    return {"\\f[C]", Groff.string(s), "\\f[]"}
   end
 
   function Groff.emphasis(s)
-    return format("\\f[I]%s\\f[]",s)
+    return {"\\f[I]", s, "\\f[]"}
   end
 
   function Groff.strong(s)
-    return format("\\f[B]%s\\f[]",s)
+    return {"\\f[B]", s, "\\f[]"}
   end
 
   return Groff

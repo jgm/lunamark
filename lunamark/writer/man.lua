@@ -12,7 +12,7 @@ local M = {}
 local groff = require("lunamark.writer.groff")
 local util = require("lunamark.util")
 local gsub = string.gsub
-local format = string.format
+local map, intersperse = util.map, util.intersperse
 
 --- Returns a new groff writer.
 -- For a list of fields, see [lunamark.writer.generic].
@@ -23,11 +23,11 @@ function M.new(options)
   local endnotes = {}
 
   function Man.link(lab,src,tit)
-    return format("%s (%s)",lab,src)
+    return {lab, "(", Man.string(src), ")"}
   end
 
   function Man.image(lab,src,tit)
-    return format("[IMAGE (%s)]",lab)
+    return {"[IMAGE (", lab, ")]"}
   end
 
   -- TODO handle continuations properly.
@@ -40,47 +40,43 @@ function M.new(options)
   -- .RE
 
   function Man.paragraph(contents)
-    return format(".PP\n%s", contents)
+    return {".PP\n", contents}
   end
 
   function Man.bulletlist(items,tight)
-    local buffer = {}
-    for _,item in ipairs(items) do
-      buffer[#buffer + 1] = format(".IP \\[bu] 2\n%s",item)
-    end
-    return table.concat(buffer, Man.containersep)
+    return intersperse(map(items, function(s) return {".IP \\[bu] 2\n", s} end))
   end
 
   function Man.orderedlist(items,tight,startnum)
     local buffer = {}
     local num = startnum or 1
     for _,item in ipairs(items) do
-      buffer[#buffer + 1] = format(".IP \"%d.\" 4\n%s",num,item)
+      buffer[#buffer + 1] = {".IP \"", num, "\" 4\n", item}
       num = num + 1
     end
-    return table.concat(buffer, Man.containersep)
+    return intersperse(buffer, Man.containersep)
   end
 
   function Man.blockquote(s)
-    return format(".RS\n%s\n.RE", s)
+    return {".RS\n", s, ".RE"}
   end
 
   function Man.verbatim(s)
-    return format(".IP\n.nf\n\\f[C]\n%s.fi",s)
+    return {".IP\n.nf\n\\f[C]\n",s,".fi"}
   end
 
   function Man.header(s,level)
-    local hcode = ".SS"
-    if level == 1 then hcode = ".SH" end
-    return format("%s %s", hcode, s)
+    local hcode = ".SS "
+    if level == 1 then hcode = ".SH " end
+    return {hcode, s}
   end
 
   Man.hrule = ".PP\n * * * * *"
 
   function Man.note(contents)
-    local num = #endnotes + 1
-    endnotes[num] = format('.SS [%d]\n%s', num, contents)
-    return format('[%d]', num)
+    local num = tostring(#endnotes + 1)
+    endnotes[num] = {'.SS [' .. num .. ']\n', contents}
+    return '[' .. num .. ']'
   end
 
   function Man.definitionlist(items,tight)
@@ -92,11 +88,13 @@ function M.new(options)
       fmt = ".TP\n.B %s\n.RS\n%s\n.RE"
     end
     for _,item in ipairs(items) do
-      buffer[#buffer + 1] = format(fmt,
-        item.term, table.concat(item.definitions, "\n.RS\n.RE\n"))
+      if tight then
+        buffer[#buffer + 1] = {".TP\n.B ", item.term, "\n", intersperse(item.definitions, "\n.RS\n.RE\n"), "\n.RS\n.RE"}
+      else
+        buffer[#buffer + 1] = {".TP\n.B ", item.term, "\n.RS\n", intersperse(item.definitions, "\n.RE\n"), "\n.RS\n.RE"}
+      end
     end
-    local contents = table.concat(buffer, "\n")
-    return contents
+    return intersperse(contents, "\n")
   end
 
   function Man.start_document()
@@ -108,7 +106,7 @@ function M.new(options)
     if #endnotes == 0 then
       return ""
     else
-      return format('\n.SH NOTES\n%s', table.concat(endnotes, "\n"))
+      return {'\n.SH NOTES\n', intersperse(endnotes, '\n')}
     end
   end
 
