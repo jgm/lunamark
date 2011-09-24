@@ -38,7 +38,7 @@ function M.new(options)
   Html.linebreak = "<br/>"
 
   function Html.code(s)
-    return "<code>" .. Html.string(s) .. "</code>"
+    return {"<code>", Html.string(s), "</code>"}
   end
 
   function Html.link(lab,src,tit)
@@ -47,7 +47,7 @@ function M.new(options)
        then titattr = " title=\"" .. Html.string(tit) .. "\""
        else titattr = ""
        end
-    return "<a href=\"" .. Html.string(src) .. "\"" .. titattr .. ">" .. lab .. "</a>"
+    return {"<a href=\"", Html.string(src), "\"", titattr, ">", lab, "</a>"}
   end
 
   function Html.image(lab,src,tit)
@@ -56,24 +56,25 @@ function M.new(options)
        then titattr = " title=\"" .. Html.string(tit) .. "\""
        else titattr = ""
        end
-    return "<img src=\"" .. Html.string(src) .. "\" alt=\"" .. Html.string(lab) .. "\"" .. titattr .. " />"
+    return {"<img src=\"", Html.string(src), "\" alt=\"", lab, "\"", titattr, " />"}
   end
 
   function Html.paragraph(s)
-    return "<p>" .. s .. "</p>"
+    return {"<p>", s, "</p>"}
   end
 
+  local util = require("lunamark.util") -- TODO
   local function listitem(s)
-    return "<li>" .. s .. "</li>"
+    return {"<li>", s, "</li>"}
   end
 
   function Html.bulletlist(items,tight)
     local buffer = {}
     for _,item in ipairs(items) do
       buffer[#buffer + 1] = listitem(item)
+      buffer[#buffer + 1] = containersep
     end
-    local contents = table.concat(buffer,Html.containersep)
-    return "<ul>" .. containersep .. contents .. containersep .. "</ul>"
+    return {"<ul>", containersep, buffer, containersep, "</ul>"}
   end
 
   function Html.orderedlist(items,tight,startnum)
@@ -84,9 +85,9 @@ function M.new(options)
     local buffer = {}
     for _,item in ipairs(items) do
       buffer[#buffer + 1] = listitem(item)
+      buffer[#buffer + 1] = containersep
     end
-    local contents = table.concat(buffer,Html.containersep)
-    return "<ol" .. start .. ">" .. containersep .. contents .. containersep .. "</ol>"
+    return {"<ol", start, ">", containersep, buffer, containersep, "</ol>"}
   end
 
   function Html.inline_html(s)
@@ -98,19 +99,19 @@ function M.new(options)
   end
 
   function Html.emphasis(s)
-    return "<em>" .. s .. "</em>"
+    return {"<em>", s, "</em>"}
   end
 
   function Html.strong(s)
-    return "<strong>" .. s .. "</strong>"
+    return {"<strong>", s, "</strong>"}
   end
 
   function Html.blockquote(s)
-    return "<blockquote>" .. containersep .. s .. containersep .. "</blockquote>"
+    return {"<blockquote>", containersep, s, containersep, "</blockquote>"}
   end
 
   function Html.verbatim(s)
-    return "<pre><code>" .. Html.string(s) .. "</code></pre>"
+    return {"<pre><code>", Html.string(s), "</code></pre>"}
   end
 
   function Html.header(s,level)
@@ -124,7 +125,7 @@ function M.new(options)
       end
       sep = stop .. Html.start_section(lev) .. Html.containersep
     end
-    return sep .. "<h" .. level .. ">" .. s .. "</h" .. level .. ">"
+    return {sep, "<h", level, ">", s, "</h", level, ">"}
   end
 
   Html.hrule = "<hr />"
@@ -132,9 +133,13 @@ function M.new(options)
   function Html.note(contents)
     local num = #endnotes + 1
     local backref = ' <a href="#fnref' .. num .. '" class="footnoteBackLink">↩</a>'
-    local adjusted = gsub(contents, "</p>$", backref .. "</p>")
-    endnotes[num] = '<li id="fn' .. num .. '">' .. adjusted .. '</li>'
-    return '<sup><a href="#fn' .. num .. '" class="footnoteRef" id="fnref' .. num .. '">' .. num .. '</a></sup>'
+    if contents[#contents] == "</p>" then
+      table.insert(contents, backref, #contents - 1)
+    else
+      contents[#contents + 1] = backref
+    end
+    endnotes[num] = {'<li id="fn', num, '">', contents, '</li>', interblocksep}
+    return {'<sup><a href="#fn', num, '" class="footnoteRef" id="fnref', num, '">', num, '</a></sup>'}
   end
 
   function Html.start_document()
@@ -143,13 +148,15 @@ function M.new(options)
   end
 
   function Html.stop_document()
-    local stop = Html.stop_section(1) -- close section containers
-    if stop ~= "" then stop = Html.containersep .. stop end
-    if #endnotes == 0 then
-      return stop
-    else
-      return stop .. interblocksep .. '<hr />' .. interblocksep .. '<ol class="notes">' ..
-         containersep .. table.concat(endnotes, interblocksep) .. containersep .. '</ol>'
+    return function()
+      local stop = Html.stop_section(1) -- close section containers
+      if stop ~= "" then stop = Html.containersep .. stop end
+      if #endnotes == 0 then
+        return stop
+      else
+        return {stop, interblocksep, '<hr />', interblocksep, '<ol class="notes">',
+           containersep, endnotes, containersep, '</ol>'}
+      end
     end
   end
 
@@ -160,12 +167,12 @@ function M.new(options)
     for _,item in ipairs(items) do
       local defs = {}
       for _,def in ipairs(item.definitions) do
-        defs[#defs + 1] = "<dd>" .. sep .. def .. sep .. "</dd>"
+        defs[#defs + 1] = {"<dd>", sep, def, sep, "</dd>", containersep}
       end
-      buffer[#buffer + 1] = "<dt>" .. item.term .. "</dt>" .. containersep .. table.concat(defs, containersep)
+      buffer[#buffer + 1] = {"<dt>", item.term, "</dt>", containersep, defs} -- table.concat(defs, containersep)
     end
-    local contents = table.concat(buffer, Html.containersep)
-    return "<dl>" .. containersep .. contents .. containersep .. "</dl>"
+    -- local contents = table.concat(buffer, Html.containersep)
+    return {"<dl>", containersep, buffer, containersep, "</dl>"}
   end
 
   Html.template = [[

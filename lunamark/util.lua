@@ -99,6 +99,42 @@ function M.expand_tabs_in_line(s, tabstop)
         end))
 end
 
+-- ropes implementation
+local function dorope(t, f)
+    local typ = type(t)
+    if typ == "string" then
+      f(t)
+    elseif typ == "table" then
+      local i = 1
+      local n
+      n = t[i]
+      while n do
+        dorope(n, f)
+        i = i +1
+        n = t[i]
+      end
+    elseif typ == "function" then
+      local ok, val = pcall(t)
+      if ok then dorope(val,f) end
+    else
+      f(tostring(t))
+    end
+end
+
+M.dorope = dorope
+
+
+local function tie(rope)
+    local buffer = {}
+    dorope(rope, function(x) buffer[#buffer + 1] = x end)
+    return table.concat(buffer)
+end
+
+M.tie = tie
+
+assert(tie{"one","two"} == "onetwo")
+assert(tie{"one",{"1","2"},"three"} == "one12three")
+
 --- Given a table `char_escapes` mapping escapable characters onto
 -- their escaped versions and optionally `string_escapes` mapping
 -- escapable strings (or multibyte UTF-8 characters) onto their
@@ -116,7 +152,10 @@ function M.escaper(char_escapes, string_escapes)
     end
   end
   local escape_string = Cs((escapable + any)^0)
-  return function(s) return lpegmatch(escape_string, s) end
+  return function(s)
+    return lpegmatch(escape_string, s)
+  end
 end
+
 
 return M

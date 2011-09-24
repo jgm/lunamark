@@ -120,12 +120,12 @@ function M.new(options)
 
   --- String in curly single quotes.
   function W.singlequoted(s)
-    return string.format("‘%s’",s)
+    return {"‘", s, "’"}
   end
 
   --- String in curly double quotes.
   function W.doublequoted(s)
-    return string.format("“%s”",s)
+    return {"“", s, "”"}
   end
 
   --- String, escaped as needed for the output format.
