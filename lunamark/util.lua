@@ -154,8 +154,8 @@ end
 
 M.rope_to_string = rope_to_string
 
-assert(rope_to_string{"one","two"} == "onetwo")
-assert(rope_to_string{"one",{"1","2"},"three"} == "one12three")
+-- assert(rope_to_string{"one","two"} == "onetwo")
+-- assert(rope_to_string{"one",{"1","2"},"three"} == "one12three")
 
 --- Return the last item in a rope.
 local function rope_last(rope)
@@ -171,9 +171,9 @@ local function rope_last(rope)
   end
 end
 
-assert(rope_last{"one","two"} == "two")
-assert(rope_last{} == nil)
-assert(rope_last{"one",{"2",{"3","4"}}} == "4")
+-- assert(rope_last{"one","two"} == "two")
+-- assert(rope_last{} == nil)
+-- assert(rope_last{"one",{"2",{"3","4"}}} == "4")
 
 M.rope_last = rope_last
 
