@@ -31,11 +31,11 @@ function M.new(options)
   TeX.ndash = "--"
 
   function TeX.singlequoted(s)
-    return format("`%s'",s)
+    return {"`", s, "'"}
   end
 
   function TeX.doublequoted(s)
-    return format("``%s''",s)
+    return {"``", s, "''"}
   end
 
   TeX.escaped = {

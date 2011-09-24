@@ -8,7 +8,7 @@ local M = {}
 
 local tex = require("lunamark.writer.tex")
 local util = require("lunamark.util")
-local format = string.format
+local intersperse, map = util.intersperse, util.map
 
 --- Returns a new LaTeX writer.
 -- For a list of fields in the writer, see [lunamark.writer.generic].
@@ -17,53 +17,43 @@ function M.new(options)
   local LaTeX = tex.new(options)
 
   function LaTeX.code(s)
-    return format("\\texttt{%s}", LaTeX.string(s))
+    return {"\\texttt{", LaTeX.string(s), "}"}
   end
 
   function LaTeX.link(lab,src,tit)
-    return format("\\href{%s}{%s}", LaTeX.string(src), lab)
+    return {"\\href{", LaTeX.string(src), "}{", lab}
   end
 
   function LaTeX.image(lab,src,tit)
-    return format("\\includegraphics{%s}", LaTeX.string(src))
+    return {"\\includegraphics{",LaTeX.string(src), "}"}
   end
 
   local function listitem(s)
-    return format("\\item %s",s)
+    return {"\\item ", s}
   end
 
   function LaTeX.bulletlist(items)
-    local buffer = {}
-    for _,item in ipairs(items) do
-      buffer[#buffer + 1] = listitem(item)
-    end
-    local contents = table.concat(buffer, "\n")
-    return format("\\begin{itemize}\n%s\n\\end{itemize}",contents)
+    return {"\\begin{itemize}\n", intersperse(map(items, listitem), "\n"), "\n\\end{itemize}"}
   end
 
   function LaTeX.orderedlist(items)
-    local buffer = {}
-    for _,item in ipairs(items) do
-      buffer[#buffer + 1] = listitem(item)
-    end
-    local contents = table.concat(buffer, "\n")
-    return format("\\begin{enumerate}\n%s\n\\end{enumerate}",contents)
+    return {"\\begin{enumerate}\n", intersperse(map(items, listitem), "\n"), "\n\\end{enumerate}"}
   end
 
   function LaTeX.emphasis(s)
-    return format("\\emph{%s}",s)
+    return {"\\emph{", s, "}"}
   end
 
   function LaTeX.strong(s)
-    return format("\\textbf{%s}",s)
+    return {"\\textbf{", s, "}"}
   end
 
   function LaTeX.blockquote(s)
-    return format("\\begin{quote}\n%s\n\\end{quote}", s)
+    return {"\\begin{quote}\n", s, "\n\\end{quote}"}
   end
 
   function LaTeX.verbatim(s)
-    return format("\\begin{verbatim}\n%s\\end{verbatim}", s)
+    return {"\\begin{verbatim}\n", s, "\\end{verbatim}"}
   end
 
   function LaTeX.header(s,level)
@@ -81,23 +71,22 @@ function M.new(options)
     else
       cmd = ""
     end
-    return format("%s{%s}", cmd, s)
+    return {cmd, "{", s, "}"}
   end
 
   LaTeX.hrule = "\\hspace{\\fill}\\rule{.6\\linewidth}{0.4pt}\\hspace{\\fill}"
 
   function LaTeX.note(contents)
-    return format("\\footnote{%s}", contents)
+    return {"\\footnote{", contents, "}"}
   end
 
   function LaTeX.definitionlist(items)
     local buffer = {}
     for _,item in ipairs(items) do
-      buffer[#buffer + 1] = format("\\item[%s]\n%s",
-        item.term, table.concat(item.definitions, LaTeX.interblocksep))
+      buffer[#buffer + 1] = {"\\item[", item.term, "]\n", intersperse(item.definitions, LaTeX.interblocksep)}
     end
-    local contents = table.concat(buffer, LaTeX.containersep)
-    return format("\\begin{description}\n%s\n\\end{description}",contents)
+    local contents = intersperse(buffer, LaTeX.containersep)
+    return {"\\begin{description}\n", contents, "\n\\end{description}"}
   end
 
   LaTeX.template = [===[
