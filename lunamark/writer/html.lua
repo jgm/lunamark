@@ -9,7 +9,7 @@ local M = {}
 local xml = require("lunamark.writer.xml")
 local util = require("lunamark.util")
 local gsub = string.gsub
-local intersperse, map = util.intersperse, util.map
+local flatten, intersperse, map = util.flatten, util.intersperse, util.map
 
 --- Return a new HTML writer.
 -- For a list of all fields in the writer, see [lunamark.writer.generic].
@@ -123,12 +123,13 @@ function M.new(options)
   function Html.note(contents)
     local num = #endnotes + 1
     local backref = ' <a href="#fnref' .. num .. '" class="footnoteBackLink">↩</a>'
-    if contents[#contents] == "</p>" then
-      table.insert(contents, backref, #contents - 1)
+    contentsf = flatten(contents)
+    if contentsf[#contentsf] == "</p>" then
+      table.insert(contentsf, #contentsf, backref)
     else
-      contents[#contents + 1] = backref
+      contentsf[#contentsf + 1] = backref
     end
-    endnotes[num] = {'<li id="fn', num, '">', contents, '</li>', interblocksep}
+    endnotes[num] = {'<li id="fn', num, '">', contentsf, '</li>'}
     return {'<sup><a href="#fn', num, '" class="footnoteRef" id="fnref', num, '">', num, '</a></sup>'}
   end
 
@@ -145,7 +146,7 @@ function M.new(options)
         return stop
       else
         return {stop, interblocksep, '<hr />', interblocksep, '<ol class="notes">',
-           containersep, endnotes, containersep, '</ol>'}
+           containersep, intersperse(endnotes, interblocksep), containersep, '</ol>'}
       end
     end
   end
