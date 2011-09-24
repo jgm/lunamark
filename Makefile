@@ -31,7 +31,7 @@ bench: ${testfile}
 	time -p ${PROG} < ${testfile} > /dev/null
 
 prof:
-	PROG='lua -luatrace.profile ${PROG}' make bench
+	lua -luatrace.profile ${PROG} ${benchtext} >/dev/null
 
 coverage:
 	-rm luacov.stats.out ; \
