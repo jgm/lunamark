@@ -9,7 +9,7 @@ local M = {}
 local xml = require("lunamark.writer.xml")
 local util = require("lunamark.util")
 local gsub = string.gsub
-local format = string.format
+local map, intersperse = util.map, util.intersperse
 
 --- Returns a new DocBook writer.
 -- For a list of all the fields, see [lunamark.writer.generic].
@@ -20,7 +20,7 @@ function M.new(options)
   Docbook.linebreak = "<literallayout>&#xA;</literallayout>"
 
   function Docbook.code(s)
-    return string.format("<literal>%s</literal>",Docbook.string(s))
+    return {"<literal>", Docbook.string(s), "</literal>"}
   end
 
   function Docbook.link(lab,src,tit)
@@ -29,47 +29,34 @@ function M.new(options)
     --   then titattr = format(" xlink:title=\"%s\"", Docbook.string(tit))
     --   else titattr = ""
     --   end
-    return string.format("<ulink url=\"%s\">%s</ulink>",Docbook.string(src),lab)
+    return {"<ulink url=\"", Docbook.string(src), "\">", lab, "</ulink>"}
   end
 
   function Docbook.image(lab,src,tit)
     local titattr, altattr
     if tit and string.len(tit) > 0
-       then titattr = string.format("<objectinfo><title>%s%</title></objectinfo>",
-                        Docbook.string(tit))
+       then titattr = "<objectinfo><title>" .. Docbook.string(tit) .. </title></objectinfo>"
        else titattr = ""
        end
-    return string.format("<inlinemediaobject><imageobject>%s<imagedata fileref="%s" /></imageobject></inlinemediaobject>",titattr,Docbook.string(src))
+    return "<inlinemediaobject><imageobject>" .. titattr .. "<imagedata fileref=\"" .. Docbook.string(src) .. "\" /></imageobject></inlinemediaobject>"
   end
 
   function Docbook.paragraph(s)
-    return format("<para>%s</para>",s)
+    return {"<para>", s, "</para>"}
   end
 
   Docbook.plain = Docbook.paragraph
 
   local function listitem(s)
-    return format("<listitem>%s</listitem>",s)
+    return {"<listitem>", s, "</listitem>"}
   end
 
   function Docbook.bulletlist(items)
-    local buffer = {}
-    for _,item in ipairs(items) do
-      buffer[#buffer + 1] = listitem(item)
-    end
-    local contents = table.concat(buffer, Docbook.containersep)
-    return format("<itemizedlist>%s%s%s</itemizedlist>",Docbook.containersep,
-            contents, Docbook.containersep)
+    return {"<itemizedlist>", Docbook.containersep, interperse(map(items, listitem), Docbook.containersep), Docbook.containersep, "</itemizedlist>"}
   end
 
   function Docbook.orderedlist(items)
-    local buffer = {}
-    for _,item in ipairs(items) do
-      buffer[#buffer + 1] = listitem(item)
-    end
-    local contents = table.concat(buffer, Docbook.containersep)
-    return format("<orderedlist>%s%s%s</orderedlist>",Docbook.containersep,
-            contents, Docbook.containersep)
+    return {"<orderedlist>", Docbook.containersep, interperse(map(items, listitem), Docbook.containersep), Docbook.containersep, "</orderedlist>"}
   end
 
   function Docbook.inline_html(s)
@@ -77,29 +64,28 @@ function M.new(options)
   end
 
   function Docbook.display_html(s)
-    return format("%s",s)
+    return s
   end
 
   function Docbook.emphasis(s)
-    return string.format("<emphasis>%s</emphasis>",s)
+    return {"<emphasis>", s, "</emphasis>"}
   end
 
   function Docbook.strong(s)
-    return string.format("<emphasis role=\"strong\">%s</emphasis>",s)
+    return {"<emphasis role=\"strong\">", s, "</emphasis>"}
   end
 
   function Docbook.blockquote(s)
-    return format("<blockquote>%s%s%s</blockquote>", Docbook.containersep, s,
-             Docbook.containersep)
+    return {"<blockquote>", Docbook.containersep, s, Docbook.containersep, "</blockquote>"}
   end
 
   function Docbook.verbatim(s)
-    return format("<programlisting>%s</programlisting>", Docbook.string(s))
+    return {"<programlisting>", Docbook.string(s), "</programlisting>"}
   end
 
   function Docbook.stop_document()
     local stop = Docbook.stop_section(1) -- close section containers
-    if stop ~= "" then stop = Docbook.containersep .. stop end
+    if stop ~= "" then stop = {Docbook.containersep, stop} end
     return stop
   end
 
