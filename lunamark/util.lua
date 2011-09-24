@@ -106,23 +106,24 @@ end
 local function walk(t, f)
     local typ = type(t)
     if typ == "string" then
-      f(t)
+      return f(t)
     elseif typ == "table" then
       local i = 1
       local n
       n = t[i]
       while n do
-        walk(n, f)
+        t[i] = walk(n, f)
         i = i + 1
         n = t[i]
       end
+      return t
     elseif typ == "function" then
       local ok, val = pcall(t)
       if ok then
-        walk(val,f)
+        return walk(val,f)
       end
     else
-      f(tostring(t))
+      return f(tostring(t))
     end
 end
 

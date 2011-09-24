@@ -42,9 +42,10 @@
 -- Render emphasized text as ALL CAPS, rather than italics:
 --
 --     local unicode = require("unicode")
+--     local util = require("lunamark.util")
 --     local utf8 = unicode.utf8
 --     function writer.emphasis(s)
---       return utf8.upper(s)
+--       return util.walk(s, utf8.upper)
 --     end
 --     local parse = lunamark.reader.markdown.new(writer, { smart = true })
 --     local result, metadata = parse("*Beiß* nicht in die Hand, die dich *füttert*.")
