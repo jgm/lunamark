@@ -1,0 +1,9 @@
+lunamark
+<<<
+> [foo]
+>
+> [foo]: /bar
+>>>
+<blockquote>
+<p><a href="/bar">foo</a></p>
+</blockquote>
