@@ -100,7 +100,7 @@ function M.expand_tabs_in_line(s, tabstop)
 end
 
 -- ropes implementation
-local function dorope(t, f)
+local function walk(t, f)
     local typ = type(t)
     if typ == "string" then
       f(t)
@@ -109,24 +109,24 @@ local function dorope(t, f)
       local n
       n = t[i]
       while n do
-        dorope(n, f)
+        walk(n, f)
         i = i +1
         n = t[i]
       end
     elseif typ == "function" then
       local ok, val = pcall(t)
-      if ok then dorope(val,f) end
+      if ok then walk(val,f) end
     else
       f(tostring(t))
     end
 end
 
-M.dorope = dorope
+M.walk = walk
 
 
 local function tie(rope)
     local buffer = {}
-    dorope(rope, function(x) buffer[#buffer + 1] = x end)
+    walk(rope, function(x) buffer[#buffer + 1] = x end)
     return table.concat(buffer)
 end
 
