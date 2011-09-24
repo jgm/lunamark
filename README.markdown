@@ -56,8 +56,9 @@ markdown test suite concatenated together):
          0.03s   sundown
          0.13s   redcarpet
          0.14s   discount
-     ->  0.35s   lunamark
+     ->  0.35s   lunamark + luajit
          0.50s   peg-markdown
+     ->  0.63s   lunamark + lua
          2.79s   PHP Markdown
          4.74s   RedCloth
          4.97s   pandoc
