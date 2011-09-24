@@ -99,9 +99,9 @@ function M.expand_tabs_in_line(s, tabstop)
         end))
 end
 
---- Walk a rope `t`, applying a function `f` to each element in order.
+--- Walk a rope `t`, applying a function `f` to each leaf element in order.
 -- A rope is an array whose elements may be ropes, strings, numbers,
--- or functions. If an element is a function, call it and get the return value
+-- or functions. If a leaf element is a function, call it and get the return value
 -- before proceeding.
 local function walk(t, f)
     local typ = type(t)
