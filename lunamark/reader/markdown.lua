@@ -869,7 +869,7 @@ function M.new(writer, options)
 
   -- parse setext header
   local SetextHeader = #(line * S("=-"))
-                     * Ct(line / parse_inlines)
+                     * (C(line) / parse_inlines)
                      * HeadingLevel
                      * optionalspace * newline
                      / writer.header
