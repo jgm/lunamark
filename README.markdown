@@ -65,6 +65,19 @@ markdown test suite concatenated together):
         56.75s   Markdown.pl
        996.14s   markdown.lua
 
+Benchmarks on a 42K file (where startup time becomes significant):
+
+        0.008s   sundown
+        0.011s   discount
+    ->  0.030s   lunamark + luajit
+        0.037s   peg-markdown
+    ->  0.046s   lunamark + lua
+        0.111s   redcarpet
+        0.292s   pandoc
+        0.294s   Markdown.pl
+        0.402s   RedCloth
+        0.961s   markdown.lua
+
 # Installing
 
 You can install the latest development version of
