@@ -4,11 +4,10 @@
   then won't we get out of order numbering?
 
 * TODO citations using independent citeproc program
-  - might need two passes for this, one to generate the list of
-    citations, which can then be passed to citeproc for processing
-    on the next pass.  otherwise footnotes will be screwed up.
-  - there can be a special writer for the first pass, which skips
-    everything but citations and just stores them in a list.
+  - need a way to handle spacing with footnote/in-text styles.
+  - note: we can store something in a rope that will "backspace"
+    over a preceding space.
+
 * TODO math in $, $$
 * TODO fenced code block extension
 * TODO alternative indented code block with metadata?
