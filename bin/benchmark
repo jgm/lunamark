@@ -1,0 +1,48 @@
+#!/usr/bin/env lua
+
+-- Run benchmark for lunamark
+
+local lunamark = require("lunamark")
+
+if not arg[1] then error("Usage: benchmark FILENAME..") end
+
+local contents = ""
+for _,filename in ipairs(arg) do
+  local fh = io.open(filename, "r")
+  contents = contents .. fh:read("*all") .. "\n"
+  fh:close()
+end
+
+local function showopts(opts)
+  buff = {}
+  for k,v in pairs(opts) do
+    buff[#buff + 1] = k
+  end
+  return table.concat(buff,", ")
+end
+
+local num = 25
+local bigcontents = ""
+
+for i=1,num do
+  bigcontents = bigcontents .. contents .. "\n"
+end
+
+local len = #bigcontents
+
+local function runbench(readername, writername, opts)
+  local writer = lunamark.writer[writername].new(opts)
+  local reader = lunamark.reader[readername].new(writer, opts)
+  local starttime = os.clock()
+  local parsed = reader(bigcontents)
+  if not parsed then error("Parser returned nil value!") end
+  local stoptime = os.clock()
+  io.write(string.format("%s reader, %s writer, options = %s\n", readername, writername, showopts(opts)))
+  local time = stoptime - starttime
+  io.write(string.format("  CPU time: %.6f seconds, %d kB per second\n", time, len / (1024 * time)))
+end
+
+runbench("markdown","html",{})
+runbench("markdown","html",{definition_lists=true})
+runbench("markdown","latex",{smart=true})
+
