@@ -1,8 +1,5 @@
 * TODO add tests for other writers
 
-* TODO Notes:  still not quite right.  If captions are notes,
-  then won't we get out of order numbering?
-
 * TODO citations using independent citeproc program
   - need a way to handle spacing with footnote/in-text styles.
   - note: we can store something in a rope that will "backspace"

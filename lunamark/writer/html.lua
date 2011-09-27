@@ -121,16 +121,18 @@ function M.new(options)
   Html.hrule = "<hr />"
 
   function Html.note(contents)
-    local num = #endnotes + 1
-    local backref = ' <a href="#fnref' .. num .. '" class="footnoteBackLink">↩</a>'
-    contentsf = flatten(contents)
-    if contentsf[#contentsf] == "</p>" then
-      table.insert(contentsf, #contentsf, backref)
-    else
-      contentsf[#contentsf + 1] = backref
+    return function()
+      local num = #endnotes + 1
+      local backref = ' <a href="#fnref' .. num .. '" class="footnoteBackLink">↩</a>'
+      contentsf = flatten(contents)
+      if contentsf[#contentsf] == "</p>" then
+        table.insert(contentsf, #contentsf, backref)
+      else
+        contentsf[#contentsf + 1] = backref
+      end
+      endnotes[num] = {'<li id="fn', num, '">', contentsf, '</li>'}
+      return {'<sup><a href="#fn', num, '" class="footnoteRef" id="fnref', num, '">', num, '</a></sup>'}
     end
-    endnotes[num] = {'<li id="fn', num, '">', contentsf, '</li>'}
-    return {'<sup><a href="#fn', num, '" class="footnoteRef" id="fnref', num, '">', num, '</a></sup>'}
   end
 
   function Html.start_document()

@@ -74,9 +74,11 @@ function M.new(options)
   Man.hrule = ".PP\n * * * * *"
 
   function Man.note(contents)
-    local num = tostring(#endnotes + 1)
-    endnotes[num] = {'.SS [' .. num .. ']\n', contents}
-    return '[' .. num .. ']'
+    return function()
+      local num = #endnotes + 1
+      endnotes[num] = {'.SS [' .. num .. ']\n', contents}
+      return '[' .. tostring(num) .. ']'
+    end
   end
 
   function Man.definitionlist(items,tight)
@@ -97,10 +99,12 @@ function M.new(options)
   end
 
   function Man.stop_document()
-    if #endnotes == 0 then
-      return ""
-    else
-      return {'\n.SH NOTES\n', intersperse(endnotes, '\n')}
+    return function()
+      if #endnotes == 0 then
+        return ""
+      else
+        return {'\n.SH NOTES\n', intersperse(endnotes, '\n')}
+      end
     end
   end
 
