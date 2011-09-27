@@ -188,30 +188,30 @@ function M.new(writer, options)
   -- Generic parsers
   ------------------------------------------------------------------------------
 
-  local percent                = P("%")
-  local asterisk               = P("*")
-  local dash                   = P("-")
-  local plus                   = P("+")
-  local underscore             = P("_")
-  local period                 = P(".")
-  local hash                   = P("#")
-  local ampersand              = P("&")
-  local backtick               = P("`")
-  local less                   = P("<")
-  local more                   = P(">")
-  local space                  = P(" ")
-  local squote                 = P("'")
-  local dquote                 = P('"')
-  local lparent                = P("(")
-  local rparent                = P(")")
-  local lbracket               = P("[")
-  local rbracket               = P("]")
-  local circumflex             = P("^")
-  local slash                  = P("/")
-  local equal                  = P("=")
-  local colon                  = P(":")
-  local semicolon              = P(";")
-  local exclamation            = P("!")
+  local PERCENT                = P("%")
+  local ASTERISK               = P("*")
+  local DASH                   = P("-")
+  local PLUS                   = P("+")
+  local UNDERSCORE             = P("_")
+  local PERIOD                 = P(".")
+  local HASH                   = P("#")
+  local AMPERSAND              = P("&")
+  local BACKTICK               = P("`")
+  local LESS                   = P("<")
+  local MORE                   = P(">")
+  local SPACE                  = P(" ")
+  local SQUOTE                 = P("'")
+  local DQUOTE                 = P('"')
+  local LPARENT                = P("(")
+  local RPARENT                = P(")")
+  local LBRACKET               = P("[")
+  local RBRACKET               = P("]")
+  local CIRCUMFLEX             = P("^")
+  local SLASH                  = P("/")
+  local EQUAL                  = P("=")
+  local COLON                  = P(":")
+  local SEMICOLON              = P(";")
+  local EXCLAMATION            = P("!")
 
   local digit                  = R("09")
   local hexdigit               = R("09","af","AF")
@@ -250,8 +250,8 @@ function M.new(writer, options)
   local optionalspace          = spacechar^0
   local spaces                 = spacechar^1
   local eof                    = - any
-  local nonindentspace         = space^-3 * - spacechar
-  local indent                 = space^-3 * tab
+  local nonindentspace         = SPACE^-3 * - spacechar
+  local indent                 = SPACE^-3 * tab
                                + fourspaces / ""
   local linechar               = P(1 - newline)
 
@@ -283,97 +283,97 @@ function M.new(writer, options)
   -- gobble spaces to make the whole bullet or enumerator four spaces wide:
   local function gobbletofour(s,pos,c)
       if length(c) >= 3
-         then return lpegmatch(space^-1,s,pos)
+         then return lpegmatch(SPACE^-1,s,pos)
       elseif length(c) == 2
-         then return lpegmatch(space^-2,s,pos)
-      else return lpegmatch(space^-3,s,pos)
+         then return lpegmatch(SPACE^-2,s,pos)
+      else return lpegmatch(SPACE^-3,s,pos)
       end
   end
 
-  local bulletchar = C(plus + asterisk + dash)
+  local bulletchar = C(PLUS + ASTERISK + DASH)
 
-  local bullet     = ( bulletchar * #spacing * (tab + space^-3)
-                     + space * bulletchar * #spacing * (tab + space^-2)
-                     + space * space * bulletchar * #spacing * (tab + space^-1)
-                     + space * space * space * bulletchar * #spacing
+  local bullet     = ( bulletchar * #spacing * (tab + SPACE^-3)
+                     + SPACE * bulletchar * #spacing * (tab + SPACE^-2)
+                     + SPACE * SPACE * bulletchar * #spacing * (tab + SPACE^-1)
+                     + SPACE * SPACE * SPACE * bulletchar * #spacing
                      ) * -bulletchar
 
   if options.hash_enumerators then
-    dig = digit + hash
+    dig = digit + HASH
   else
     dig = digit
   end
 
-  local enumerator = C(dig^3 * period) * #spacing
-                   + C(dig^2 * period) * #spacing * (tab + space^1)
-                   + C(dig * period) * #spacing * (tab + space^-2)
-                   + space * C(dig^2 * period) * #spacing
-                   + space * C(dig * period) * #spacing * (tab + space^-1)
-                   + space * space * C(dig^1 * period) * #spacing
+  local enumerator = C(dig^3 * PERIOD) * #spacing
+                   + C(dig^2 * PERIOD) * #spacing * (tab + SPACE^1)
+                   + C(dig * PERIOD) * #spacing * (tab + SPACE^-2)
+                   + SPACE * C(dig^2 * PERIOD) * #spacing
+                   + SPACE * C(dig * PERIOD) * #spacing * (tab + SPACE^-1)
+                   + SPACE * SPACE * C(dig^1 * PERIOD) * #spacing
 
   -----------------------------------------------------------------------------
   -- Parsers used for markdown code spans
   -----------------------------------------------------------------------------
 
-  local openticks   = Cg(backtick^1, "ticks")
+  local openticks   = Cg(BACKTICK^1, "ticks")
 
   local function captures_equal_length(s,i,a,b)
     return #a == #b and i
   end
 
-  local closeticks  = space^-1 *
-                      Cmt(C(backtick^1) * Cb("ticks"), captures_equal_length)
+  local closeticks  = SPACE^-1 *
+                      Cmt(C(BACKTICK^1) * Cb("ticks"), captures_equal_length)
 
   local intickschar = (any - S(" \n\r`"))
                     + (newline * -blankline)
-                    + (space - closeticks)
-                    + (backtick^1 - closeticks)
+                    + (SPACE - closeticks)
+                    + (BACKTICK^1 - closeticks)
 
-  local inticks     = openticks * space^-1 * C(intickschar^1) * closeticks
+  local inticks     = openticks * SPACE^-1 * C(intickschar^1) * closeticks
 
   -----------------------------------------------------------------------------
   -- Parsers used for markdown tags and links
   -----------------------------------------------------------------------------
 
-  local leader        = space^-3
+  local leader        = SPACE^-3
 
   -- in balanced brackets, parentheses, quotes:
-  local bracketed     = P{ lbracket
-                         * ((anyescaped - (lbracket + rbracket + blankline^2)) + V(1))^0
-                         * rbracket }
+  local bracketed     = P{ LBRACKET
+                         * ((anyescaped - (LBRACKET + RBRACKET + blankline^2)) + V(1))^0
+                         * RBRACKET }
 
-  local inparens      = P{ lparent
-                         * ((anyescaped - (lparent + rparent + blankline^2)) + V(1))^0
-                         * rparent }
+  local inparens      = P{ LPARENT
+                         * ((anyescaped - (LPARENT + RPARENT + blankline^2)) + V(1))^0
+                         * RPARENT }
 
-  local squoted       = P{ squote * alphanumeric
-                         * ((anyescaped - (squote + blankline^2)) + V(1))^0
-                         * squote }
+  local squoted       = P{ SQUOTE * alphanumeric
+                         * ((anyescaped - (SQUOTE + blankline^2)) + V(1))^0
+                         * SQUOTE }
 
-  local dquoted       = P{ dquote * alphanumeric
-                         * ((anyescaped - (dquote + blankline^2)) + V(1))^0
-                         * dquote }
+  local dquoted       = P{ DQUOTE * alphanumeric
+                         * ((anyescaped - (DQUOTE + blankline^2)) + V(1))^0
+                         * DQUOTE }
 
   -- bracketed 'tag' for markdown links, allowing nested brackets:
-  local tag           = lbracket
+  local tag           = LBRACKET
                       * Cs((alphanumeric^1
                            + bracketed
                            + inticks
-                           + (anyescaped - (rbracket + blankline^2)))^0)
-                      * rbracket
+                           + (anyescaped - (RBRACKET + blankline^2)))^0)
+                      * RBRACKET
 
   -- url for markdown links, allowing balanced parentheses:
-  local url           = less * Cs((anyescaped-more)^0) * more
-                      + Cs((inparens + (anyescaped-spacing-rparent))^1)
+  local url           = LESS * Cs((anyescaped-MORE)^0) * MORE
+                      + Cs((inparens + (anyescaped-spacing-RPARENT))^1)
 
   -- quoted text possibly with nested quotes:
-  local title_s       = squote  * Cs(((anyescaped-squote) + squoted)^0) * squote
+  local title_s       = SQUOTE  * Cs(((anyescaped-SQUOTE) + squoted)^0) * SQUOTE
 
-  local title_d       = dquote  * Cs(((anyescaped-dquote) + dquoted)^0) * dquote
+  local title_d       = DQUOTE  * Cs(((anyescaped-DQUOTE) + dquoted)^0) * DQUOTE
 
-  local title_p       = lparent
-                      * Cs((inparens + (anyescaped-rparent))^0)
-                      * rparent
+  local title_p       = LPARENT
+                      * Cs((inparens + (anyescaped-RPARENT))^0)
+                      * RPARENT
 
   local title         = title_d + title_s + title_p
 
@@ -407,14 +407,14 @@ function M.new(writer, options)
     return ""
   end
 
-  local RawNoteRef = #(lbracket * circumflex) * tag / strip_first_char
+  local RawNoteRef = #(LBRACKET * CIRCUMFLEX) * tag / strip_first_char
 
   local NoteRef    = RawNoteRef / lookup_note
 
   local NoteBlock
 
   if options.notes then
-    NoteBlock = leader * RawNoteRef * colon * spnl * indented_blocks(chunk)
+    NoteBlock = leader * RawNoteRef * COLON * spnl * indented_blocks(chunk)
               / register_note
   else
     NoteBlock = fail
@@ -435,7 +435,7 @@ function M.new(writer, options)
 
   -- parse a reference definition:  [foo]: /bar "title"
   local define_reference_parser =
-    leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^1
+    leader * tag * COLON * spacechar^0 * url * optionaltitle * blankline^1
 
   -- lookup link reference and return either
   -- the link or nil and fallback text.
@@ -521,49 +521,49 @@ function M.new(writer, options)
       keyword_exact("td") + keyword_exact("tr")
 
   -- There is no reason to support bad html, so we expect quoted attributes
-  local htmlattributevalue  = squote * (any - (blankline + squote))^0 * squote
-                            + dquote * (any - (blankline + dquote))^0 * dquote
+  local htmlattributevalue  = SQUOTE * (any - (blankline + SQUOTE))^0 * SQUOTE
+                            + DQUOTE * (any - (blankline + DQUOTE))^0 * DQUOTE
 
-  local htmlattribute       = spacing^1 * (alphanumeric + S("_-"))^1 * sp * equal
+  local htmlattribute       = spacing^1 * (alphanumeric + S("_-"))^1 * sp * EQUAL
                             * sp * htmlattributevalue
 
   local htmlcomment         = P("<!--") * (any - P("-->"))^0 * P("-->")
 
   local htmlinstruction     = P("<?")   * (any - P("?>" ))^0 * P("?>" )
 
-  local openelt_any = less * keyword * htmlattribute^0 * sp * more
+  local openelt_any = LESS * keyword * htmlattribute^0 * sp * MORE
 
   local function openelt_exact(s)
-    return (less * sp * keyword_exact(s) * htmlattribute^0 * sp * more)
+    return (LESS * sp * keyword_exact(s) * htmlattribute^0 * sp * MORE)
   end
 
-  local openelt_block = less * sp * block_keyword * htmlattribute^0 * sp * more
+  local openelt_block = LESS * sp * block_keyword * htmlattribute^0 * sp * MORE
 
-  local closeelt_any = less * sp * slash * keyword * sp * more
+  local closeelt_any = LESS * sp * SLASH * keyword * sp * MORE
 
   local function closeelt_exact(s)
-    return (less * sp * slash * keyword_exact(s) * sp * more)
+    return (LESS * sp * SLASH * keyword_exact(s) * sp * MORE)
   end
 
-  local emptyelt_any = less * sp * keyword * htmlattribute^0 * sp * slash * more
+  local emptyelt_any = LESS * sp * keyword * htmlattribute^0 * sp * SLASH * MORE
 
   local function emptyelt_exact(s)
-    return (less * sp * keyword_exact(s) * htmlattribute^0 * sp * slash * more)
+    return (LESS * sp * keyword_exact(s) * htmlattribute^0 * sp * SLASH * MORE)
   end
 
-  local emptyelt_block = less * sp * block_keyword * htmlattribute^0 * sp * slash * more
+  local emptyelt_block = LESS * sp * block_keyword * htmlattribute^0 * sp * SLASH * MORE
 
-  local displaytext         = (any - less)^1
+  local displaytext         = (any - LESS)^1
 
   -- return content between two matched HTML tags
   local function in_matched(s)
     return { openelt_exact(s)
-           * (V(1) + displaytext + (less - closeelt_exact(s)))^0
+           * (V(1) + displaytext + (LESS - closeelt_exact(s)))^0
            * closeelt_exact(s) }
   end
 
   local function parse_matched_tags(s,pos)
-    local t = utf8.lower(lpegmatch(less * C(keyword),s,pos))
+    local t = utf8.lower(lpegmatch(LESS * C(keyword),s,pos))
     return lpegmatch(in_matched(t),s,pos)
   end
 
@@ -585,9 +585,9 @@ function M.new(writer, options)
   -- Entities
   ------------------------------------------------------------------------------
 
-  local hexentity = ampersand * hash * S("Xx") * C(hexdigit    ^1) * semicolon
-  local decentity = ampersand * hash           * C(digit       ^1) * semicolon
-  local tagentity = ampersand *                  C(alphanumeric^1) * semicolon
+  local hexentity = AMPERSAND * HASH * S("Xx") * C(hexdigit    ^1) * SEMICOLON
+  local decentity = AMPERSAND * HASH           * C(digit       ^1) * SEMICOLON
+  local tagentity = AMPERSAND *                  C(alphanumeric^1) * SEMICOLON
 
   ------------------------------------------------------------------------------
   -- Inline elements
@@ -599,21 +599,21 @@ function M.new(writer, options)
 
   local Ellipsis  = P("...") / writer.ellipsis
 
-  local Dash      = P("---") * -dash / writer.mdash
-                  + P("--") * -dash / writer.ndash
+  local Dash      = P("---") * -DASH / writer.mdash
+                  + P("--") * -DASH / writer.ndash
                   + P("-") * #digit * B(digit, 2) / writer.ndash
 
-  local DoubleQuoted = dquote * Ct((Inline - dquote)^1) * dquote
+  local DoubleQuoted = DQUOTE * Ct((Inline - DQUOTE)^1) * DQUOTE
                      / writer.doublequoted
 
-  local squote_start = squote * -spacing
+  local squote_start = SQUOTE * -spacing
 
-  local squote_end = squote * B(nonspacechar, 2)
+  local squote_end = SQUOTE * B(nonspacechar, 2)
 
   local SingleQuoted = squote_start * Ct((Inline - squote_end)^1) * squote_end
                      / writer.singlequoted
 
-  local Apostrophe = squote * B(nonspacechar, 2) / "’"
+  local Apostrophe = SQUOTE * B(nonspacechar, 2) / "’"
 
   local Smart      = Ellipsis + Dash + SingleQuoted + DoubleQuoted + Apostrophe
 
@@ -621,9 +621,9 @@ function M.new(writer, options)
 
   local Code      = inticks / writer.code
 
-  local bqstart      = more
-  local headerstart  = hash
-                     + (line * (equal^1 + dash^1) * optionalspace * newline)
+  local bqstart      = MORE
+  local headerstart  = HASH
+                     + (line * (EQUAL^1 + DASH^1) * optionalspace * newline)
 
   if options.require_blank_before_blockquote then
     bqstart = fail
@@ -655,28 +655,28 @@ function M.new(writer, options)
                  + between(Inline, doubleunderscores, doubleunderscores)
                  ) / writer.strong
 
-  local Emph   = ( between(Inline, asterisk, asterisk)
-                 + between(Inline, underscore, underscore)
+  local Emph   = ( between(Inline, ASTERISK, ASTERISK)
+                 + between(Inline, UNDERSCORE, UNDERSCORE)
                  ) / writer.emphasis
 
-  local urlchar = anyescaped - newline - more
+  local urlchar = anyescaped - newline - MORE
 
-  local AutoLinkUrl   = less
+  local AutoLinkUrl   = LESS
                       * C(alphanumeric^1 * P("://") * urlchar^1)
-                      * more
+                      * MORE
                       / function(url) return writer.link(writer.string(url),url) end
 
-  local AutoLinkEmail = less
+  local AutoLinkEmail = LESS
                       * C((alphanumeric + S("-._+"))^1 * P("@") * urlchar^1)
-                      * more
+                      * MORE
                       / function(email) return writer.link(writer.string(email),"mailto:"..email) end
 
   local DirectLink    = (tag / parse_inlines_no_link)  -- no links inside links
                       * spnl
-                      * lparent
+                      * LPARENT
                       * (url + Cc(""))  -- link can be empty [foo]()
                       * optionaltitle
-                      * rparent
+                      * RPARENT
                       / writer.link
 
   local IndirectLink = tag * (C(spnl) * tag)^-1 / indirect_link
@@ -684,21 +684,21 @@ function M.new(writer, options)
   -- parse a link or image (direct or indirect)
   local Link          = DirectLink + IndirectLink
 
-  local DirectImage   = exclamation
+  local DirectImage   = EXCLAMATION
                       * (tag / parse_inlines)
                       * spnl
-                      * lparent
+                      * LPARENT
                       * (url + Cc(""))  -- link can be empty [foo]()
                       * optionaltitle
-                      * rparent
+                      * RPARENT
                       / writer.image
 
-  local IndirectImage  = exclamation * tag * (C(spnl) * tag)^-1 / indirect_image
+  local IndirectImage  = EXCLAMATION * tag * (C(spnl) * tag)^-1 / indirect_image
 
   local Image         = DirectImage + IndirectImage
 
   -- avoid parsing long strings of * or _ as emph/strong
-  local UlOrStarLine  = asterisk^4 + underscore^4 / writer.string
+  local UlOrStarLine  = ASTERISK^4 + UNDERSCORE^4 / writer.string
 
   local EscapedChar   = S("\\") * C(escapable) / writer.string
 
@@ -722,7 +722,7 @@ function M.new(writer, options)
 
   -- strip off leading > and indents, and run through blocks
   local Blockquote     = Cs((
-            ((leader * more * space^-1)/"" * linechar^0 * newline)^1
+            ((leader * MORE * SPACE^-1)/"" * linechar^0 * newline)^1
           * (-blankline * linechar^1 * newline)^0
           * blankline^0
           )^1) / parse_blocks / writer.blockquote
@@ -731,17 +731,17 @@ function M.new(writer, options)
       return (leader * (P(c) * optionalspace)^3 * newline * blankline^1)
   end
 
-  local HorizontalRule = ( lineof(asterisk)
-                         + lineof(dash)
-                         + lineof(underscore)
+  local HorizontalRule = ( lineof(ASTERISK)
+                         + lineof(DASH)
+                         + lineof(UNDERSCORE)
                          ) / writer.hrule
 
   local Reference      = define_reference_parser / register_link
 
   local Paragraph      = nonindentspace * Ct(Inline^1) * newline
                        * ( blankline^1
-                         + #hash
-                         + #(leader * more * space^-1)
+                         + #HASH
+                         + #(leader * MORE * SPACE^-1)
                          )
                        / writer.paragraph
 
@@ -801,10 +801,10 @@ function M.new(writer, options)
                       ) * Cb("listtype") / ordered_list
 
   local defstartchar = S("~:")
-  local defstart     = ( defstartchar * #spacing * (tab + space^-3)
-                     + space * defstartchar * #spacing * (tab + space^-2)
-                     + space * space * defstartchar * #spacing * (tab + space^-1)
-                     + space * space * space * defstartchar * #spacing
+  local defstart     = ( defstartchar * #spacing * (tab + SPACE^-3)
+                     + SPACE * defstartchar * #spacing * (tab + SPACE^-2)
+                     + SPACE * SPACE * defstartchar * #spacing * (tab + SPACE^-1)
+                     + SPACE * SPACE * SPACE * defstartchar * #spacing
                      )
 
   local dlchunk = Cs(line * (indentedline - blankline)^0)
@@ -860,16 +860,16 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   local pandoc_title =
-      percent * optionalspace
+      PERCENT * optionalspace
     * C(line * (spacechar * nonemptyline)^0) / parse_inlines
   local pandoc_author =
       spacechar * optionalspace
-    * C((anyescaped - newline - semicolon)^0)
-    * (semicolon + newline)
+    * C((anyescaped - newline - SEMICOLON)^0)
+    * (SEMICOLON + newline)
   local pandoc_authors =
-    percent * Cs((pandoc_author / parse_inlines)^0) * newline^-1
+    PERCENT * Cs((pandoc_author / parse_inlines)^0) * newline^-1
   local pandoc_date =
-    percent * optionalspace * C(line) / parse_inlines
+    PERCENT * optionalspace * C(line) / parse_inlines
   local pandoc_title_block =
       (pandoc_title + Cc(""))
     * (pandoc_authors + Cc({}))
@@ -891,10 +891,10 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   -- parse Atx heading start and return level
-  local HeadingStart = #hash * C(hash^-6) * -hash / length
+  local HeadingStart = #HASH * C(HASH^-6) * -HASH / length
 
   -- parse setext header ending and return level
-  local HeadingLevel = equal^1 * Cc(1) + dash^1 * Cc(2)
+  local HeadingLevel = EQUAL^1 * Cc(1) + DASH^1 * Cc(2)
 
   local function strip_atx_end(s)
     return s:gsub("[#%s]*\n$","")
