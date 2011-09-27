@@ -1,3 +1,5 @@
+* TODO using -Xall gives you "grammar too large"!
+
 * TODO rewrite markdown reader to avoid limit on upvalues,
   ie. external local variables (60) and local variables (200)
   Does declaring all those locals really help performance?
