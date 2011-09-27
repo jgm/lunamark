@@ -78,6 +78,46 @@ end
 --         be used to ensure that string fields are parsed
 --         as markdown; otherwise, they will be read literally.
 --
+--     `citeproc`
+--     :   Automatic citations as in pandoc.  Requires installation of
+--         the standalone `citeproc` executable.  The bibliography
+--         or bibliographies must be specified using the `bibliography`
+--         variable or metadata.  (The bibliography can be
+--         MODS, BibTeX, BibLaTeX, RIS, EndNote, EndNote XML, ISI,
+--         MEDLINE, Copac, or JSON citeproc.)  The CSL stylesheet must
+--         be specified using the `csl` variable or metadata. A
+--         primer on creating and modifying CSL styles can be found
+--         at <http://citationstyles.org/downloads/primer.html>.
+--         A repository of CSL styles can be found at
+--         <https://github.com/citation-style-language/styles>. See also
+--         <http://zotero.org/styles> for easy browsing.
+--
+--         Citations go inside square brackets and are separated by semicolons.
+--         Each citation must have a key, composed of '@' + the citation
+--         identifier from the database, and may optionally have a prefix,
+--         a locator, and a suffix.  Here are some examples:
+--
+--             Blah blah [see @doe99, pp. 33-35; also @smith04, ch. 1].
+--
+--             Blah blah [@doe99, pp. 33-35, 38-39 and *passim*].
+--
+--             Blah blah [@smith04; @doe99].
+--
+--         A minus sign (`-`) before the `@` will suppress mention of
+--         the author in the citation.  This can be useful when the
+--         author is already mentioned in the text:
+--
+--             Smith says blah [-@smith04].
+--
+--         You can also write an in-text citation, as follows:
+--
+--             @smith04 says blah.
+--
+--             @smith04 [p. 33] says blah.
+--
+--         If the style calls for a list of works cited, it will replace the
+--         template variable `references`.
+--
 --     `require_blank_before_blockquote`
 --     :   Require a blank line between a paragraph and a following
 --         block quote.
