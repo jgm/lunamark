@@ -295,9 +295,31 @@ H.inlinehtml  = emptyelt_any
 function M.new(writer, options)
   local options = options or {}
 
+  local function expandtabs(s)
+    if s:find("\t") then
+      return s:gsub("[^\n]*",expand_tabs_in_line)
+    else
+      return s
+    end
+  end
+
+  if options.preserve_tabs then
+    expandtabs = function(s) return s end
+  end
+
   ------------------------------------------------------------------------------
 
+  local blocks
   local inlines
+
+  parse_blocks =
+    function(str)
+      local res = lpegmatch(blocks, str)
+      if res == nil
+        then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
+        else return res
+        end
+    end
 
   parse_inlines =
     function(str)
@@ -321,6 +343,14 @@ function M.new(writer, options)
   -- Generic parsers
   ------------------------------------------------------------------------------
 
+  -- block followed by 0 or more optionally
+  -- indented blocks with first line indented.
+  local function indented_blocks(bl)
+    return Cs( bl
+             * (L.BLANKLINE^1 * L.INDENT * -L.BLANKLINE * bl)^0
+             * L.BLANKLINE^1 )
+  end
+
   local escapable              = S("\\`*_{}[]()+_.!<>#-~:^")
   local anyescaped             = P("\\") / "" * escapable
                                + any
@@ -336,7 +366,6 @@ function M.new(writer, options)
 
   local normalchar             = any -
                                  (specialchar + L.SPACING + tightblocksep)
-
   -----------------------------------------------------------------------------
   -- Parsers used for markdown lists
   -----------------------------------------------------------------------------
@@ -471,6 +500,15 @@ function M.new(writer, options)
   local RawNoteRef = #(L.LBRACKET * L.CIRCUMFLEX) * tag / strip_first_char
 
   local NoteRef    = RawNoteRef / lookup_note
+
+  local NoteBlock
+
+  if options.notes then
+    NoteBlock = leader * RawNoteRef * L.COLON * L.SPNL * indented_blocks(L.CHUNK)
+              / register_note
+  else
+    NoteBlock = fail
+  end
 
   ------------------------------------------------------------------------------
   -- Helpers for links and references
@@ -671,9 +709,7 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   local inlines_syntax = {
-      "Inlines",
-
-      Inlines               = V("Inline")^0 * (L.SPACING^0 * eof / ""),
+      Inline^0 * (L.SPACING^0 * eof / ""),
 
       Inline                = V("Str")
                             + V("Space")
@@ -726,31 +762,7 @@ function M.new(writer, options)
   -- Block elements
   ------------------------------------------------------------------------------
 
-  local blocks
-
-  parse_blocks =
-    function(str)
-      local res = lpegmatch(blocks, str)
-      if res == nil
-        then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
-        else return res
-        end
-    end
-
-
   local Block          = V("Block")
-
-  local function expandtabs(s)
-    if s:find("\t") then
-      return s:gsub("[^\n]*",expand_tabs_in_line)
-    else
-      return s
-    end
-  end
-
-  if options.preserve_tabs then
-    expandtabs = function(s) return s end
-  end
 
   local DisplayHtml    = C(H.displayhtml) / expandtabs / writer.display_html
 
@@ -784,27 +796,6 @@ function M.new(writer, options)
                        / writer.paragraph
 
   local Plain          = L.NONINDENTSPACE * inlines / writer.plain
-
-  ------------------------------------------------------------------------------
-  -- Footnotes
-  ------------------------------------------------------------------------------
-
-  -- block followed by 0 or more optionally
-  -- indented blocks with first line indented.
-  local function indented_blocks(bl)
-    return Cs( bl
-             * (L.BLANKLINE^1 * L.INDENT * -L.BLANKLINE * bl)^0
-             * L.BLANKLINE^1 )
-  end
-
-  local NoteBlock
-
-  if options.notes then
-    NoteBlock = leader * RawNoteRef * L.COLON * L.SPNL * indented_blocks(L.CHUNK)
-              / register_note
-  else
-    NoteBlock = fail
-  end
 
   ------------------------------------------------------------------------------
   -- Lists
