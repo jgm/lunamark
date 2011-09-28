@@ -732,6 +732,9 @@ function M.new(writer, options)
         end
     end
 
+
+  local Block          = V("Block")
+
   local function expandtabs(s)
     if s:find("\t") then
       return s:gsub("[^\n]*",expand_tabs_in_line)
@@ -978,8 +981,8 @@ function M.new(writer, options)
     { "Blocks",
 
       Blocks                = Blank^0 *
-                              V("Block")^-1 *
-                              (Blank^0 / function() return writer.interblocksep end * V("Block"))^0 *
+                              Block^-1 *
+                              (Blank^0 / function() return writer.interblocksep end * Block)^0 *
                               Blank^0 *
                               eof,
 
