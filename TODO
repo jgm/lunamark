@@ -1,8 +1,6 @@
 * TODO using -Xall gives you "grammar too large"!
-
-* TODO rewrite markdown reader to avoid limit on upvalues,
-  ie. external local variables (60) and local variables (200)
-  Does declaring all those locals really help performance?
+  try to fix this by splitting off Inline into its own
+  grammar?
 
 * TODO add tests for other writers
 
