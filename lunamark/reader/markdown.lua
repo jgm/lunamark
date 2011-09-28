@@ -297,6 +297,8 @@ function M.new(writer, options)
 
   ------------------------------------------------------------------------------
 
+  local rawnotes = {}
+
   local inlines
 
   parse_inlines =
@@ -445,12 +447,6 @@ function M.new(writer, options)
   -- Footnotes
   ------------------------------------------------------------------------------
 
-  local rawnotes = {}
-
-  local function strip_first_char(s)
-    return s:sub(2)
-  end
-
   -- like indirect_link
   local function lookup_note(ref)
     return function()
@@ -463,9 +459,8 @@ function M.new(writer, options)
     end
   end
 
-  local function register_note(ref,rawnote)
-    rawnotes[normalize_tag(ref)] = rawnote
-    return ""
+  local function strip_first_char(s)
+    return s:sub(2)
   end
 
   local RawNoteRef = #(L.LBRACKET * L.CIRCUMFLEX) * tag / strip_first_char
@@ -795,6 +790,11 @@ function M.new(writer, options)
     return Cs( bl
              * (L.BLANKLINE^1 * L.INDENT * -L.BLANKLINE * bl)^0
              * L.BLANKLINE^1 )
+  end
+
+  local function register_note(ref,rawnote)
+    rawnotes[normalize_tag(ref)] = rawnote
+    return ""
   end
 
   local NoteBlock
