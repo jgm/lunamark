@@ -309,6 +309,7 @@ function M.new(writer, options)
 
   ------------------------------------------------------------------------------
 
+  local syntax
   local blocks
   local inlines
 
@@ -705,60 +706,6 @@ function M.new(writer, options)
                       + tagentity / entities.char_entity / writer.string
 
   ------------------------------------------------------------------------------
-  -- Inline syntax
-  ------------------------------------------------------------------------------
-
-  local inlines_syntax = {
-      Inline^0 * (L.SPACING^0 * eof / ""),
-
-      Inline                = V("Str")
-                            + V("Space")
-                            + V("Endline")
-                            + V("UlOrStarLine")
-                            + V("Strong")
-                            + V("Emph")
-                            + V("NoteRef")
-                            + V("Link")
-                            + V("Image")
-                            + V("Code")
-                            + V("AutoLinkUrl")
-                            + V("AutoLinkEmail")
-                            + V("InlineHtml")
-                            + V("HtmlEntity")
-                            + V("EscapedChar")
-                            + V("Smart")
-                            + V("Symbol"),
-
-      Str                   = Str,
-      Space                 = Space,
-      Endline               = Endline,
-      UlOrStarLine          = UlOrStarLine,
-      Strong                = Strong,
-      Emph                  = Emph,
-      NoteRef               = NoteRef,
-      Link                  = Link,
-      Image                 = Image,
-      Code                  = Code,
-      AutoLinkUrl           = AutoLinkUrl,
-      AutoLinkEmail         = AutoLinkEmail,
-      InlineHtml            = InlineHtml,
-      HtmlEntity            = HtmlEntity,
-      EscapedChar           = EscapedChar,
-      Smart                 = Smart,
-      Symbol                = Symbol,
-    }
-
-  if not options.smart then
-    inlines_syntax.Smart = fail
-  end
-
-  inlines = Ct(inlines_syntax)
-
-  inlines_no_link_t = util.table_copy(inlines_syntax)
-  inlines_no_link_t.Link = fail
-  inlines_no_link = Ct(inlines_no_link_t)
-
-  ------------------------------------------------------------------------------
   -- Block elements
   ------------------------------------------------------------------------------
 
@@ -788,14 +735,14 @@ function M.new(writer, options)
 
   local Reference      = define_reference_parser / register_link
 
-  local Paragraph      = L.NONINDENTSPACE * inlines * L.NEWLINE
+  local Paragraph      = L.NONINDENTSPACE * Ct(Inline^1) * L.NEWLINE
                        * ( L.BLANKLINE^1
                          + #L.HASH
                          + #(leader * L.MORE * L.SPACE^-1)
                          )
                        / writer.paragraph
 
-  local Plain          = L.NONINDENTSPACE * inlines / writer.plain
+  local Plain          = L.NONINDENTSPACE * Ct(Inline^1) / writer.plain
 
   ------------------------------------------------------------------------------
   -- Lists
@@ -968,7 +915,7 @@ function M.new(writer, options)
   -- Syntax specification
   ------------------------------------------------------------------------------
 
-  local blocks_syntax =
+  syntax =
     { "Blocks",
 
       Blocks                = Blank^0 *
@@ -1000,21 +947,70 @@ function M.new(writer, options)
       DisplayHtml           = DisplayHtml,
       Paragraph             = Paragraph,
       Plain                 = Plain,
+
+      Inline                = V("Str")
+                            + V("Space")
+                            + V("Endline")
+                            + V("UlOrStarLine")
+                            + V("Strong")
+                            + V("Emph")
+                            + V("NoteRef")
+                            + V("Link")
+                            + V("Image")
+                            + V("Code")
+                            + V("AutoLinkUrl")
+                            + V("AutoLinkEmail")
+                            + V("InlineHtml")
+                            + V("HtmlEntity")
+                            + V("EscapedChar")
+                            + V("Smart")
+                            + V("Symbol"),
+
+      Str                   = Str,
+      Space                 = Space,
+      Endline               = Endline,
+      UlOrStarLine          = UlOrStarLine,
+      Strong                = Strong,
+      Emph                  = Emph,
+      NoteRef               = NoteRef,
+      Link                  = Link,
+      Image                 = Image,
+      Code                  = Code,
+      AutoLinkUrl           = AutoLinkUrl,
+      AutoLinkEmail         = AutoLinkEmail,
+      InlineHtml            = InlineHtml,
+      HtmlEntity            = HtmlEntity,
+      EscapedChar           = EscapedChar,
+      Smart                 = Smart,
+      Symbol                = Symbol,
     }
 
   if not options.definition_lists then
-    blocks_syntax.DefinitionList = fail
+    syntax.DefinitionList = fail
   end
 
   if not options.notes then
-    blocks_syntax.NoteRef = fail
+    syntax.NoteRef = fail
+  end
+
+  if not options.smart then
+    syntax.Smart = fail
   end
 
   if options.alter_syntax and type(options.alter_syntax) == "function" then
-    blocks_syntax = options.alter_syntax(syntax)
+    syntax = options.alter_syntax(syntax)
   end
 
-  blocks = Ct(blocks_syntax)
+  blocks = Ct(syntax)
+
+  local inlines_t = util.table_copy(syntax)
+  inlines_t[1] = "Inlines"
+  inlines_t.Inlines = Inline^0 * (L.SPACING^0 * eof / "")
+  inlines = Ct(inlines_t)
+
+  inlines_no_link_t = util.table_copy(inlines_t)
+  inlines_no_link_t.Link = fail
+  inlines_no_link = Ct(inlines_no_link_t)
 
   ------------------------------------------------------------------------------
   -- Exported conversion function
