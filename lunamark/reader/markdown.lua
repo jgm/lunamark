@@ -299,7 +299,7 @@ function M.new(writer, options)
 
   local rawnotes = {}
 
-  local inlines
+  local inlines, inlines_no_link
 
   parse_inlines =
     function(str)
@@ -665,10 +665,8 @@ function M.new(writer, options)
   -- Inline syntax
   ------------------------------------------------------------------------------
 
-  local inlines_syntax = {
-      "Inlines",
-
-      Inlines               = V("Inline")^0 * (L.SPACING^0 * eof / ""),
+  local inline_syntax = {
+      "Inline",
 
       Inline                = V("Str")
                             + V("Space")
@@ -708,14 +706,17 @@ function M.new(writer, options)
     }
 
   if not options.smart then
-    inlines_syntax.Smart = fail
+    inline_syntax.Smart = fail
   end
 
-  inlines = Ct(inlines_syntax)
+  local inline = Ct(inline_syntax)
+  inlines = Ct(inline^0) * (L.SPACING^0 * eof / "")
 
-  inlines_no_link_t = util.table_copy(inlines_syntax)
-  inlines_no_link_t.Link = fail
-  inlines_no_link = Ct(inlines_no_link_t)
+  local inline_no_link_t = util.table_copy(inline_syntax)
+  inline_no_link_t.Link = fail
+  local inline_no_link = Ct(inline_no_link_t)
+
+  inlines_no_link = Ct(inline_no_link^0) * (L.SPACING^0 * eof / "")
 
   ------------------------------------------------------------------------------
   -- Block elements
@@ -768,14 +769,14 @@ function M.new(writer, options)
 
   local Reference      = define_reference_parser / register_link
 
-  local Paragraph      = L.NONINDENTSPACE * inlines * L.NEWLINE
+  local Paragraph      = L.NONINDENTSPACE * Ct(inline^1) * L.NEWLINE
                        * ( L.BLANKLINE^1
                          + #L.HASH
                          + #(leader * L.MORE * L.SPACE^-1)
                          )
                        / writer.paragraph
 
-  local Plain          = L.NONINDENTSPACE * inlines / writer.plain
+  local Plain          = L.NONINDENTSPACE * Ct(inline^1) / writer.plain
 
   ------------------------------------------------------------------------------
   -- Footnotes
@@ -977,10 +978,10 @@ function M.new(writer, options)
   local blocks_syntax =
     { "Blocks",
 
-      Blocks                = Blank^0 *
+      Blocks                = V("Blank")^0 *
                               V("Block")^-1 *
-                              (Blank^0 / function() return writer.interblocksep end * V("Block"))^0 *
-                              Blank^0 *
+                              (V("Blank")^0 / function() return writer.interblocksep end * V("Block"))^0 *
+                              V("Blank")^0 *
                               eof,
 
       Blank                 = Blank,
