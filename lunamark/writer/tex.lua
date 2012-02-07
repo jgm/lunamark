@@ -24,7 +24,7 @@ function M.new(options)
 
   TeX.linebreak = "\\\\"
 
-  TeX.ellipsis = "\ldots{}"
+  TeX.ellipsis = "\\ldots{}"
 
   TeX.mdash = "---"
 
