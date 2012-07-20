@@ -10,7 +10,6 @@ local M = {}
 
 local util = require("lunamark.util")
 local html5 = require("lunamark.writer.html5")
-local format = string.format
 
 --- Returns a new dzslides writer.
 -- `options` is as in `lunamark.writer.html5`. However,

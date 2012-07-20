@@ -20,7 +20,7 @@ function M.new(options)
   Docbook.linebreak = "<literallayout>&#xA;</literallayout>"
 
   function Docbook.code(s)
-    return string.format("<literal>%s</literal>",Docbook.string(s))
+    return {"<literal>",Docbook.string(s),"</literal>"}
   end
 
   function Docbook.link(lab,src,tit)
@@ -29,7 +29,7 @@ function M.new(options)
     --   then titattr = format(" xlink:title=\"%s\"", Docbook.string(tit))
     --   else titattr = ""
     --   end
-    return string.format("<ulink url=\"%s\">%s</ulink>",Docbook.string(src),lab)
+    return {"<ulink url=\"",Docbook.string(src),"\">",lab,"</ulink>"}
   end
 
   function Docbook.image(lab,src,tit)
@@ -39,37 +39,35 @@ function M.new(options)
                         Docbook.string(tit))
        else titattr = ""
        end
-    return string.format("<inlinemediaobject><imageobject>%s<imagedata fileref="%s" /></imageobject></inlinemediaobject>",titattr,Docbook.string(src))
+    return {"<inlinemediaobject><imageobject>",titattr,"<imagedata fileref=\"",Docbook.string(src),"\" /></imageobject></inlinemediaobject>"}
   end
 
   function Docbook.paragraph(s)
-    return format("<para>%s</para>",s)
+    return {"<para>",s,"</para>"}
   end
 
   Docbook.plain = Docbook.paragraph
 
   local function listitem(s)
-    return format("<listitem>%s</listitem>",s)
+    return {"<listitem>",s,"</listitem>"}
   end
 
   function Docbook.bulletlist(items)
     local buffer = {}
     for _,item in ipairs(items) do
       buffer[#buffer + 1] = listitem(item)
+      buffer[#buffer + 1]= Docbook.containersep
     end
-    local contents = table.concat(buffer, Docbook.containersep)
-    return format("<itemizedlist>%s%s%s</itemizedlist>",Docbook.containersep,
-            contents, Docbook.containersep)
+    return {"<itemizedlist>", Docbook.containersep, buffer, "</itemizedlist>"}
   end
 
   function Docbook.orderedlist(items)
     local buffer = {}
     for _,item in ipairs(items) do
       buffer[#buffer + 1] = listitem(item)
+      buffer[#buffer + 1]= Docbook.containersep
     end
-    local contents = table.concat(buffer, Docbook.containersep)
-    return format("<orderedlist>%s%s%s</orderedlist>",Docbook.containersep,
-            contents, Docbook.containersep)
+    return {"<orderedlist>",Docbook.containersep,buffer,"</orderedlist>"}
   end
 
   function Docbook.inline_html(s)
@@ -77,24 +75,23 @@ function M.new(options)
   end
 
   function Docbook.display_html(s)
-    return format("%s",s)
+    return s
   end
 
   function Docbook.emphasis(s)
-    return string.format("<emphasis>%s</emphasis>",s)
+    return {"<emphasis>",s,"</emphasis>"}
   end
 
   function Docbook.strong(s)
-    return string.format("<emphasis role=\"strong\">%s</emphasis>",s)
+    return {"<emphasis role=\"strong\">",s,"</emphasis>"}
   end
 
   function Docbook.blockquote(s)
-    return format("<blockquote>%s%s%s</blockquote>", Docbook.containersep, s,
-             Docbook.containersep)
+    return {"<blockquote>",Docbook.containersep,s,Docbook.containersep,"</blockquote>"}
   end
 
   function Docbook.verbatim(s)
-    return format("<programlisting>%s</programlisting>", Docbook.string(s))
+    return {"<programlisting>",Docbook.string(s),"</programlisting>"}
   end
 
   function Docbook.stop_document()
@@ -114,14 +111,13 @@ function M.new(options)
       end
       sep = stop .. Docbook.start_section(lev) .. Docbook.containersep
     end
-    return format("%s<title>%s</title>",sep,level,s,level)
+    return {sep,"<title>",s,"</title>"}
   end
 
   Docbook.hrule = ""
 
   function Docbook.note(contents)
-    return format("<footnote>%s%s%s</footnote>", Docbook.containersep, contents,
-                Docbook.containersep)
+    return {"<footnote>",Docbook.containersep,contents,Docbook.containersep,"</footnote>"}
   end
 
   function Docbook.definitionlist(items)
@@ -129,13 +125,13 @@ function M.new(options)
     for _,item in ipairs(items) do
       local defs = {}
       for _,def in ipairs(item.definitions) do
-        defs[#defs + 1] = format("<listitem>%s%s%s</listitem>", Docbook.containersep, def, Docbook.containersep)
+        defs[#defs + 1] = {"<listitem>",Docbook.containersep,def,Docbook.containersep,"</listitem>"}
+        defs[#defs + 1] = Docbook.containersep
       end
-      buffer[#buffer + 1] = format("<varlistentry>%s<term>%s</term>%s%s%s</varlistentry>", Docbook.containersep,
-         item.term, Docbook.containersep, table.concat(defs, Docbook.containersep), Docbook.containersep)
+      buffer[#buffer + 1] = {"<varlistentry>",Docbook.containersep,"<term>",item.term,"</term>",Docbook.containersep,defs,"</varlistentry>"}
     end
     local contents = table.concat(buffer, Docbook.containersep)
-    return format("<variablelist>%s%s%s</variablelist>",Docbook.containersep, contents, Docbook.containersep)
+    return {"<variablelist>",Docbook.containersep,contents,Docbook.containersep,"</variablelist>"}
   end
 
   Docbook.template = [[

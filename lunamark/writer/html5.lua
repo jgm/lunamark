@@ -9,7 +9,6 @@ local M = {}
 
 local util = require("lunamark.util")
 local html = require("lunamark.writer.html")
-local format = string.format
 
 --- Returns a new HTML 5 writer.
 -- `options` is as in `lunamark.writer.html`.
