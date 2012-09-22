@@ -40,7 +40,7 @@ function M.new(options)
   -- .RE
 
   function Man.paragraph(contents)
-    return format(".PP\n%s", contents)
+    return {".PP\n",contents}
   end
 
   function Man.bulletlist(items,tight)
