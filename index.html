@@ -11,7 +11,7 @@
 
 <p>Lunamark is a lua library and command-line program for conversion of markdown to other textual formats. Currently HTML, <a href="http://paulrouget.com/dzslides/">dzslides</a> (HTML5 slides), Docbook, ConTeXt, LaTeX, and Groff man are the supported output formats, but it is easy to add new writers or modify existing ones. The markdown parser is written using a PEG grammar and can also be modified by the user.</p>
 
-<p>The library is as portable as lua and has very good performance. It is slightly faster than the author’s own C library <a href="http://github.com/jgm/peg-markdown">peg-markdown</a>, an order of magnitude faster than pandoc, two orders of magnitude faster than <code>Markdown.pl</code>, and three orders of magnitude faster than <code>markdown.lua</code>.</p>
+<p>The library is as portable as lua and has very good performance. It is roughly as fast as the author’s own C library <a href="http://github.com/jgm/peg-markdown">peg-markdown</a>, two orders of magnitude faster than <code>Markdown.pl</code>, and three orders of magnitude faster than <code>markdown.lua</code>.</p>
 
 <h1>Links</h1>
 
@@ -26,7 +26,7 @@
 
 <h1>Extensions</h1>
 
-<p>Lunamark’s markdown parser currently supports the following extensions (which can be turned on or off individually):</p>
+<p>Lunamark’s markdown parser currently supports a number of extensions (which can be turned on or off individually), including:</p>
 
 <ul>
 <li>Smart typography (fancy quotes, dashes, ellipses)</li>
@@ -37,19 +37,27 @@
 <li>Flexible metadata using lua declarations</li>
 </ul>
 
+<p>See the <a href="lunamark.1.html">lunamark man page</a> for a complete list.</p>
+
 <p>It is very easy to extend the library by modifying the writers, adding new writers, and even modifying the markdown parser. Some simple examples are given in the <a href="http://jgm.github.com/lunamark/doc/">API documentation</a>.</p>
 
 <h1>Benchmarks</h1>
 
-<p>Benchmarks (converting a 1M test file consisting of 25 copies of the markdown test suite concatenated together):</p>
+<p>Generated with</p>
 
-<pre><code>     0.03s   sundown
-     0.14s   discount
- -&gt;  0.42s   lunamark
-     0.50s   peg-markdown
-     4.97s   pandoc
-    56.75s   Markdown.pl
-   996.14s   markdown.lua
+<pre><code>PROG=$program make bench
+</code></pre>
+
+<p>This converts the input files from the original markdown test suite concatenated together 25 times.</p>
+
+<pre><code>     0.04s   sundown
+     0.15s   discount
+     0.80s   peg-markdown
+-&gt;   0.97s   lunamark
+     4.05s   PHP Markdown
+     6.11s   pandoc
+   113.13s   Markdown.pl
+  2322.33s   markdown.lua
 </code></pre>
 
 <h1>Installing</h1>
@@ -98,10 +106,17 @@ print(parse(&quot;Here&#39;s my *text*&quot;))
 <pre><code>bin/shtest --help            # get usage
 bin/shtest                   # run all tests
 bin/shtest indent            # run all tests matching &quot;indent&quot;
-bin/shtest -p Markdown.pl -n # run all tests using Markdown.pl, and normalizing whitespace &amp; entities
+bin/shtest -p Markdown.pl -t # run all tests using Markdown.pl, and normalize using &#39;tidy&#39;
 </code></pre>
 
-<p>Lunamark currently fails a few of the PHP Markdown tests. In most cases I disagree with the interpretation of markdown syntax that these tests reflect.</p>
+<p>Lunamark currently fails four of the PHP Markdown tests:</p>
+
+<ul>
+<li><p><code>tests/PHP_Markdown/Quotes in attributes.test</code>: The HTML is semantically equivalent; using the <code>-t/--tidy</code> option to <code>bin/shtest</code> makes the test pass.</p></li>
+<li><p><code>tests/PHP_Markdown/Email auto links.test</code>: The HTML is semantically equivalent. PHP markdown does entity obfuscation, and lunamark does not. This feature could be added easily enough, but the test would still fail, because the obfuscation involves randomness. Again, using the <code>-t/--tidy</code> option makes the test pass.</p></li>
+<li><p><code>tests/PHP_Markdown/Ins &amp; del.test</code>: PHP markdown puts extra <code>&lt;p&gt;</code> tags around <code>&lt;ins&gt;hello&lt;/ins&gt;</code>, while lunamark does not. It’s hard to tell from the markdown spec which behavior is correct.</p></li>
+<li><p><code>tests/PHP_Markdown/Emphasis.test</code>: A bunch of corner cases with nested strong and emphasized text. These corner cases are left undecided by the markdown spec, so in my view the PHP test suite is not normative here; I think lunamark’s behavior is perfectly reasonable, and I see no reason to change.</p></li>
+</ul>
 
 <h1>Authors</h1>
 
