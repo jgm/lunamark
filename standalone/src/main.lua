@@ -1,0 +1,524 @@
+#!/usr/bin/env lua
+-- lunamark program
+
+--[===[
+@startman
+# NAME
+
+lunamark - converts markdown to many formats
+
+# SYNOPSIS
+
+lunamark [options] [file..]
+
+# DESCRIPTION
+
+Lunamark is a lua library and command-line program for conversion of markdown
+to other textual formats. Currently HTML, Docbook, ConTeXt, LaTeX, and Groff man
+are the supported output formats, but it is easy to add new writers or modify
+existing ones. The markdown parser is written using a PEG grammar and can also
+be modified by the user.
+
+Lunamark's markdown parser currently supports the following extensions (which
+can be turned on or off individually):
+
+  - Smart typography (fancy quotes, dashes, ellipses)
+  - Significant start numbers in ordered lists
+  - Footnotes
+  - Definition lists
+  - Metadata
+  - Pandoc title blocks
+  - Citations using citeproc
+
+More extensions will be supported in later versions.
+
+The library is as portable as lua and has very good performance.
+It is slightly faster than the author's own C library
+[peg-markdown](http://github.com/jgm/peg-markdown).
+
+# OPTIONS
+
+`--to,-t` *format*
+:   Specify format for output.
+    *format* can be `html`, `html5`, `dzslides`, `docbook`, `latex`, `context`, or `man`.
+`--layout,-l` *layout*
+:   Control whitespace in output.
+    *layout* can be `default` (blank lines between block-level elements),
+    `compact` (avoid unnecessary blank lines), or `minimize` (avoid
+    all unnecessary space).
+`--extensions,-X` *extensions*
+:   Use the specified syntax extensions in parsing markdown.
+    *extensions* is a comma-separated list of extensions, each optionally
+    prefixed by `+` (enable) or `-` (disable).  See EXTENSIONS, below, for
+    a list of supported extensions.  The keyword 'all' may also be used,
+    to set all extensions simultaneously.
+`--output,-o` *file*
+:   Write output to *file*.
+`--standalone,-s`
+:   Add header and footer to the document, so that it is a functional
+    standalone document, not a fragment.  Use the default template
+    for the writer, unless `--template,-T` is used.
+`--template,-T` *file*
+:   Insert converted text and metadata into a template.  See TEMPLATES,
+    below, for template format.  Implies `--standalone,-s`.
+`--data,-d` *key=value[,key=value..]*
+:   Set metadata fields to be passed to template.  Argument is a list
+    of *key=value* pairs, separated by commas.  If keys are repeated,
+    an array value will be formed.
+`--strict,-0`
+:   Disable all markdown extensions.
+`--version,-V`
+:   Print version information.
+`--help,-h`
+:   This message
+
+# EXTENSIONS
+
+The following extensions are defined, with the default setting given in
+parentheses.  The defaults can be changed locally by defining an
+environment variable `LUNAMARK_EXTENSIONS` (see ENVIRONMENT below).
+
+`(-) containers`
+:   Put sections in containers (`div` tags for `html` writer,
+    `section` tags for `html5` or `dzslides`).
+
+`(-) slides`
+:   Like `containers`, but do not allow containers to nest.
+    The container for a section will end before the container for
+    a subsection begins.  This is usually what is wanted
+    for HTML5 slide shows (and is selected by default for `dzslides`).
+
+`(-) startnum`
+:   Start number of an ordered list is significant. In standard
+    markdown, the starting number is irrelevant.  If this
+    extension is selected, the starting number determines
+    the starting number of the list in the output.  (The
+    subsequent numbers are ignored, as in standard markdown.)
+
+`(-) smart`
+:   Smart typography. Straight quotes are turned into curly
+    quotes, `--` into en dashes, `---` into em dashes, `...`
+    into an ellipsis character.
+
+`(-) preserve_tabs`
+:   Don't expand tabs to spaces. Standard markdown expands all
+    tabs, using a tabstop of 4 spaces.  This extension allows
+    tabs to be preserved in literal code contexts.
+
+`(-) notes`
+:   Footnotes. A footnote marker is like a markdown bracketed
+    reference, but beginning with a circumflex (`^`).  The note
+    itself goes in a separate block, which begins with the marker,
+    followed by a colon and space, and ends with a blank line.
+    The note can contain multiple paragraphs or other block elements,
+    but each block must be indented four spaces. Example:
+
+        Here is a note.[^mynote]
+
+        [^mynote]: This note has two paragraphs.
+
+            Here is the second one.
+
+`(-) definition_lists`
+:   Definition lists.  A list item consists of a term, on a single
+    line, followed by one or more definitions.  Each definition
+    begins with a colon (`:`), but is otherwise indented four spaces.
+    A definition may contain multiple block elements.  The colon
+    need not be flush-left, but may be preceded by one or two spaces.
+    Alternatively, a tilde (`~`) may be used instead of a colon.
+    Example:
+
+        rake
+        :   a tool for gathering leaves.
+
+            (paragraph two of definition one.)
+
+        :   a ruby build system.
+
+`(-) lua_metadata`
+:   Lua metadata.  An HTML comment beginning `<!--@` and containing
+    lua variable declarations is treated as metadata.  Note that strings
+    are read literally unless they are explicitly marked as markdown
+    using the `markdown` (or `m`) function. Lua metadata can occur anywhere
+    in a document. Example:
+
+        <!--@
+        title = m"My title with *italics*"
+        abstract = m[[
+          This is my abstract.
+
+          * point one
+          * point two
+          ]]
+        author = { "Me", "You" }
+        -->
+
+`(-) pandoc_title_blocks`
+:   Pandoc style title blocks at the beginning of a document:
+
+        % Title
+        % Author1; Author2
+        % Date
+
+        content starts here...
+
+`(-) citeproc`
+:   Automatic citations as in pandoc.  Requires installation of
+    the standalone `citeproc` executable.  The bibliography
+    or bibliographies must be specified using the `bibliography`
+    variable or metadata.  (The bibliography can be
+    MODS, BibTeX, BibLaTeX, RIS, EndNote, EndNote XML, ISI,
+    MEDLINE, Copac, or JSON citeproc.)  The CSL stylesheet must
+    be specified using the `csl` variable or metadata. A
+    primer on creating and modifying CSL styles can be found
+    at <http://citationstyles.org/downloads/primer.html>.
+    A repository of CSL styles can be found at
+    <https://github.com/citation-style-language/styles>. See also
+    <http://zotero.org/styles> for easy browsing.
+
+    Citations go inside square brackets and are separated by semicolons.
+    Each citation must have a key, composed of '@' + the citation
+    identifier from the database, and may optionally have a prefix,
+    a locator, and a suffix.  Here are some examples:
+
+        Blah blah [see @doe99, pp. 33-35; also @smith04, ch. 1].
+
+        Blah blah [@doe99, pp. 33-35, 38-39 and *passim*].
+
+        Blah blah [@smith04; @doe99].
+
+    A minus sign (`-`) before the `@` will suppress mention of
+    the author in the citation.  This can be useful when the
+    author is already mentioned in the text:
+
+        Smith says blah [-@smith04].
+
+    You can also write an in-text citation, as follows:
+
+        @smith04 says blah.
+
+        @smith04 [p. 33] says blah.
+
+    If the style calls for a list of works cited, it will replace the
+    template variable `references`.
+
+`(-) require_blank_before_blockquote`
+:   Require a blank line between a paragraph and a following blockquote.
+
+`(-) require_blank_before_header`
+:   Require a blank line between a paragraph and a following header.
+
+`(-) hash_enumerators`
+:   Allow `#` instead of a digit for an ordered list enumerator
+    (equivalent to `1`).
+
+# TEMPLATES
+
+By default, lunamark will produce a fragment.  If the
+`--standalone` or `--template` options are specified, it will insert
+this fragment into a template, producing a standalone document with
+appropriate header and footer.  `--standalone` uses the default template
+built into the writer, while `--template` specifies a custom template,
+which is sought first in the working directory, then in
+`templates`, and finally in `$HOME/lunamark/templates`. If no
+extension is given, the name of the writer will be used as an
+extension. So, for example, one can put the template `letter.html`
+in the `$HOME?lunamark/templates` directory, and use it anywhere
+with `lunamark --template letter`.
+
+The templates are [cosmo](http://cosmo.luaforge.net/) templates.
+Conditionals are enabled, so you can use the `$if` keyword
+as follows:
+
+    $if{ #people == 1 }[[There is only one.]][[There are many.]]
+
+A `sepby` keyword is also enabled:
+
+    $sepby{ people }[[$it]][[ and ]]
+
+will render "`Sid`" if `people == {"Sid"}` and
+"`Sid and Nancy`" if `people == {"Sid","Nancy"}`.
+
+The following variables are set by default; others may be set
+by the reader (if metadata extensions are used) or through
+the `--data` option:
+
+`body`
+:   the fragment converted from markdown
+`sources`
+:   array of the source files specified on the command line
+`timestamp`
+:   the current time
+
+# EXAMPLES
+
+    lunamark
+
+acts as a filter, reading markdown from stdin and writing
+HTML to stdout.
+
+    lunamark -Xsmart,definition_lists -t latex
+
+acts as a filter, reading markdown with smart typography
+and definition list extensions from stdin, and writing
+LaTeX to stdout.
+
+    lunamark -t latex -s -o mybook.tex ch{1,2,3}.txt references.txt
+
+reads `ch1.txt`, `ch2.txt`, `ch3.txt`, and `references.txt`,
+concatenates them, and converts the result from markdown to LaTeX,
+using the default template and saving the result as `mybook.tex`.
+
+    lunamark -Xall --template letter -d cc=Smith,cc="Jim Jones",sign="yes" \
+      -t context -o myletter.ctx myletter.txt
+
+produces a ConTeXt file using the template `letter.context`,
+and setting the variable `cc` to `{"Smith","Jim Jones"}`
+and `sign` to `"yes"`.  All lunamark etensions are enabled.
+
+# ENVIRONMENT
+
+The environment variable `LUNAMARK_EXTENSIONS` can contain
+a comma-separated list of extensions, optionally prefixed by
+`+` or `-`, that will serve as defaults. These defaults can
+be overridden using the command-line option `--extensions`.
+
+# AUTHORS
+
+Most of lunamark is written by John MacFarlane.  Hans Hagen
+made some major performance improvements to the markdown
+parser.  Khaled Hosny added the original ConTeXt writer.
+
+@stopman
+--]===]
+
+local lunamark = require("lunamark")
+local alt_getopt = require("alt_getopt")
+local cosmo = require("cosmo")
+
+local function ensure_one_of(optval,s,ary)
+  for i=1,#ary do
+    if ary[i]==s then return true end
+  end
+  lunamark.util.err("Illegal value for " .. optval ..
+     "\nLegal values are: " .. table.concat(ary,", "))
+end
+
+local version = [[
+lunamark 0.2
+Copyright (C) 2009-2011 John MacFarlane
+]]
+
+local usage = [[
+Usage: lunamark [options] [file..] - convert markdown to other formats
+
+Options:
+  --to,-t FORMAT             Target format
+  --layout,-l LAYOUT         Whitespace in output (default|compact|minimize)
+  --extensions,-X EXTENSIONS Syntax extensions to use
+  --output,-o FILE           Output file
+  --standalone,-s            Add header and footer
+  --template,-T FILE         Insert output into template
+  --data,-d K=V[,K=V..]      Set metadata to be passed to template
+  --strict,-0                Disable markdown extensions
+  --version,-V               Version information
+  --help,-h                  This message
+
+FORMAT can be html, html5, docbook, latex, context, or man.
+
+LAYOUT can be default, compact (no unnecessary blank lines), or
+minimize (no unnecessary blank space).
+
+EXTENSIONS is a comma-separated list of extensions, each optionally prefixed
+by + (enable) or - (disable).  The following extensions are defined,
+with the default setting given in parentheses:
+  (-) containers        Put sections in containers (e.g. div or section tags)
+  (-) slides            Like containers, but do not nest them
+  (-) startnum          Start number of an ordered list is significant
+  (-) smart             Smart typography (quotes, dashes, ellipses)
+  (-) preserve_tabs     Don't expand tabs to spaces
+  (-) notes             Footnotes
+  (-) definition_lists  Definition lists
+The keyword 'all' may also be used, to set all extensions simultaneously.
+Setting the environment variable LUNAMARK_EXTENSIONS can change the
+defaults.
+]]
+
+local long_opts = {
+  to = "t",
+  layout = "l",
+  extensions = "X",
+  output = "o",
+  standalone = "s",
+  template = "T",
+  data = "d",
+  strict = "0",
+  version = "V",
+  help = "h"
+}
+
+local short_opts = "t:l:X:o:sT:d:0Vh"
+
+local optarg,optind = alt_getopt.get_opts(arg, short_opts, long_opts)
+
+if optarg.h then
+  io.write(usage)
+  os.exit(0)
+end
+
+if optarg.V then
+  io.write(version)
+  os.exit(0)
+end
+
+local to = optarg.t or "html"
+ensure_one_of("--to,-t", to,
+  {"markdown","html","html5","dzslides","docbook","latex","context","man"})
+
+local reader = lunamark.reader.markdown
+
+local extensions = {  -- defaults
+  containers = false,
+  slides = false,
+  startnum = false,
+  smart = false,
+  preserve_tabs = false,
+  notes = false,
+  definition_lists = false,
+  lua_metadata = false,
+  pandoc_title_blocks = false,
+  citeproc = false,
+  require_blank_before_blockquote = false,
+  require_blank_before_header = false,
+  hash_enumerators = false,
+}
+
+if optarg["0"] then
+  extensions = {}
+end
+
+local default_extensions = os.getenv("LUNAMARK_EXTENSIONS") or ""
+local extensions_opt = default_extensions .. "," .. (optarg.X or "")
+for x in extensions_opt:gmatch("[%+%-]?[%a_]+") do
+  local val = true
+  if x:sub(1,1) == "+" then
+    val = true
+    x = x:sub(2)
+  elseif x:sub(1,1) == "-" then
+    val = false
+    x = x:sub(2)
+  end
+  if x == "all" then
+    for k,_ in pairs(extensions) do
+      extensions[k] = val
+    end
+  elseif type(extensions[x]) ~= "boolean" then
+    lunamark.util.err("Unrecognized extension: " .. x, 15)
+  else
+    extensions[x] = val
+  end
+end
+
+local output = optarg.o
+local ok, msg = pcall(function() io.output(output) end)
+if not ok then
+  lunamark.util.err("Could not open '" .. output .. "' for writing.\n" .. msg, 9)
+end
+
+local writer_options = extensions
+
+local layout = optarg["l"] or "default"
+ensure_one_of("--layout,-l",layout,{"default","compact","minimize"})
+writer_options.layout = layout
+
+local writer = lunamark.writer[to].new(writer_options)
+if not writer then
+  lunamark.util.err("Unknown writer: " .. tostring(to), 5)
+end
+
+local reader_options = extensions
+
+local parse = reader.new(writer, reader_options)
+
+local args = {}
+for i=optind,#arg do
+  table.insert(args,arg[i])
+end
+
+local inp
+if #args == 0 then
+  inp = io.read("*all") .. "\n"
+else
+  inpt = {}
+  for _,f in ipairs(args) do
+    local ok, msg = pcall(function() io.input(f) end)
+    if ok then
+      table.insert(inpt, io.read("*all"))
+    else
+      lunamark.util.err("Could not open file '" .. f .. "'", 7)
+    end
+  end
+  inp = table.concat(inpt, "\n") .. "\n"
+end
+if inp:find("\r",1,true) then
+  inp = inp:gsub("\r\n","\n") -- convert DOS line endings
+end
+
+local body, metadata = parse(inp)
+
+local standalone = optarg.s
+local template = optarg.T
+
+local template_contents
+
+if standalone and not template then
+  template_contents = writer.template
+end
+
+if template then
+  local template_name = template
+  -- use writer name as extension if none provided
+  if not template_name:match("%..+$") then
+    template_name = template_name .. "." .. to
+  end
+  template_contents = lunamark.util.find_template(template_name)
+  if not template_contents then
+    lunamark.util.err("Could not find template '" .. template_name .. "'")
+  end
+end
+
+if template_contents then
+  local data = metadata or {}
+  data.timestamp = os.date("%Y-%m-%d %X")
+  data.sources = args
+  local keys = {}
+  if optarg.d then
+    for x in string.gmatch(optarg.d, "[%w_]+=[^,]+") do
+      local k,v = string.match(x, "([^=]*)=(.*)")
+      if keys[k] then
+        if keys[k] == "string" then
+          data[k] = {data[k], v}
+        elseif keys[k] == "array" then
+          data[k] = table.insert(data[k],v)
+        end
+        keys[k] = "array"
+      else
+        data[k] = writer.string(v)
+        keys[k] = "string"
+      end
+    end
+  end
+  data.body = body
+  data["if"] = cosmo.cif  -- this activates the "if" keyword
+  data.sepby = lunamark.util.sepby  -- actives "sepby" keyword
+  local result = cosmo.fill(template_contents, data)
+  io.write(result)
+else
+  io.write(body)
+end
+
+if not template_contents then
+  io.write("\n")
+end
+
+

@@ -1,0 +1,33 @@
+See http://lua-users.org/lists/lua-l/2009-06/msg00565.html
+
+diff --git a/lpeg.c b/lpeg.c
+index d46d463..14ba93a 100644
+--- a/lpeg.c
++++ b/lpeg.c
+@@ -142,7 +142,7 @@ typedef union Instruction {
+   struct Inst {
+     byte code;
+     byte aux;
+-    short offset;
++    int offset;
+   } i;
+   PattFunc f;
+   int iv;
+@@ -160,7 +160,7 @@ static const Instruction giveup = {{IGiveup, 0, 0}};
+ #define MAXAUX		0xFF
+ 
+ /* maximum size (in elements) for a pattern */
+-#define MAXPATTSIZE	(SHRT_MAX - 10)
++#define MAXPATTSIZE	(INT_MAX - 10)
+ 
+ 
+ #define isprop(op,p)	(opproperties[(op)->i.code] & (p))
+@@ -185,7 +185,7 @@ typedef enum CapKind {
+ 
+ typedef struct Capture {
+   const char *s;  /* position */
+-  short idx;
++  int idx;
+   byte kind;
+   byte siz;
+ } Capture;
