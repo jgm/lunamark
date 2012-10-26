@@ -130,7 +130,7 @@ function M.new(options)
       end
       buffer[#buffer + 1] = {"<varlistentry>",Docbook.containersep,"<term>",item.term,"</term>",Docbook.containersep,defs,"</varlistentry>"}
     end
-    local contents = table.concat(buffer, Docbook.containersep)
+    local contents = util.intersperse(buffer, Docbook.containersep)
     return {"<variablelist>",Docbook.containersep,contents,Docbook.containersep,"</variablelist>"}
   end
 
