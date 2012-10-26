@@ -62,7 +62,7 @@ website: docs ${web}/index.html
 	cp -r doc lunamark.1.html lunadoc.1.html ${web}/
 
 ${web}/index.html: README.markdown ${templatesdir}/web.html
-	bin/lunamark -Xdefinition_lists,notes,smart --template ${templatesdir}/web.html -o $@ $<
+	bin/lunamark -Xdefinition_lists,smart --template ${templatesdir}/web.html -o $@ $<
 
 clean:
 	-rm -rf doc ${testfile} ${benchtext} lunamark.1 lunadoc.1
