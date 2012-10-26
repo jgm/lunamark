@@ -38,12 +38,49 @@
 <p>Expand tabs in a line of text. <code>s</code> is assumed to be a single line of text. From <em>Programming Lua</em>.</p>
 </div>
 
+<div class="section"  id="walk">
+<h3 class="declaration"><code>walk(t, f)</code></h3>
+<p>Walk a rope <code>t</code>, applying a function <code>f</code> to each leaf element in order. A rope is an array whose elements may be ropes, strings, numbers, or functions. If a leaf element is a function, call it and get the return value before proceeding.</p>
+</div>
+
+<div class="section"  id="flatten">
+<h3 class="declaration"><code>flatten(ary)</code></h3>
+<p>Flatten an array <code>ary</code>.</p>
+</div>
+
+<div class="section"  id="rope_to_string">
+<h3 class="declaration"><code>rope_to_string(rope)</code></h3>
+<p>Convert a rope to a string.</p>
+</div>
+
+<div class="section"  id="rope_last">
+<h3 class="declaration"><code>rope_last(rope)</code></h3>
+<p>Return the last item in a rope.</p>
+</div>
+
+<div class="section"  id="intersperse">
+<h3 class="declaration"><code>intersperse(ary, x)</code></h3>
+<p>Given an array <code>ary</code>, return a new array with <code>x</code> interspersed between elements of <code>ary</code>.</p>
+</div>
+
+<div class="section"  id="map">
+<h3 class="declaration"><code>map(ary, f)</code></h3>
+<p>Given an array <code>ary</code>, return a new array with each element <code>x</code> of <code>ary</code> replaced by <code>f(x)</code>.</p>
+</div>
+
+<div class="section"  id="escaper">
+<h3 class="declaration"><code>escaper(char_escapes, string_escapes)</code></h3>
+<p>Given a table <code>char_escapes</code> mapping escapable characters onto their escaped versions and optionally <code>string_escapes</code> mapping escapable strings (or multibyte UTF-8 characters) onto their escaped versions, returns a function that escapes a string. This function uses lpeg and is faster than gsub.</p>
+</div>
+
 </div>
 <div id="index">
 
 <p><a href="lunamark.html">lunamark</a></p>
 
 <p><a href="lunamark.entities.html">lunamark.entities</a></p>
+
+<p><a href="lunamark.optparser.html">lunamark.optparser</a></p>
 
 <p><a href="lunamark.reader.html">lunamark.reader</a></p>
 

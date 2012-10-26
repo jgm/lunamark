@@ -29,7 +29,7 @@
 
 <p>More extensions will be supported in later versions.</p>
 
-<p>The library is as portable as lua and has very good performance. It is slightly faster than the author’s own C library <a href="http://github.com/jgm/peg-markdown">peg-markdown</a>.</p>
+<p>The library is as portable as lua and has very good performance. It is about as fast as the author’s own C library <a href="http://github.com/jgm/peg-markdown">peg-markdown</a>.</p>
 
 <h2>Simple usage example</h2>
 
@@ -43,17 +43,16 @@ assert(result == &#39;Here’s ‘my &lt;em&gt;text&lt;/em&gt;’…&#39;)
 
 <h2>Customizing the writer</h2>
 
-<p>Render emphasized text as ALL CAPS, rather than italics:</p>
+<p>Render emphasized text using <code>&lt;u&gt;</code> tags rather than <code>&lt;em&gt;</code>.</p>
 
 <pre><code>local unicode = require(&quot;unicode&quot;)
-local utf8 = unicode.utf8
 function writer.emphasis(s)
-  return utf8.upper(s)
+  return {&quot;&lt;u&gt;&quot;,s,&quot;&lt;/u&gt;&quot;}
 end
 local parse = lunamark.reader.markdown.new(writer, { smart = true })
 local result, metadata = parse(&quot;*Beiß* nicht in die Hand, die dich *füttert*.&quot;)
 print(result)
-assert(result == &#39;BEIß nicht in die Hand, die dich FÜTTERT.&#39;)
+assert(result == &#39;&lt;u&gt;Beiß&lt;/u&gt; nicht in die Hand, die dich &lt;u&gt;füttert&lt;/u&gt;.&#39;)
 </code></pre>
 
 <p>Eliminate hyperlinks:</p>
@@ -97,6 +96,8 @@ assert(result == &#39;My text with &lt;a href=&quot;/WikiLinks&quot; title=&quot
 <p><a href="lunamark.html">lunamark</a></p>
 
 <p><a href="lunamark.entities.html">lunamark.entities</a></p>
+
+<p><a href="lunamark.optparser.html">lunamark.optparser</a></p>
 
 <p><a href="lunamark.reader.html">lunamark.reader</a></p>
 

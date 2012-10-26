@@ -49,6 +49,31 @@
 <dd>
 <p>Enable definition lists as in pandoc.</p>
 </dd>
+<dt><code>pandoc_title_blocks</code></dt>
+<dd>
+<p>Parse pandoc-style title block at the beginning of document:</p>
+
+<pre><code>% Title
+% Author1; Author2
+% Date
+</code></pre>
+</dd>
+<dt><code>lua_metadata</code></dt>
+<dd>
+<p>Enable lua metadata. This is an HTML comment block that starts with <code>&lt;!--@</code> and contains lua code. The lua code is interpreted in a sandbox, and any variables defined are added to the metadata. The function <code>markdown</code> (also <code>m</code>) is defined and can be used to ensure that string fields are parsed as markdown; otherwise, they will be read literally.</p>
+</dd>
+<dt><code>require_blank_before_blockquote</code></dt>
+<dd>
+<p>Require a blank line between a paragraph and a following block quote.</p>
+</dd>
+<dt><code>require_blank_before_header</code></dt>
+<dd>
+<p>Require a blank line between a paragraph and a following header.</p>
+</dd>
+<dt><code>hash_enumerators</code></dt>
+<dd>
+<p>Allow <code>#</code> instead of a digit for an ordered list enumerator (equivalent to <code>1</code>).</p>
+</dd>
 </dl></li>
 <li><p>Returns a converter function that converts a markdown string using <code>writer</code>, returning the parsed document as first result, and a table containing any extracted metadata as the second result. The converter assumes that the input has unix line endings (newline). If the input might have DOS line endings, a simple <code>gsub(&quot;\r&quot;,&quot;&quot;)</code> should take care of them.</p></li>
 </ul>
@@ -60,6 +85,8 @@
 <p><a href="lunamark.html">lunamark</a></p>
 
 <p><a href="lunamark.entities.html">lunamark.entities</a></p>
+
+<p><a href="lunamark.optparser.html">lunamark.optparser</a></p>
 
 <p><a href="lunamark.reader.html">lunamark.reader</a></p>
 
