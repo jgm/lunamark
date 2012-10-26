@@ -25,7 +25,7 @@
 -- More extensions will be supported in later versions.
 --
 -- The library is as portable as lua and has very good performance.
--- It is slightly faster than the author's own C library
+-- It is about as fast as the author's own C library
 -- [peg-markdown](http://github.com/jgm/peg-markdown).
 --
 -- ## Simple usage example
@@ -39,17 +39,16 @@
 --
 -- ## Customizing the writer
 --
--- Render emphasized text as ALL CAPS, rather than italics:
+-- Render emphasized text using `<u>` tags rather than `<em>`.
 --
 --     local unicode = require("unicode")
---     local utf8 = unicode.utf8
 --     function writer.emphasis(s)
---       return utf8.upper(s)
+--       return {"<u>",s,"</u>"}
 --     end
 --     local parse = lunamark.reader.markdown.new(writer, { smart = true })
 --     local result, metadata = parse("*Beiß* nicht in die Hand, die dich *füttert*.")
 --     print(result)
---     assert(result == 'BEIß nicht in die Hand, die dich FÜTTERT.')
+--     assert(result == '<u>Beiß</u> nicht in die Hand, die dich <u>füttert</u>.')
 --
 -- Eliminate hyperlinks:
 --
