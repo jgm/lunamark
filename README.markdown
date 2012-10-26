@@ -67,8 +67,18 @@ concatenated together 25 times.
 
 # Installing
 
-You can install the latest development version of
-lunamark using [luarocks](http://www.luarocks.org):
+If you want a standalone version of lunamark that doesn't
+depend on lua or other lua modules being installed on
+your system, just do
+
+    make standalone
+
+Your executable will be created in the `standalone`
+directory.
+
+If you are a lua user, you will probably prefer to install
+lunamark using luarocks.  You can install the latest development
+version this way:
 
     git clone http://github.com/jgm/lunamark.git
     cd lunamark
