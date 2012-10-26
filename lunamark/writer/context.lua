@@ -25,7 +25,7 @@ function M.new(options)
   end
 
   function ConTeXt.doublequoted(s)
-    return {"\\quotation{,"s,"}"}
+    return {"\\quotation{",s,"}"}
   end
 
   function ConTeXt.code(s)
