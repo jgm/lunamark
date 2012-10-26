@@ -130,11 +130,11 @@ Lunamark currently fails four of the PHP Markdown tests:
     would still fail, because the obfuscation involves randomness. Again,
     using the `-t/--tidy` option makes the test pass.
 
-*   `tests/PHP_Markdown/Ins & del.test`:  PHP markdown puts extra `<p>`
+  * `tests/PHP_Markdown/Ins & del.test`:  PHP markdown puts extra `<p>`
     tags around `<ins>hello</ins>`, while lunamark does not.  It's hard
     to tell from the markdown spec which behavior is correct.
 
-*   `tests/PHP_Markdown/Emphasis.test`:  A bunch of corner cases with nested
+  * `tests/PHP_Markdown/Emphasis.test`:  A bunch of corner cases with nested
     strong and emphasized text.  These corner cases are left undecided by
     the markdown spec, so in my view the PHP test suite is not normative here;
     I think lunamark's behavior is perfectly reasonable, and I see no reason
