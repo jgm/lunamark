@@ -47,8 +47,6 @@ lunamark 0.3 (released 26 Oct 2012)
 
   * Fixed typo in tex writer: `\ldots` for `\\ldots`.
 
-  * Fixed footnotes.
-
   * Fixed bug in rockspec (`branch` -> `tag`).
 
   * man writer:  Fixed lists so we don't get `.PP` after `.IP`.
