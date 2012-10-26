@@ -21,27 +21,27 @@ function M.new(options)
   ConTeXt.string = escape
 
   function ConTeXt.singlequoted(s)
-    return format("\\quote{%s}",s)
+    return {"\\quote{",s,"}"}
   end
 
   function ConTeXt.doublequoted(s)
-    return format("\\quotation{%s}",s)
+    return {"\\quotation{,"s,"}"}
   end
 
   function ConTeXt.code(s)
-    return format("\\type{%s}", s)  -- escape here?
+    return {"\\type{",ConTeXt.string(s),"}"}
   end
 
   function ConTeXt.link(lab,src,tit)
-    return format("\\goto{%s}[url(%s)]",lab, ConTeXt.string(src))
+    return {"\\goto{",lab,"}[url(",ConTeXt.string(src),"]"}
   end
 
   function ConTeXt.image(lab,src,tit)
-    return format("\\externalfigure[%s]", ConTeXt.string(src))
+    return {"\\externalfigure[",ConTeXt.string(src),"]"}
   end
 
   local function listitem(s)
-    return format("\\item %s\n",s)
+    return {"\\item ",s,"\n"}
   end
 
   function ConTeXt.bulletlist(items,tight)
@@ -51,8 +51,8 @@ function M.new(options)
     for _,item in ipairs(items) do
       buffer[#buffer + 1] = listitem(item)
     end
-    local contents = table.concat(buffer)
-    return format("\\startitemize%s\n%s\\stopitemize",opt,contents)
+    local contents = util.intersperse(buffer)
+    return {"\\startitemize",opt,"\n",contents,"\\stopitemize"}
   end
 
   function ConTeXt.orderedlist(items,tight,startnum)
@@ -63,24 +63,24 @@ function M.new(options)
     for _,item in ipairs(items) do
       buffer[#buffer + 1] = listitem(item)
     end
-    local contents = table.concat(buffer)
-    return format("\\startitemize%s\n%s\\stopitemize",opt,contents)
+    local contents = util.intersperse(buffer)
+    return {"\\startitemize",opt,"\n",contents,"\\stopitemize"}
   end
 
   function ConTeXt.emphasis(s)
-    return format("{\\em %s}",s)
+    return {"{\\em ",s,"}"}
   end
 
   function ConTeXt.strong(s)
-    return format("{\\bf %s}",s)
+    return {"{\\bf ",s,"}"}
   end
 
   function ConTeXt.blockquote(s)
-    return format("\\startblockquote\n%s\\stopblockquote", s)
+    return {"\\startblockquote\n",s,"\\stopblockquote"}
   end
 
   function ConTeXt.verbatim(s)
-    return format("\\starttyping\n%s\\stoptyping", s)
+    return {"\\starttyping\n",s,"\\stoptyping"}
   end
 
   function ConTeXt.header(s,level)
@@ -98,22 +98,22 @@ function M.new(options)
     else
       cmd = ""
     end
-    return format("%s{%s}", cmd, s)
+    return {cmd,"{",s,"}"}
   end
 
   ConTeXt.hrule = "\\hairline"
 
   function ConTeXt.note(contents)
-    return format("\\footnote{%s}", contents)
+    return {"\\footnote{",contents,"}"}
   end
 
   function ConTeXt.definitionlist(items)
     local buffer = {}
     for _,item in ipairs(items) do
-      buffer[#buffer + 1] = format("\\startdescription{%s}\n%s\n\\stopdescription",
-        item.term, table.concat(item.definitions, ConTeXt.interblocksep))
+      buffer[#buffer + 1] = {"\\startdescription{",item.term,"}\n",
+         util.intersperse(item.definitions,ConTeXt.interblocksep),"\n\\stopdescription"}
     end
-    local contents = table.concat(buffer, ConTeXt.containersep)
+    local contents = util.intersperse(buffer, ConTeXt.containersep)
     return contents
   end
 

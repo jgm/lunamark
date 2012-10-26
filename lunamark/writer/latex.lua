@@ -15,18 +15,17 @@ local format = string.format
 function M.new(options)
   local options = options or {}
   local LaTeX = tex.new(options)
-  local str = LaTeX.string
 
   function LaTeX.code(s)
-    return {"\\texttt{",str(s),"}"}
+    return {"\\texttt{",LaTeX.string(s),"}"}
   end
 
   function LaTeX.link(lab,src,tit)
-    return {"\\href{",str(src),"}{",lab,"}"}
+    return {"\\href{",LaTeX.string(src),"}{",lab,"}"}
   end
 
   function LaTeX.image(lab,src,tit)
-    return {"\\includegraphics{",str(src),"}"}
+    return {"\\includegraphics{",LaTeX.string(src),"}"}
   end
 
   local function listitem(s)
