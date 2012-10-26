@@ -12,7 +12,7 @@ TESTOPTS ?= --tidy
 all:
 	@echo Targets: test bench docs run-code-examples install clean
 
-.PHONY: test bench docs clean run-code-examples install website
+.PHONY: test bench docs clean run-code-examples install website standalone
 test:
 	LUNAMARK_EXTENSIONS="" bin/shtest ${TESTOPTS} -p ${PROG} ${OPTS}
 
@@ -64,5 +64,9 @@ website: docs ${web}/index.html
 ${web}/index.html: README.markdown ${templatesdir}/web.html
 	bin/lunamark -Xdefinition_lists,smart --template ${templatesdir}/web.html -o $@ $<
 
+standalone: ${luas}
+	make -C standalone
+
 clean:
 	-rm -rf doc ${testfile} ${benchtext} lunamark.1 lunadoc.1
+	make -C standalone clean
