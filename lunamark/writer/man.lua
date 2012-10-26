@@ -23,11 +23,11 @@ function M.new(options)
   local endnotes = {}
 
   function Man.link(lab,src,tit)
-    return format("%s (%s)",lab,src)
+    return {lab," (",src,")"}
   end
 
   function Man.image(lab,src,tit)
-    return format("[IMAGE (%s)]",lab)
+    return {"[IMAGE (",lab,")]"}
   end
 
   -- TODO handle continuations properly.
@@ -46,56 +46,56 @@ function M.new(options)
   function Man.bulletlist(items,tight)
     local buffer = {}
     for _,item in ipairs(items) do
-      buffer[#buffer + 1] = format(".IP \\[bu] 2\n%s",item)
+      buffer[#buffer + 1] = {".IP \\[bu] 2\n",item}
     end
-    return table.concat(buffer, Man.containersep)
+    return util.intersperse(buffer, Man.containersep)
   end
 
   function Man.orderedlist(items,tight,startnum)
     local buffer = {}
     local num = startnum or 1
     for _,item in ipairs(items) do
-      buffer[#buffer + 1] = format(".IP \"%d.\" 4\n%s",num,item)
+      buffer[#buffer + 1] = {format(".IP \"%d.\" 4\n",num),item}
       num = num + 1
     end
-    return table.concat(buffer, Man.containersep)
+    return util.intersperse(buffer, Man.containersep)
   end
 
   function Man.blockquote(s)
-    return format(".RS\n%s\n.RE", s)
+    return {".RS\n",s,"\n.RE"}
   end
 
   function Man.verbatim(s)
-    return format(".IP\n.nf\n\\f[C]\n%s.fi",s)
+    return {".IP\n.nf\n\\f[C]\n",s,".fi"}
   end
 
   function Man.header(s,level)
     local hcode = ".SS"
     if level == 1 then hcode = ".SH" end
-    return format("%s %s", hcode, s)
+    return {hcode," ",s}
   end
 
   Man.hrule = ".PP\n * * * * *"
 
   function Man.note(contents)
     local num = #endnotes + 1
-    endnotes[num] = format('.SS [%d]\n%s', num, contents)
+    endnotes[num] = {format(".SS [%d]\n",num),contents}
     return format('[%d]', num)
   end
 
   function Man.definitionlist(items,tight)
     local buffer = {}
-    local fmt
-    if tight then
-      fmt = ".TP\n.B %s\n%s\n.RS\n.RE"
-    else
-      fmt = ".TP\n.B %s\n.RS\n%s\n.RE"
-    end
+    local ds
     for _,item in ipairs(items) do
-      buffer[#buffer + 1] = format(fmt,
-        item.term, table.concat(item.definitions, "\n.RS\n.RE\n"))
+        if tight then
+          ds = util.intersperse(item.definitions,"\n.RS\n.RE\n")
+          buffer[#buffer + 1] = {".TP\n.B ",item.term,"\n",ds,"\n.RS\n.RE"}
+        else
+          ds = util.intersperse(item.definitions,"\n.RS\n.RE\n")
+          buffer[#buffer + 1] = {".TP\n.B ",item.term,"\n.RS\n",ds,"\n.RE"}
+        end
     end
-    local contents = table.concat(buffer, "\n")
+    local contents = util.intersperse(buffer,"\n")
     return contents
   end
 
@@ -108,7 +108,7 @@ function M.new(options)
     if #endnotes == 0 then
       return ""
     else
-      return format('\n.SH NOTES\n%s', table.concat(endnotes, "\n"))
+      return {"\n.SH NOTES\n", util.intersperse(endnotes, "\n")}
     end
   end
 
