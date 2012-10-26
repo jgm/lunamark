@@ -46,6 +46,9 @@ function M.new(options)
   function Man.bulletlist(items,tight)
     local buffer = {}
     for _,item in ipairs(items) do
+      local revitem = item
+      -- we don't want to have .IP then .PP
+      if revitem[1][1] == ".PP\n" then revitem[1][1] = "" end
       buffer[#buffer + 1] = {".IP \\[bu] 2\n",item}
     end
     return util.intersperse(buffer, Man.containersep)
@@ -55,6 +58,9 @@ function M.new(options)
     local buffer = {}
     local num = startnum or 1
     for _,item in ipairs(items) do
+      local revitem = item
+      -- we don't want to have .IP then .PP
+      if revitem[1][1] == ".PP\n" then revitem[1][1] = "" end
       buffer[#buffer + 1] = {format(".IP \"%d.\" 4\n",num),item}
       num = num + 1
     end
