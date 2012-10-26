@@ -1,1 +1,58 @@
+lunamark 0.3 (released 26 Oct 2012)
+
+  * Removed title h1 tag in html template.
+
+  * Made benchmarks easier to read.
+
+  * A blockquote or header ends a paragraph.
+    This makes lunamark more compatible with other implementations,
+    even though I'm dubious whether this is desirable.
+
+  * Avoid links within links.
+
+  * Added `escaper` to util; using this instead of gsub in xml writer.
+    This gives a big speed boost (15-20%).
+
+  * Improved handling of ins/del tags.
+
+  * Added `hash_enumerators` option.
+
+  * Added `require_blank_before_header`, `require_blank_before_blockquote`
+    options.
+
+  * Require newline after reference definition.
+
+  * Added `make prof`, `make coverage`.
+
+  * Cleaner treatment of `expandtabs`.
+
+  * Use ropes instead of concatenating strings.  The advantage is not
+    speed -- this is actually slower than the old version -- but flexibility.
+
+    A rope (here) is an array containing strings, functions, and ropes.  At
+    the end of parsing, the rope is walked and a string constructed by
+    concatenating its elements in order.
+
+    The functions are evaluated after parsing, and can access globals
+    constructed during parsing, such as a list of references or footnotes.  So
+    we no longer need to do two passes for things like this.  This will be
+    really useful when we add things like citations.
+
+    As a bonus, reference link definitions now work even in embedded contexts
+    like block quotes.
+
+  * Added map, intersperse, flatten to util
+
+  * Cleaned up spacing in html lists.
+
+  * Fixed typo in tex writer: `\ldots` for `\\ldots`.
+
+  * Fixed footnotes.
+
+  * Fixed bug in rockspec (`branch` -> `tag`).
+
+  * man writer:  Fixed lists so we don't get `.PP` after `.IP`.
+
+  * Change default of containers to + for docbook and dzslides.
+
 lunamark 0.2 (released 17 Sep 2011)
