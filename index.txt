@@ -1,6 +1,0 @@
-# lunamark
-
-* [API documentation](doc/)
-* [lunamark(1)](lunamark.1.html)
-* [lunadoc(1)](lunadoc.1.html)
-
