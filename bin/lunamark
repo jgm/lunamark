@@ -265,7 +265,7 @@ end
 
 local version = [[
 lunamark 0.3
-Copyright (C) 2009-2011 John MacFarlane
+Copyright (C) 2009-2012 John MacFarlane
 ]]
 
 local usage = [[
