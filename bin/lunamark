@@ -337,7 +337,7 @@ ensure_one_of("--to,-t", to,
 local reader = lunamark.reader.markdown
 
 local extensions = {  -- defaults
-  containers = false,
+  containers = (to == "docbook" or to == "dzslides"),
   slides = false,
   startnum = false,
   smart = false,
