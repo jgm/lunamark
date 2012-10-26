@@ -159,7 +159,7 @@ function M.new(options)
   -- `tight` is true, returns a "tight" list (with
   -- minimal space between items).
   function W.bulletlist(items,tight)
-    return table.concat(items,W.interblocksep)
+    return util.intersperse(items,W.interblocksep)
   end
 
   --- An ordered list with contents `items` (an array). If
@@ -168,7 +168,7 @@ function M.new(options)
   -- number `startnum` is present, use it as the
   -- number of the first list item.
   function W.orderedlist(items,tight,startnum)
-    return table.concat(items,W.interblocksep)
+    return util.intersperse(items,W.interblocksep)
   end
 
   --- Inline HTML.
@@ -222,9 +222,9 @@ function M.new(options)
     local buffer = {}
     for _,item in ipairs(items) do
       buffer[#buffer + 1] = item.t
-      buffer[#buffer + 1] = table.concat(item.definitions, W.interblocksep)
+      buffer[#buffer + 1] = util.intersperse(item.definitions, W.interblocksep)
     end
-    return table.concat(buffer,W.interblocksep)
+    return util.intersperse(buffer,W.interblocksep)
   end
 
   --- A cosmo template to be used in producing a standalone document.
