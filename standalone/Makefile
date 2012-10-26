@@ -2,7 +2,7 @@ OBJS=lpeg.o slnunico.o
 COPT= -O2 -DNDEBUG
 CWARNS= -Wall -Wextra -pedantic
 CC=gcc $(COPT) $(CWARNS) -I$(LUADIR) -L$(LUADIR)
-LUADIR=lua
+LUADIR=lua-5.1.5/src
 PROG ?= ./lunamark
 TESTOPTS ?= --tidy
 NUM ?= 25
@@ -51,5 +51,5 @@ bench: ${testfile}
 
 clean:
 	make -C $(LUADIR) clean
-	rm $(lunamarkS) $(OBJS) lunamark main.squished.lua.embed lunamark.1
+	rm lunamark $(OBJS) lunamark main.squished.lua main.squished.lua.embed lunamark.1
 	rm ${benchtext} ${testfile}
