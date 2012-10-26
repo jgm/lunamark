@@ -7,11 +7,10 @@ it is easy to add new writers or modify existing ones. The markdown parser is
 written using a PEG grammar and can also be modified by the user.
 
 The library is as portable as lua and has very good performance.
-It is significantly faster than the author's own C library
-[peg-markdown](http://github.com/jgm/peg-markdown), an order of
-magnitude faster than pandoc, two orders of magnitude
-faster than `Markdown.pl`, and three orders of magnitude
-faster than `markdown.lua`.
+It is roughly as fast as the author's own C library
+[peg-markdown](http://github.com/jgm/peg-markdown),
+two orders of magnitude faster than `Markdown.pl`,
+and three orders of magnitude faster than `markdown.lua`.
 
 # Links
 
@@ -50,19 +49,21 @@ simple examples are given in the [API documentation].
 
 # Benchmarks
 
-Benchmarks (converting a 1M test file consisting of 25 copies of the
-markdown test suite concatenated together):
+Generated with
 
-         0.03s   sundown
-         0.13s   redcarpet
-         0.14s   discount
-     ->  0.35s   lunamark
-         0.50s   peg-markdown
-         2.79s   PHP Markdown
-         4.74s   RedCloth
-         4.97s   pandoc
-        56.75s   Markdown.pl
-       996.14s   markdown.lua
+    PROG=$program make bench
+
+This converts the input files from the original markdown test suite
+concatenated together 25 times.
+
+         0.04s   sundown
+         0.15s   discount
+         0.80s   peg-markdown
+    ->   0.97s   lunamark
+         4.05s   PHP Markdown
+         6.11s   pandoc
+       113.13s   Markdown.pl
+      2322.33s   markdown.lua
 
 # Installing
 
