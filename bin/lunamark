@@ -264,7 +264,7 @@ local function ensure_one_of(optval,s,ary)
 end
 
 local version = [[
-lunamark 0.2
+lunamark 0.3
 Copyright (C) 2009-2011 John MacFarlane
 ]]
 
