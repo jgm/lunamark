@@ -52,6 +52,7 @@
 
 <pre><code>     0.04s   sundown
      0.15s   discount
+-&gt;   0.56s   lunamark + luajit
      0.80s   peg-markdown
 -&gt;   0.97s   lunamark
      4.05s   PHP Markdown
@@ -62,7 +63,14 @@
 
 <h1>Installing</h1>
 
-<p>You can install the latest development version of lunamark using <a href="http://www.luarocks.org">luarocks</a>:</p>
+<p>If you want a standalone version of lunamark that doesn’t depend on lua or other lua modules being installed on your system, just do</p>
+
+<pre><code>make standalone
+</code></pre>
+
+<p>Your executable will be created in the <code>standalone</code> directory.</p>
+
+<p>If you are a lua user, you will probably prefer to install lunamark using luarocks. You can install the latest development version this way:</p>
 
 <pre><code>git clone http://github.com/jgm/lunamark.git
 cd lunamark
