@@ -58,6 +58,7 @@ concatenated together 25 times.
 
          0.04s   sundown
          0.15s   discount
+    ->   0.56s   lunamark + luajit
          0.80s   peg-markdown
     ->   0.97s   lunamark
          4.05s   PHP Markdown
