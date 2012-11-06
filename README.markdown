@@ -41,7 +41,7 @@ Lunamark's markdown parser currently supports a number of extensions
   - Pandoc-style title blocks
   - Flexible metadata using lua declarations
 
-See the [lunamark man page](lunamark.1.html) for a complete list.
+See the [lunamark(1)] man page for a complete list.
 
 It is very easy to extend the library by modifying the writers,
 adding new writers, and even modifying the markdown parser. Some
