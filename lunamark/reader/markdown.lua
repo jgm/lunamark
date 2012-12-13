@@ -834,7 +834,7 @@ function M.new(writer, options)
     * C((anyescaped - newline - semicolon)^0)
     * (semicolon + newline)
   local pandoc_authors =
-    percent * Cs((pandoc_author / parse_inlines)^0) * newline^-1
+    percent * Ct((pandoc_author / parse_inlines)^0) * newline^-1
   local pandoc_date =
     percent * optionalspace * C(line) / parse_inlines
   local pandoc_title_block =
