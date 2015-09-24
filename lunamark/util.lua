@@ -37,7 +37,9 @@ function M.find_template(name)
     end
   end
   if file then
-    return file:read("*all")
+    local data = file:read("*all")
+    file:close()
+    return data
   else
     return false, "Could not find template '" .. fname .. "'"
   end
