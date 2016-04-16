@@ -31,7 +31,7 @@ function M.new(options)
   end
 
   function Docbook.image(lab,src,tit)
-    local titattr, altattr
+    local titattr
     if tit and string.len(tit) > 0
        then titattr = string.format("<objectinfo><title>%s%</title></objectinfo>",
                         Docbook.string(tit))

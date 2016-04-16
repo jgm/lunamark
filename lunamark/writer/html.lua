@@ -51,7 +51,7 @@ function M.new(options)
   end
 
   function Html.image(lab,src,tit)
-    local titattr, altattr
+    local titattr
     if type(tit) == "string" and #tit > 0
        then titattr = " title=\"" .. Html.string(tit) .. "\""
        else titattr = ""
