@@ -4,8 +4,8 @@
 local util = require("lunamark.util")
 local lpeg = require("lpeg")
 local entities = require("lunamark.entities")
-local upper, gsub, format, length =
-  string.upper, string.gsub, string.format, string.len
+local lower, upper, gsub, format, length =
+  string.lower, string.upper, string.gsub, string.format, string.len
 local P, R, S, V, C, Cg, Cb, Cmt, Cc, Ct, B, Cs =
   lpeg.P, lpeg.R, lpeg.S, lpeg.V, lpeg.C, lpeg.Cg, lpeg.Cb,
   lpeg.Cmt, lpeg.Cc, lpeg.Ct, lpeg.B, lpeg.Cs
@@ -468,7 +468,7 @@ function M.new(writer, options)
   -- HTML
   ------------------------------------------------------------------------------
 
-  -- case-insensitive match (we assume s is lowercase)
+  -- case-insensitive match (we assume s is lowercase). must be single byte encoding
   local function keyword_exact(s)
     local parser = P(0)
     for i=1,#s do
@@ -535,7 +535,7 @@ function M.new(writer, options)
   end
 
   local function parse_matched_tags(s,pos)
-    local t = utf8_lower(lpegmatch(C(keyword),s,pos))
+    local t = lower(lpegmatch(C(keyword),s,pos))
     return lpegmatch(in_matched(t),s,pos-1)
   end
 
