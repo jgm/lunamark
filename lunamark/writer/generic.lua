@@ -31,7 +31,7 @@ local meta = {}
 meta.__index =
   function(_, key)
     io.stderr:write(string.format("WARNING: Undefined writer function '%s'\n",key))
-    return (function(...) return table.concat(arg," ") end)
+    return (function(...) return table.concat({...}," ") end)
   end
 setmetatable(W, meta)
 
