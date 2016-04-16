@@ -8,12 +8,11 @@ local M = {}
 
 local tex = require("lunamark.writer.tex")
 local util = require("lunamark.util")
-local format = string.format
 
 --- Returns a new ConTeXt writer
 -- For a list of all the fields, see [lunamark.writer.generic].
 function M.new(options)
-  local options = options or {}
+  options = options or {}
   local ConTeXt = tex.new(options)
 
   -- we don't try to escape utf-8 characters in context

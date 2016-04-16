@@ -13,7 +13,7 @@ local format = string.format
 --- Returns a new LaTeX writer.
 -- For a list of fields in the writer, see [lunamark.writer.generic].
 function M.new(options)
-  local options = options or {}
+  options = options or {}
   local LaTeX = tex.new(options)
 
   function LaTeX.code(s)
