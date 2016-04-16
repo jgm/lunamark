@@ -394,13 +394,6 @@ function M.new(writer, options)
   local define_reference_parser =
     leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^1
 
-  local referenceparser =
-    -- need the Ct or we get a stack overflow
-    Ct(( NoteBlock / register_note
-       + define_reference_parser / register_link
-       + nonemptyline^1
-       + blankline^1)^0)
-
   -- lookup link reference and return either
   -- the link or nil and fallback text.
   local function lookup_reference(label,sps,tag)
@@ -983,7 +976,6 @@ function M.new(writer, options)
   -- and tabs are assumed to be expanded.
   return function(inp)
       references = options.references or {}
-      -- lpegmatch(referenceparser,inp)
       if options.pandoc_title_blocks then
         local title, authors, date, rest = lpegmatch(pandoc_title_block, inp)
         writer.set_metadata("title",title)
