@@ -573,19 +573,19 @@ function M.new(writer, options)
 
   local Dash      = P("---") * -dash / writer.mdash
                   + P("--") * -dash / writer.ndash
-                  + P("-") * #digit * B(digit, 2) / writer.ndash
+                  + P("-") * #digit * B(digit*1, 2) / writer.ndash
 
   local DoubleQuoted = dquote * Ct((Inline - dquote)^1) * dquote
                      / writer.doublequoted
 
   local squote_start = squote * -spacing
 
-  local squote_end = squote * B(nonspacechar, 2)
+  local squote_end = squote * B(nonspacechar*1, 2)
 
   local SingleQuoted = squote_start * Ct((Inline - squote_end)^1) * squote_end
                      / writer.singlequoted
 
-  local Apostrophe = squote * B(nonspacechar, 2) / "’"
+  local Apostrophe = squote * B(nonspacechar*1, 2) / "’"
 
   local Smart      = Ellipsis + Dash + SingleQuoted + DoubleQuoted + Apostrophe
 
