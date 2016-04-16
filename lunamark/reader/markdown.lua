@@ -152,6 +152,8 @@ function M.new(writer, options)
         end
     end
 
+  local parse_markdown
+
   ------------------------------------------------------------------------------
   -- Generic parsers
   ------------------------------------------------------------------------------
@@ -974,7 +976,8 @@ function M.new(writer, options)
 
   -- inp is a string; line endings are assumed to be LF (unix-style)
   -- and tabs are assumed to be expanded.
-  return function(inp)
+  parse_markdown =
+    function(inp)
       references = options.references or {}
       if options.pandoc_title_blocks then
         local title, authors, date, rest = lpegmatch(pandoc_title_block, inp)
@@ -985,8 +988,9 @@ function M.new(writer, options)
       end
       local result = { writer.start_document(), parse_blocks(inp), writer.stop_document() }
       return rope_to_string(result), writer.get_metadata()
-  end
+    end
 
+  return parse_markdown
 end
 
 return M
