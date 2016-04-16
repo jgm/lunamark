@@ -514,7 +514,7 @@ function M.new(writer, options)
     return (less * sp * keyword_exact(s) * htmlattribute^0 * sp * more)
   end
 
-  local openelt_block = less * sp * block_keyword * htmlattribute^0 * sp * more
+  local openelt_block = sp * block_keyword * htmlattribute^0 * sp * more
 
   local closeelt_any = less * sp * slash * keyword * sp * more
 
@@ -536,11 +536,11 @@ function M.new(writer, options)
   end
 
   local function parse_matched_tags(s,pos)
-    local t = utf8_lower(lpegmatch(less * C(keyword),s,pos))
-    return lpegmatch(in_matched(t),s,pos)
+    local t = utf8_lower(lpegmatch(C(keyword),s,pos))
+    return lpegmatch(in_matched(t),s,pos-1)
   end
 
-  local in_matched_block_tags = Cmt(#openelt_block, parse_matched_tags)
+  local in_matched_block_tags = less * Cmt(#openelt_block, parse_matched_tags)
 
   local displayhtml = htmlcomment
                     + emptyelt_block
