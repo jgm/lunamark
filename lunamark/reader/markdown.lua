@@ -23,6 +23,24 @@ local utf8_lower do
   end
 end
 
+local load = load -- lua 5.2/5.3 style `load` function
+if _VERSION == "Lua 5.1" then
+  function load(ld, source, mode, env)
+    assert(mode == "t")
+    if ld:sub(1,1) == "\27" then
+      error("attempt to load a binary chunk (mode is 'text')")
+    end
+    local chunk, msg = loadstring(ld, source)
+    if not chunk then
+      return chunk, msg
+    end
+    if env ~= nil then
+      setfenv(chunk, env)
+    end
+    return chunk
+  end
+end
+
 local M = {}
 
 local rope_to_string = util.rope_to_string
@@ -790,11 +808,10 @@ function M.new(writer, options)
   local function lua_metadata(s)  -- run lua code in comment in sandbox
     local env = { m = parse_markdown, markdown = parse_blocks }
     local scode = s:match("^<!%-%-@%s*(.*)%-%->")
-    local untrusted_table, message = loadstring(scode)
+    local untrusted_table, message = load(scode, nil, "t", env)
     if not untrusted_table then
       util.err(message, 37)
     end
-    setfenv(untrusted_table, env)
     local ok, msg = pcall(untrusted_table)
     if not ok then
       util.err(msg)
