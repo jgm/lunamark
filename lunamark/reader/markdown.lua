@@ -13,8 +13,17 @@ local P, R, S, V, C, Cg, Cb, Cmt, Cc, Cf, Ct, B, Cs =
   lpeg.Cmt, lpeg.Cc, lpeg.Cf, lpeg.Ct, lpeg.B, lpeg.Cs
 local lpegmatch = lpeg.match
 local expand_tabs_in_line = util.expand_tabs_in_line
-local unicode = require("unicode")
-local utf8 = unicode.utf8
+local utf8_lower do
+  if pcall(require, "lua-utf8") then -- try luautf8
+    local luautf8 = require("lua-utf8")
+    utf8_lower = luautf8.lower
+  elseif pcall(require, "unicode") then -- try slnunicode
+    local slnunicde = require "unicode"
+    utf8_lower = slnunicde.utf8.lower
+  else
+    error "no unicode library found"
+  end
+end
 
 local M = {}
 
@@ -23,7 +32,7 @@ local rope_to_string = util.rope_to_string
 -- Normalize a markdown reference tag.  (Make lowercase, and collapse
 -- adjacent whitespace characters.)
 local function normalize_tag(tag)
-  return utf8.lower(gsub(rope_to_string(tag), "[ \n\r\t]+", " "))
+  return utf8_lower(gsub(rope_to_string(tag), "[ \n\r\t]+", " "))
 end
 
 --- Create a new markdown parser.
@@ -461,7 +470,7 @@ function M.new(writer, options)
   -- case-insensitive match (we assume s is lowercase)
   local function keyword_exact(s)
     local parser = P(0)
-    s = utf8.lower(s)
+    s = utf8_lower(s)
     for i=1,#s do
       local c = s:sub(i,i)
       local m = c .. upper(c)
@@ -530,7 +539,7 @@ function M.new(writer, options)
   end
 
   local function parse_matched_tags(s,pos)
-    local t = utf8.lower(lpegmatch(less * C(keyword),s,pos))
+    local t = utf8_lower(lpegmatch(less * C(keyword),s,pos))
     return lpegmatch(in_matched(t),s,pos)
   end
 
