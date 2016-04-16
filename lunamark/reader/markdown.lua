@@ -739,7 +739,7 @@ function M.new(writer, options)
 
   local function ordered_list(s,tight,startnum)
     if options.startnum then
-      startnum = tonumber(listtype) or 1  -- fallback for '#'
+      startnum = tonumber(startnum) or 1  -- fallback for '#'
     else
       startnum = nil
     end
