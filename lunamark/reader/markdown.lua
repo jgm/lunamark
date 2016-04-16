@@ -4,13 +4,11 @@
 local util = require("lunamark.util")
 local lpeg = require("lpeg")
 local entities = require("lunamark.entities")
-local lower, upper, gsub, rep, gmatch, format, length =
-  string.lower, string.upper, string.gsub, string.rep, string.gmatch,
-  string.format, string.len
-local concat = table.concat
-local P, R, S, V, C, Cg, Cb, Cmt, Cc, Cf, Ct, B, Cs =
+local upper, gsub, format, length =
+  string.upper, string.gsub, string.format, string.len
+local P, R, S, V, C, Cg, Cb, Cmt, Cc, Ct, B, Cs =
   lpeg.P, lpeg.R, lpeg.S, lpeg.V, lpeg.C, lpeg.Cg, lpeg.Cb,
-  lpeg.Cmt, lpeg.Cc, lpeg.Cf, lpeg.Ct, lpeg.B, lpeg.Cs
+  lpeg.Cmt, lpeg.Cc, lpeg.Ct, lpeg.B, lpeg.Cs
 local lpegmatch = lpeg.match
 local expand_tabs_in_line = util.expand_tabs_in_line
 local utf8_lower do
@@ -106,7 +104,7 @@ end
 --     line endings (newline).  If the input might have DOS
 --     line endings, a simple `gsub("\r","")` should take care of them.
 function M.new(writer, options)
-  local options = options or {}
+  options = options or {}
 
   local function expandtabs(s)
     if s:find("\t") then
@@ -125,8 +123,9 @@ function M.new(writer, options)
   local syntax
   local blocks
   local inlines
+  local inlines_no_link
 
-  parse_blocks =
+  local parse_blocks =
     function(str)
       local res = lpegmatch(blocks, str)
       if res == nil
@@ -135,7 +134,7 @@ function M.new(writer, options)
         end
     end
 
-  parse_inlines =
+  local parse_inlines =
     function(str)
       local res = lpegmatch(inlines, str)
       if res == nil
@@ -144,7 +143,7 @@ function M.new(writer, options)
         end
     end
 
-  parse_inlines_no_link =
+  local parse_inlines_no_link =
     function(str)
       local res = lpegmatch(inlines_no_link, str)
       if res == nil
@@ -194,7 +193,6 @@ function M.new(writer, options)
 
   local any                    = P(1)
   local fail                   = any - 1
-  local always                 = P("")
 
   local escapable              = S("\\`*_{}[]()+_.!<>#-~:^")
   local anyescaped             = P("\\") / "" * escapable
@@ -217,7 +215,6 @@ function M.new(writer, options)
   local normalchar             = any -
                                  (specialchar + spacing + tightblocksep)
   local optionalspace          = spacechar^0
-  local spaces                 = spacechar^1
   local eof                    = - any
   local nonindentspace         = space^-3 * - spacechar
   local indent                 = space^-3 * tab
@@ -249,16 +246,6 @@ function M.new(writer, options)
   -- Parsers used for markdown lists
   -----------------------------------------------------------------------------
 
-  -- gobble spaces to make the whole bullet or enumerator four spaces wide:
-  local function gobbletofour(s,pos,c)
-      if length(c) >= 3
-         then return lpegmatch(space^-1,s,pos)
-      elseif length(c) == 2
-         then return lpegmatch(space^-2,s,pos)
-      else return lpegmatch(space^-3,s,pos)
-      end
-  end
-
   local bulletchar = C(plus + asterisk + dash)
 
   local bullet     = ( bulletchar * #spacing * (tab + space^-3)
@@ -267,6 +254,7 @@ function M.new(writer, options)
                      + space * space * space * bulletchar * #spacing
                      ) * -bulletchar
 
+  local dig
   if options.hash_enumerators then
     dig = digit + hash
   else
@@ -522,10 +510,6 @@ function M.new(writer, options)
   end
 
   local emptyelt_any = less * sp * keyword * htmlattribute^0 * sp * slash * more
-
-  local function emptyelt_exact(s)
-    return (less * sp * keyword_exact(s) * htmlattribute^0 * sp * slash * more)
-  end
 
   local emptyelt_block = less * sp * block_keyword * htmlattribute^0 * sp * slash * more
 
@@ -987,7 +971,7 @@ function M.new(writer, options)
   inlines_t.Inlines = Inline^0 * (spacing^0 * eof / "")
   inlines = Ct(inlines_t)
 
-  inlines_no_link_t = util.table_copy(inlines_t)
+  local inlines_no_link_t = util.table_copy(inlines_t)
   inlines_no_link_t.Link = fail
   inlines_no_link = Ct(inlines_no_link_t)
 
