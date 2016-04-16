@@ -471,7 +471,6 @@ function M.new(writer, options)
   -- case-insensitive match (we assume s is lowercase)
   local function keyword_exact(s)
     local parser = P(0)
-    s = utf8_lower(s)
     for i=1,#s do
       local c = s:sub(i,i)
       local m = c .. upper(c)
