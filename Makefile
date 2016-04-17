@@ -1,4 +1,6 @@
-version=$(shell bin/lunamark --version | head -1)
+VERSION=0.3.3
+REVISION=1
+ROCKSPEC=lunamark-$(VERSION)-$(REVISION).rockspec
 date=$(shell date +%x)
 luas=lunamark.lua lunamark/*.lua lunamark/*/*.lua
 testfile=tmptest.txt
@@ -9,12 +11,19 @@ NUM ?= 25
 PROG ?= bin/lunamark
 TESTOPTS ?= --tidy
 
-all:
-	@echo Targets: test bench docs run-code-examples install clean
 
-.PHONY: test bench docs clean run-code-examples install website standalone
+all: build
+
+build: $(ROCKSPEC)
+	luarocks make $(ROCKSPEC)
+
+.PHONY: help build test bench docs clean run-code-examples install website standalone
+
 test:
 	LUNAMARK_EXTENSIONS="" bin/shtest ${TESTOPTS} -p ${PROG} ${OPTS}
+
+$(ROCKSPEC): rockspec.in
+	sed -e "s/_VERSION/$(VERSION)/g; s/_REVISION/$(REVISION)/g" $< > $@
 
 ${benchtext}:
 	for i in tests/Markdown_1.0.3/*.test; do sed -e '1,/<<</d;/>>>/,$$d' "$$i" >> $@; echo >> $@.txt; done
@@ -66,6 +75,9 @@ ${web}/index.html: README.markdown ${templatesdir}/web.html
 
 standalone: ${luas}
 	make -C standalone
+
+help:
+	#@echo Targets: build test bench docs run-code-examples install clean
 
 clean:
 	-rm -rf doc ${testfile} ${benchtext} lunamark.1 lunadoc.1
