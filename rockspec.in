@@ -22,7 +22,7 @@ dependencies = {
    "lpeg >= 0.10",
    "cosmo >= 10.0",
    "alt-getopt >= 0.7",
---   "slnunicode >= 1.1",
+   "luautf8 >= 0.1.1"
 }
 build = {
    type = "none",
