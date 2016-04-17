@@ -4,17 +4,42 @@
 local util = require("lunamark.util")
 local lpeg = require("lpeg")
 local entities = require("lunamark.entities")
-local lower, upper, gsub, rep, gmatch, format, length =
-  string.lower, string.upper, string.gsub, string.rep, string.gmatch,
-  string.format, string.len
-local concat = table.concat
-local P, R, S, V, C, Cg, Cb, Cmt, Cc, Cf, Ct, B, Cs =
+local lower, upper, gsub, format, length =
+  string.lower, string.upper, string.gsub, string.format, string.len
+local P, R, S, V, C, Cg, Cb, Cmt, Cc, Ct, B, Cs =
   lpeg.P, lpeg.R, lpeg.S, lpeg.V, lpeg.C, lpeg.Cg, lpeg.Cb,
-  lpeg.Cmt, lpeg.Cc, lpeg.Cf, lpeg.Ct, lpeg.B, lpeg.Cs
+  lpeg.Cmt, lpeg.Cc, lpeg.Ct, lpeg.B, lpeg.Cs
 local lpegmatch = lpeg.match
 local expand_tabs_in_line = util.expand_tabs_in_line
-local unicode = require("unicode")
-local utf8 = unicode.utf8
+local utf8_lower do
+  if pcall(require, "lua-utf8") then -- try luautf8
+    local luautf8 = require("lua-utf8")
+    utf8_lower = luautf8.lower
+  elseif pcall(require, "unicode") then -- try slnunicode
+    local slnunicde = require "unicode"
+    utf8_lower = slnunicde.utf8.lower
+  else
+    error "no unicode library found"
+  end
+end
+
+local load = load -- lua 5.2/5.3 style `load` function
+if _VERSION == "Lua 5.1" then
+  function load(ld, source, mode, env)
+    assert(mode == "t")
+    if ld:sub(1,1) == "\27" then
+      error("attempt to load a binary chunk (mode is 'text')")
+    end
+    local chunk, msg = loadstring(ld, source)
+    if not chunk then
+      return chunk, msg
+    end
+    if env ~= nil then
+      setfenv(chunk, env)
+    end
+    return chunk
+  end
+end
 
 local M = {}
 
@@ -23,7 +48,7 @@ local rope_to_string = util.rope_to_string
 -- Normalize a markdown reference tag.  (Make lowercase, and collapse
 -- adjacent whitespace characters.)
 local function normalize_tag(tag)
-  return utf8.lower(gsub(rope_to_string(tag), "[ \n\r\t]+", " "))
+  return utf8_lower(gsub(rope_to_string(tag), "[ \n\r\t]+", " "))
 end
 
 --- Create a new markdown parser.
@@ -97,7 +122,7 @@ end
 --     line endings (newline).  If the input might have DOS
 --     line endings, a simple `gsub("\r","")` should take care of them.
 function M.new(writer, options)
-  local options = options or {}
+  options = options or {}
 
   local function expandtabs(s)
     if s:find("\t") then
@@ -116,8 +141,9 @@ function M.new(writer, options)
   local syntax
   local blocks
   local inlines
+  local inlines_no_link
 
-  parse_blocks =
+  local parse_blocks =
     function(str)
       local res = lpegmatch(blocks, str)
       if res == nil
@@ -126,7 +152,7 @@ function M.new(writer, options)
         end
     end
 
-  parse_inlines =
+  local parse_inlines =
     function(str)
       local res = lpegmatch(inlines, str)
       if res == nil
@@ -135,7 +161,7 @@ function M.new(writer, options)
         end
     end
 
-  parse_inlines_no_link =
+  local parse_inlines_no_link =
     function(str)
       local res = lpegmatch(inlines_no_link, str)
       if res == nil
@@ -143,6 +169,8 @@ function M.new(writer, options)
         else return res
         end
     end
+
+  local parse_markdown
 
   ------------------------------------------------------------------------------
   -- Generic parsers
@@ -185,7 +213,6 @@ function M.new(writer, options)
 
   local any                    = P(1)
   local fail                   = any - 1
-  local always                 = P("")
 
   local escapable              = S("\\`*_{}[]()+_.!<>#-~:^")
   local anyescaped             = P("\\") / "" * escapable
@@ -208,7 +235,6 @@ function M.new(writer, options)
   local normalchar             = any -
                                  (specialchar + spacing + tightblocksep)
   local optionalspace          = spacechar^0
-  local spaces                 = spacechar^1
   local eof                    = - any
   local nonindentspace         = space^-3 * - spacechar
   local indent                 = space^-3 * tab
@@ -240,16 +266,6 @@ function M.new(writer, options)
   -- Parsers used for markdown lists
   -----------------------------------------------------------------------------
 
-  -- gobble spaces to make the whole bullet or enumerator four spaces wide:
-  local function gobbletofour(s,pos,c)
-      if length(c) >= 3
-         then return lpegmatch(space^-1,s,pos)
-      elseif length(c) == 2
-         then return lpegmatch(space^-2,s,pos)
-      else return lpegmatch(space^-3,s,pos)
-      end
-  end
-
   local bulletchar = C(plus + asterisk + dash)
 
   local bullet     = ( bulletchar * #spacing * (tab + space^-3)
@@ -258,6 +274,7 @@ function M.new(writer, options)
                      + space * space * space * bulletchar * #spacing
                      ) * -bulletchar
 
+  local dig
   if options.hash_enumerators then
     dig = digit + hash
   else
@@ -397,13 +414,6 @@ function M.new(writer, options)
   local define_reference_parser =
     leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^1
 
-  local referenceparser =
-    -- need the Ct or we get a stack overflow
-    Ct(( NoteBlock / register_note
-       + define_reference_parser / register_link
-       + nonemptyline^1
-       + blankline^1)^0)
-
   -- lookup link reference and return either
   -- the link or nil and fallback text.
   local function lookup_reference(label,sps,tag)
@@ -458,10 +468,9 @@ function M.new(writer, options)
   -- HTML
   ------------------------------------------------------------------------------
 
-  -- case-insensitive match (we assume s is lowercase)
+  -- case-insensitive match (we assume s is lowercase). must be single byte encoding
   local function keyword_exact(s)
     local parser = P(0)
-    s = utf8.lower(s)
     for i=1,#s do
       local c = s:sub(i,i)
       local m = c .. upper(c)
@@ -504,7 +513,7 @@ function M.new(writer, options)
     return (less * sp * keyword_exact(s) * htmlattribute^0 * sp * more)
   end
 
-  local openelt_block = less * sp * block_keyword * htmlattribute^0 * sp * more
+  local openelt_block = sp * block_keyword * htmlattribute^0 * sp * more
 
   local closeelt_any = less * sp * slash * keyword * sp * more
 
@@ -513,10 +522,6 @@ function M.new(writer, options)
   end
 
   local emptyelt_any = less * sp * keyword * htmlattribute^0 * sp * slash * more
-
-  local function emptyelt_exact(s)
-    return (less * sp * keyword_exact(s) * htmlattribute^0 * sp * slash * more)
-  end
 
   local emptyelt_block = less * sp * block_keyword * htmlattribute^0 * sp * slash * more
 
@@ -530,11 +535,11 @@ function M.new(writer, options)
   end
 
   local function parse_matched_tags(s,pos)
-    local t = utf8.lower(lpegmatch(less * C(keyword),s,pos))
-    return lpegmatch(in_matched(t),s,pos)
+    local t = lower(lpegmatch(C(keyword),s,pos))
+    return lpegmatch(in_matched(t),s,pos-1)
   end
 
-  local in_matched_block_tags = Cmt(#openelt_block, parse_matched_tags)
+  local in_matched_block_tags = less * Cmt(#openelt_block, parse_matched_tags)
 
   local displayhtml = htmlcomment
                     + emptyelt_block
@@ -568,19 +573,19 @@ function M.new(writer, options)
 
   local Dash      = P("---") * -dash / writer.mdash
                   + P("--") * -dash / writer.ndash
-                  + P("-") * #digit * B(digit, 2) / writer.ndash
+                  + P("-") * #digit * B(digit*1, 2) / writer.ndash
 
   local DoubleQuoted = dquote * Ct((Inline - dquote)^1) * dquote
                      / writer.doublequoted
 
   local squote_start = squote * -spacing
 
-  local squote_end = squote * B(nonspacechar, 2)
+  local squote_end = squote * B(nonspacechar*1, 2)
 
   local SingleQuoted = squote_start * Ct((Inline - squote_end)^1) * squote_end
                      / writer.singlequoted
 
-  local Apostrophe = squote * B(nonspacechar, 2) / "’"
+  local Apostrophe = squote * B(nonspacechar*1, 2) / "’"
 
   local Smart      = Ellipsis + Dash + SingleQuoted + DoubleQuoted + Apostrophe
 
@@ -753,7 +758,7 @@ function M.new(writer, options)
 
   local function ordered_list(s,tight,startnum)
     if options.startnum then
-      startnum = tonumber(listtype) or 1  -- fallback for '#'
+      startnum = tonumber(startnum) or 1  -- fallback for '#'
     else
       startnum = nil
     end
@@ -802,11 +807,10 @@ function M.new(writer, options)
   local function lua_metadata(s)  -- run lua code in comment in sandbox
     local env = { m = parse_markdown, markdown = parse_blocks }
     local scode = s:match("^<!%-%-@%s*(.*)%-%->")
-    local untrusted_table, message = loadstring(scode)
+    local untrusted_table, message = load(scode, nil, "t", env)
     if not untrusted_table then
       util.err(message, 37)
     end
-    setfenv(untrusted_table, env)
     local ok, msg = pcall(untrusted_table)
     if not ok then
       util.err(msg)
@@ -978,7 +982,7 @@ function M.new(writer, options)
   inlines_t.Inlines = Inline^0 * (spacing^0 * eof / "")
   inlines = Ct(inlines_t)
 
-  inlines_no_link_t = util.table_copy(inlines_t)
+  local inlines_no_link_t = util.table_copy(inlines_t)
   inlines_no_link_t.Link = fail
   inlines_no_link = Ct(inlines_no_link_t)
 
@@ -988,9 +992,9 @@ function M.new(writer, options)
 
   -- inp is a string; line endings are assumed to be LF (unix-style)
   -- and tabs are assumed to be expanded.
-  return function(inp)
+  parse_markdown =
+    function(inp)
       references = options.references or {}
-      -- lpegmatch(referenceparser,inp)
       if options.pandoc_title_blocks then
         local title, authors, date, rest = lpegmatch(pandoc_title_block, inp)
         writer.set_metadata("title",title)
@@ -1000,8 +1004,9 @@ function M.new(writer, options)
       end
       local result = { writer.start_document(), parse_blocks(inp), writer.stop_document() }
       return rope_to_string(result), writer.get_metadata()
-  end
+    end
 
+  return parse_markdown
 end
 
 return M

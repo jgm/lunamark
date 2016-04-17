@@ -5,8 +5,22 @@
 
 local M = {}
 
-local unicode=require("unicode")
-local utf8=unicode.utf8
+local utf8_char do
+  if utf8 then
+    utf8_char = utf8.char
+  elseif pcall(require, "compat53.module") then
+    local utf8 = require "compat53.module".utf8
+    utf8_char = utf8.char
+  elseif pcall(require, "lua-utf8") then -- try luautf8
+    local luautf8 = require("lua-utf8")
+    utf8_char = luautf8.char
+  elseif pcall(require, "unicode") then -- try slnunicode
+    local slnunicode = require "unicode"
+    utf8_char = slnunicode.utf8.char
+  else
+    error "no unicode library found"
+  end
+end
 
 local character_entities = {
   ["quot"] = 0x0022,
@@ -263,20 +277,20 @@ local character_entities = {
 --- Given a string of decimal digits, returns a UTF-8 encoded
 -- string encoding a unicode character.
 function M.dec_entity(s)
-  return utf8.char(tonumber(s))
+  return utf8_char(tonumber(s))
 end
 
 --- Given a string of hexadecimal digits, returns a UTF-8 encoded
 -- string encoding a unicode character.
 function M.hex_entity(s)
-  return utf8.char(tonumber("0x"..s))
+  return utf8_char(tonumber("0x"..s))
 end
 
 --- Given a character entity name (like `ouml`), returns a UTF-8 encoded
 -- string encoding a unicode character.
 function M.char_entity(s)
   local n = character_entities[s]
-  return utf8.char(n)
+  return utf8_char(n)
 end
 
 return M

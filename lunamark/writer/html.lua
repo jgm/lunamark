@@ -8,7 +8,6 @@ local M = {}
 
 local xml = require("lunamark.writer.xml")
 local util = require("lunamark.util")
-local gsub = string.gsub
 local flatten, intersperse, map = util.flatten, util.intersperse, util.map
 
 --- Return a new HTML writer.
@@ -28,9 +27,9 @@ local flatten, intersperse, map = util.flatten, util.intersperse, util.map
 -- :   `compact` removes unneeded blank lines.
 -- :   `default` puts blank lines between block elements.
 function M.new(options)
-  local options = options or {}
+  options = options or {}
   local Html = xml.new(options)
-  local options = options or {}
+
   local endnotes = {}
   local containersep = Html.containersep
   local interblocksep = Html.interblocksep
@@ -52,7 +51,7 @@ function M.new(options)
   end
 
   function Html.image(lab,src,tit)
-    local titattr, altattr
+    local titattr
     if type(tit) == "string" and #tit > 0
        then titattr = " title=\"" .. Html.string(tit) .. "\""
        else titattr = ""
@@ -106,7 +105,6 @@ function M.new(options)
 
   function Html.header(s,level)
     local sep = ""
-    local stop
     if options.slides or options.containers then
       local lev = (options.slides and 1) or level
       local stop = Html.stop_section(lev)
@@ -123,7 +121,7 @@ function M.new(options)
   function Html.note(contents)
     local num = #endnotes + 1
     local backref = ' <a href="#fnref' .. num .. '" class="footnoteBackLink">↩</a>'
-    contentsf = flatten(contents)
+    local contentsf = flatten(contents)
     if contentsf[#contentsf] == "</p>" then
       table.insert(contentsf, #contentsf, backref)
     else

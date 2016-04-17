@@ -31,7 +31,7 @@ local meta = {}
 meta.__index =
   function(_, key)
     io.stderr:write(string.format("WARNING: Undefined writer function '%s'\n",key))
-    return (function(...) return table.concat(arg," ") end)
+    return (function(...) return table.concat({...}," ") end)
   end
 setmetatable(W, meta)
 
@@ -141,13 +141,13 @@ function M.new(options)
   --- A link with link text `label`, uri `uri`,
   -- and title `title`.
   function W.link(label, uri, title)
-    return lab
+    return label
   end
 
   --- An image link with alt text `label`,
   -- source `src`, and title `title`.
   function W.image(label, src, title)
-    return lab
+    return label
   end
 
   --- A paragraph.
