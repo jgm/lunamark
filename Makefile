@@ -17,7 +17,13 @@ all: build
 build: $(ROCKSPEC)
 	luarocks make $(ROCKSPEC)
 
-.PHONY: help build test bench docs clean run-code-examples install website standalone
+.PHONY: help build test check rock bench docs clean run-code-examples install website standalone
+
+rock: $(ROCKSPEC)
+	luarocks --local make $(ROCKSPEC)
+
+check:
+	luacheck bin/lunamark lunamark/*.lua lunamark/*/*.lua
 
 test:
 	LUNAMARK_EXTENSIONS="" bin/shtest ${TESTOPTS} -p ${PROG} ${OPTS}
