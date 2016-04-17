@@ -1,3 +1,66 @@
+lunamark 0.4.0 (released 16 Apr 2016)
+
+  * Don't run the failing PHP Markdown tests by default (#13).
+
+  * Depend on luautf8 instead of slnunicode (which doesn't build on 5.2).
+
+  * Makefile: added rock and check targets.
+
+  * Makefile:  build rockspec from template.
+    `make` now does `luarocks make` with a recreated rockspec.
+    Version must be specified in Makefile.
+
+  * Fix compatibility with lpeg 1.0 (daurnimator).
+
+  * Use non-utf8 lower when utf8 not acceptable (daurnimator).
+
+  * Remove utf8_lower call when input is already lowercase (daurnimator).
+
+  * Add hack to avoid Cmt that matches empty string (daurnimator),
+
+    working around a change in lpeg behavior (#11).
+
+  * Remove unused 'altattr' local (daurnimator).
+
+  * Fix use of deprecated magic 'arg' variable (daurnimator).
+
+  * Fix some luacheck complaints (daurnimator).
+
+  * Use lua 5.3 style load function (daurnimator).
+
+  * Name exported function 'parse_markdown' to get lua_metadata
+    option working again (daurnimator).
+
+  * Use correct variable for start of ordered lists (daurnimator).
+    Fixes issue where options.startnum wouldn't work.
+
+  * Remove commented out 'referenceparser' code (daurnimator).
+
+  * Try other unicode libraries other than slnunicode (daurnimator).
+
+  * Close file descriptor (TsT).
+
+  * Fixed regression in pandoc title block (#7).
+
+  * README: Fixed man page link.
+
+  * Removed unneeded bit32 dependency.
+
+  * Added luajit benchmark.
+
+  * Documented 'make standalone' in README.
+
+  * Added 'standalone' target to Makefile.
+
+    This creates a standalone executable version of lunamark in the
+    standalone directory.  It doesn't require that lua or other
+    lua libraries be installed.  The lua interpreter is baked into
+    the executable.  It also uses a version of lpeg that has been
+    modified to allow for larger grammars.  See the patch in standalone/.
+
+  * Use unicode library for entities, remove depend on bit32.
+
+
 lunamark 0.3 (released 26 Oct 2012)
 
   * Removed title h1 tag in html template.
