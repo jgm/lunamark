@@ -1,4 +1,4 @@
-VERSION=0.3.3
+VERSION=0.4.0
 REVISION=1
 ROCKSPEC=lunamark-$(VERSION)-$(REVISION).rockspec
 date=$(shell date +%x)
