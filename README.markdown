@@ -152,6 +152,9 @@ Lunamark currently fails four of the PHP Markdown tests:
     I think lunamark's behavior is perfectly reasonable, and I see no reason
     to change.
 
+The `make test` target only runs the Markdown and lunamark
+tests, skipping the PHP Markdown tests.
+
 # Authors
 
 lunamark is released under the MIT license.

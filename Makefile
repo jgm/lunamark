@@ -17,7 +17,7 @@ all: build
 build: $(ROCKSPEC)
 	luarocks make $(ROCKSPEC)
 
-.PHONY: help build test check rock bench docs clean run-code-examples install website standalone
+.PHONY: build test testall check rock bench docs clean run-code-examples install website standalone
 
 rock: $(ROCKSPEC)
 	luarocks --local make $(ROCKSPEC)
@@ -26,7 +26,13 @@ check:
 	luacheck bin/lunamark lunamark/*.lua lunamark/*/*.lua
 
 test:
-	LUNAMARK_EXTENSIONS="" bin/shtest ${TESTOPTS} -p ${PROG} ${OPTS}
+	LUAPATH="?.lua;lunamark/?.lua;lunamark/?/?.lua;$$LUAPATH"
+	LUNAMARK_EXTENSIONS="" bin/shtest ${TESTOPTS} -d tests/Markdown_1.0.3 -p ${PROG} ${OPTS}
+	LUNAMARK_EXTENSIONS="" bin/shtest ${TESTOPTS} -d tests/lunamark -p ${PROG} ${OPTS}
+
+testall: test
+	LUAPATH="?.lua;lunamark/?.lua;lunamark/?/?.lua;$$LUAPATH"
+	LUNAMARK_EXTENSIONS="" bin/shtest ${TESTOPTS} -d tests/PHP_Markdown -p ${PROG} ${OPTS}
 
 $(ROCKSPEC): rockspec.in
 	sed -e "s/_VERSION/$(VERSION)/g; s/_REVISION/$(REVISION)/g" $< > $@
@@ -81,9 +87,6 @@ ${web}/index.html: README.markdown ${templatesdir}/web.html
 
 standalone: ${luas}
 	make -C standalone
-
-help:
-	#@echo Targets: build test bench docs run-code-examples install clean
 
 clean:
 	-rm -rf doc ${testfile} ${benchtext} lunamark.1 lunadoc.1
