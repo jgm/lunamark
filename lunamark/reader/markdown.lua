@@ -374,7 +374,7 @@ function M.new(writer, options)
       if found then
         return writer.note(parse_blocks(found))
       else
-        return {"[^", ref, "]"}
+        return {"[", parse_inlines("^" .. ref), "]"}
       end
     end
   end
