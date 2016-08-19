@@ -51,6 +51,52 @@ local function normalize_tag(tag)
   return utf8_lower(gsub(rope_to_string(tag), "[ \n\r\t]+", " "))
 end
 
+------------------------------------------------------------------------------
+
+local syntax
+local blocks_toplevel
+local blocks
+local inlines
+local inlines_no_link
+
+local parse_blocks =
+  function(str)
+    local res = lpegmatch(blocks, str)
+    if res == nil
+      then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
+      else return res
+      end
+  end
+
+local parse_blocks_toplevel =
+  function(str)
+    local res = lpegmatch(blocks_toplevel, str)
+    if res == nil
+      then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
+      else return res
+      end
+  end
+
+local parse_inlines =
+  function(str)
+    local res = lpegmatch(inlines, str)
+    if res == nil
+      then error(format("parse_inlines failed on:\n%s", str:sub(1,20)))
+      else return res
+      end
+  end
+
+local parse_inlines_no_link =
+  function(str)
+    local res = lpegmatch(inlines_no_link, str)
+    if res == nil
+      then error(format("parse_inlines_no_link failed on:\n%s", str:sub(1,20)))
+      else return res
+      end
+  end
+
+local parse_markdown
+
 --- Create a new markdown parser.
 --
 -- *   `writer` is a writer table (see [lunamark.writer.generic]).
@@ -135,52 +181,6 @@ function M.new(writer, options)
   if options.preserve_tabs then
     expandtabs = function(s) return s end
   end
-
-  ------------------------------------------------------------------------------
-
-  local syntax
-  local blocks_toplevel
-  local blocks
-  local inlines
-  local inlines_no_link
-
-  local parse_blocks =
-    function(str)
-      local res = lpegmatch(blocks, str)
-      if res == nil
-        then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
-        else return res
-        end
-    end
-
-  local parse_blocks_toplevel =
-    function(str)
-      local res = lpegmatch(blocks_toplevel, str)
-      if res == nil
-        then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
-        else return res
-        end
-    end
-
-  local parse_inlines =
-    function(str)
-      local res = lpegmatch(inlines, str)
-      if res == nil
-        then error(format("parse_inlines failed on:\n%s", str:sub(1,20)))
-        else return res
-        end
-    end
-
-  local parse_inlines_no_link =
-    function(str)
-      local res = lpegmatch(inlines_no_link, str)
-      if res == nil
-        then error(format("parse_inlines_no_link failed on:\n%s", str:sub(1,20)))
-        else return res
-        end
-    end
-
-  local parse_markdown
 
   ------------------------------------------------------------------------------
   -- Generic parsers
