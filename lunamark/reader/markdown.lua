@@ -316,7 +316,7 @@ function M.new(writer, options)
                     + (space - closeticks)
                     + (backtick^1 - closeticks)
 
-  local inticks     = openticks * space^-1 * C(intickschar^1) * closeticks
+  local inticks     = openticks * space^-1 * C(intickschar^0) * closeticks
 
   -----------------------------------------------------------------------------
   -- Parsers used for markdown tags and links
