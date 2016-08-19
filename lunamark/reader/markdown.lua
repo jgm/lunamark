@@ -706,7 +706,7 @@ function M.new(writer, options)
   local Blockquote     = Cs((
             ((leader * more * space^-1)/"" * linechar^0 * newline)^1
           * (-blankline * linechar^1 * newline)^0
-          * blankline^0
+          * ( blankline^0 / "")
           )^1) / parse_blocks_toplevel / writer.blockquote
 
   local function lineof(c)
