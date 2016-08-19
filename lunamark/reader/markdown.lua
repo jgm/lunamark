@@ -139,6 +139,7 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   local syntax
+  local blocks_toplevel
   local blocks
   local inlines
   local inlines_no_link
@@ -146,6 +147,15 @@ function M.new(writer, options)
   local parse_blocks =
     function(str)
       local res = lpegmatch(blocks, str)
+      if res == nil
+        then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
+        else return res
+        end
+    end
+
+  local parse_blocks_toplevel =
+    function(str)
+      local res = lpegmatch(blocks_toplevel, str)
       if res == nil
         then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
         else return res
@@ -372,7 +382,7 @@ function M.new(writer, options)
     return function()
       local found = rawnotes[normalize_tag(ref)]
       if found then
-        return writer.note(parse_blocks(found))
+        return writer.note(parse_blocks_toplevel(found))
       else
         return {"[", parse_inlines("^" .. ref), "]"}
       end
@@ -697,7 +707,7 @@ function M.new(writer, options)
             ((leader * more * space^-1)/"" * linechar^0 * newline)^1
           * (-blankline * linechar^1 * newline)^0
           * blankline^0
-          )^1) / parse_blocks / writer.blockquote
+          )^1) / parse_blocks_toplevel / writer.blockquote
 
   local function lineof(c)
       return (leader * (P(c) * optionalspace)^3 * newline * blankline^1)
@@ -715,6 +725,16 @@ function M.new(writer, options)
                          + #hash
                          + #(leader * more * space^-1)
                          )
+                       / writer.paragraph
+
+  local ToplevelParagraph
+                       = nonindentspace * Ct(Inline^1) * (newline
+                       * ( blankline^1
+                         + #hash
+                         + #(leader * more * space^-1)
+                         + eof
+                         )
+                       + eof )
                        / writer.paragraph
 
   local Plain          = nonindentspace * Ct(Inline^1) / writer.plain
@@ -786,7 +806,7 @@ function M.new(writer, options)
   end
 
   local DefinitionListItemLoose = C(line) * skipblanklines
-                           * Ct((defstart * indented_blocks(dlchunk) / parse_blocks)^1)
+                           * Ct((defstart * indented_blocks(dlchunk) / parse_blocks_toplevel)^1)
                            * Cc(false)
                            / definition_list_item
 
@@ -805,7 +825,7 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   local function lua_metadata(s)  -- run lua code in comment in sandbox
-    local env = { m = parse_markdown, markdown = parse_blocks }
+    local env = { m = parse_markdown, markdown = parse_blocks_toplevel }
     local scode = s:match("^<!%-%-@%s*(.*)%-%->")
     local untrusted_table, message = load(scode, nil, "t", env)
     if not untrusted_table then
@@ -975,6 +995,10 @@ function M.new(writer, options)
     syntax = options.alter_syntax(syntax)
   end
 
+  local blocks_toplevel_t = util.table_copy(syntax)
+  blocks_toplevel_t.Paragraph = ToplevelParagraph
+  blocks_toplevel = Ct(blocks_toplevel_t)
+
   blocks = Ct(syntax)
 
   local inlines_t = util.table_copy(syntax)
@@ -1002,7 +1026,7 @@ function M.new(writer, options)
         writer.set_metadata("date",date)
         inp = rest
       end
-      local result = { writer.start_document(), parse_blocks(inp), writer.stop_document() }
+      local result = { writer.start_document(), parse_blocks_toplevel(inp), writer.stop_document() }
       return rope_to_string(result), writer.get_metadata()
     end
 
