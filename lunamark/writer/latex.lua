@@ -66,6 +66,8 @@ function M.new(options)
     return {"\\begin{verbatim}\n",s,"\\end{verbatim}"}
   end
 
+  LaTeX.fenced_code = LaTeX.verbatim
+
   function LaTeX.header(s,level)
     local cmd
     if level == 1 then

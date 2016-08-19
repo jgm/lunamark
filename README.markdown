@@ -38,6 +38,7 @@ Lunamark's markdown parser currently supports a number of extensions
   - Significant start numbers in ordered lists
   - Footnotes
   - Definition lists
+  - CommonMark fenced code lists
   - Pandoc-style title blocks
   - Flexible metadata using lua declarations
 
@@ -152,7 +153,13 @@ Lunamark currently fails four of the PHP Markdown tests:
     I think lunamark's behavior is perfectly reasonable, and I see no reason
     to change.
 
-The `make test` target only runs the Markdown and lunamark
+and one of the CommonMark tests:
+
+  * `tests/CommonMark_0.26/fenced-code-blocks.test`: The HTML is
+    semantically equivalent; using the `-t/--tidy` option to `bin/shtest` makes
+    the test pass.
+
+The `make test` target only runs the Markdown, CommonMark and lunamark
 tests, skipping the PHP Markdown tests.
 
 # Authors

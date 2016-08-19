@@ -92,6 +92,8 @@ function M.new(options)
     return {"<programlisting>",Docbook.string(s),"</programlisting>"}
   end
 
+  Docbook.fenced_code = Docbook.verbatim
+
   function Docbook.stop_document()
     local stop = Docbook.stop_section(1) -- close section containers
     if stop ~= "" then stop = Docbook.containersep .. stop end

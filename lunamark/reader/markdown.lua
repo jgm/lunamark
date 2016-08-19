@@ -52,50 +52,34 @@ local function normalize_tag(tag)
 end
 
 ------------------------------------------------------------------------------
+-- Character parsers
+------------------------------------------------------------------------------
 
-local syntax
-local blocks_toplevel
-local blocks
-local inlines
-local inlines_no_link
-
-local parse_blocks =
-  function(str)
-    local res = lpegmatch(blocks, str)
-    if res == nil
-      then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
-      else return res
-      end
-  end
-
-local parse_blocks_toplevel =
-  function(str)
-    local res = lpegmatch(blocks_toplevel, str)
-    if res == nil
-      then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
-      else return res
-      end
-  end
-
-local parse_inlines =
-  function(str)
-    local res = lpegmatch(inlines, str)
-    if res == nil
-      then error(format("parse_inlines failed on:\n%s", str:sub(1,20)))
-      else return res
-      end
-  end
-
-local parse_inlines_no_link =
-  function(str)
-    local res = lpegmatch(inlines_no_link, str)
-    if res == nil
-      then error(format("parse_inlines_no_link failed on:\n%s", str:sub(1,20)))
-      else return res
-      end
-  end
-
-local parse_markdown
+local percent                = P("%")
+local asterisk               = P("*")
+local dash                   = P("-")
+local plus                   = P("+")
+local underscore             = P("_")
+local period                 = P(".")
+local hash                   = P("#")
+local ampersand              = P("&")
+local backtick               = P("`")
+local less                   = P("<")
+local more                   = P(">")
+local space                  = P(" ")
+local squote                 = P("'")
+local dquote                 = P('"')
+local lparent                = P("(")
+local rparent                = P(")")
+local lbracket               = P("[")
+local rbracket               = P("]")
+local circumflex             = P("^")
+local slash                  = P("/")
+local equal                  = P("=")
+local colon                  = P(":")
+local semicolon              = P(";")
+local exclamation            = P("!")
+local tilde                  = P("~")
 
 --- Create a new markdown parser.
 --
@@ -133,6 +117,9 @@ local parse_markdown
 --     `definition_lists`
 --     :   Enable definition lists as in pandoc.
 --
+--     `fenced_code_blocks`
+--     :   Enable commonmark fenced code blocks.
+--
 --     `pandoc_title_blocks`
 --     :   Parse pandoc-style title block at the beginning of document:
 --
@@ -156,6 +143,10 @@ local parse_markdown
 --     `require_blank_before_header`
 --     :   Require a blank line between a paragraph and a following
 --         header.
+--
+--     `require_blank_before_fenced_code_block`
+--     :   Require a blank line between a paragraph and a following
+--         fenced code block.
 --
 --     `hash_enumerators`
 --     :   Allow `#` instead of a digit for an ordered list enumerator
@@ -183,33 +174,54 @@ function M.new(writer, options)
   end
 
   ------------------------------------------------------------------------------
+
+  local syntax
+  local blocks_toplevel
+  local blocks
+  local inlines
+  local inlines_no_link
+
+  local parse_blocks =
+    function(str)
+      local res = lpegmatch(blocks, str)
+      if res == nil
+        then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
+        else return res
+        end
+    end
+
+  local parse_blocks_toplevel =
+    function(str)
+      local res = lpegmatch(blocks_toplevel, str)
+      if res == nil
+        then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
+        else return res
+        end
+    end
+
+  local parse_inlines =
+    function(str)
+      local res = lpegmatch(inlines, str)
+      if res == nil
+        then error(format("parse_inlines failed on:\n%s", str:sub(1,20)))
+        else return res
+        end
+    end
+
+  local parse_inlines_no_link =
+    function(str)
+      local res = lpegmatch(inlines_no_link, str)
+      if res == nil
+        then error(format("parse_inlines_no_link failed on:\n%s", str:sub(1,20)))
+        else return res
+        end
+    end
+
+  local parse_markdown
+
+  ------------------------------------------------------------------------------
   -- Generic parsers
   ------------------------------------------------------------------------------
-
-  local percent                = P("%")
-  local asterisk               = P("*")
-  local dash                   = P("-")
-  local plus                   = P("+")
-  local underscore             = P("_")
-  local period                 = P(".")
-  local hash                   = P("#")
-  local ampersand              = P("&")
-  local backtick               = P("`")
-  local less                   = P("<")
-  local more                   = P(">")
-  local space                  = P(" ")
-  local squote                 = P("'")
-  local dquote                 = P('"')
-  local lparent                = P("(")
-  local rparent                = P(")")
-  local lbracket               = P("[")
-  local rbracket               = P("]")
-  local circumflex             = P("^")
-  local slash                  = P("/")
-  local equal                  = P("=")
-  local colon                  = P(":")
-  local semicolon              = P(";")
-  local exclamation            = P("!")
 
   local digit                  = R("09")
   local hexdigit               = R("09","af","AF")
@@ -317,6 +329,40 @@ function M.new(writer, options)
                     + (backtick^1 - closeticks)
 
   local inticks     = openticks * space^-1 * C(intickschar^0) * closeticks
+
+  -----------------------------------------------------------------------------
+  -- Parsers used for commonmark fenced code blocks
+  -----------------------------------------------------------------------------
+
+  local function captures_geq_length(s,i,a,b)
+    return #a >= #b and i
+  end
+
+  local infostring     = (linechar - (backtick + space^1 * (newline + eof)))^0
+
+  local fenceindent
+  local function fencehead(char)
+    return               C(nonindentspace) / function(s) fenceindent = #s end
+                       * Cg(char^3, "fencelength")
+                       * optionalspace * C(infostring) * optionalspace
+                       * (newline + eof)
+  end
+
+  local function fencetail(char)
+    return               nonindentspace
+                       * Cmt(C(char^3) * Cb("fencelength"),
+                             captures_geq_length)
+                       * optionalspace * (newline + eof)
+                       + eof
+  end
+
+  local function fencedline(char)
+    return               C(line - fencetail(char))
+                       / function(s)
+                             return s:gsub("^" .. string.rep(" ?",
+                                 fenceindent), "")
+                         end
+  end
 
   -----------------------------------------------------------------------------
   -- Parsers used for markdown tags and links
@@ -606,6 +652,7 @@ function M.new(writer, options)
   local bqstart      = more
   local headerstart  = hash
                      + (line * (equal^1 + dash^1) * optionalspace * newline)
+  local fencestart   = fencehead(backtick) + fencehead(tilde)
 
   if options.require_blank_before_blockquote then
     bqstart = fail
@@ -615,12 +662,18 @@ function M.new(writer, options)
     headerstart = fail
   end
 
+  if not options.fenced_code_blocks or
+    options.blank_before_fenced_code_blocks then
+    fencestart = fail
+  end
+
   local Endline   = newline * -( -- newline, but not before...
                         blankline -- paragraph break
                       + tightblocksep  -- nested list
                       + eof       -- end of document
                       + bqstart
                       + headerstart
+                      + fencestart
                     ) * spacechar^0 / writer.space
 
   local Space     = spacechar^2 * Endline / writer.linebreak
@@ -702,6 +755,24 @@ function M.new(writer, options)
                            * ((indentedline - blankline))^1)^1
                            ) / expandtabs / writer.verbatim
 
+  local TildeFencedCodeBlock
+                       = fencehead(tilde)
+                       * Cs(fencedline(tilde)^0)
+                       * fencetail(tilde)
+
+  local BacktickFencedCodeBlock
+                       = fencehead(backtick)
+                       * Cs(fencedline(backtick)^0)
+                       * fencetail(backtick)
+
+  local FencedCodeBlock
+                       = (TildeFencedCodeBlock + BacktickFencedCodeBlock)
+                       / function(infostring, code)
+                             return writer.fenced_code(
+                                 expandtabs(code),
+                                 writer.string(infostring))
+                         end
+
   -- strip off leading > and indents, and run through blocks
   local Blockquote     = Cs((
             ((leader * more * space^-1)/"" * linechar^0 * newline)^1
@@ -733,6 +804,8 @@ function M.new(writer, options)
                        * ( blankline^1
                          + #hash
                          + #(leader * more * space^-1)
+                         + #(fencehead(backtick))
+                         + #(fencehead(tilde))
                          + eof
                          )
                        + eof )
@@ -923,6 +996,7 @@ function M.new(writer, options)
 
       Block                 = V("Blockquote")
                             + V("Verbatim")
+                            + V("FencedCodeBlock")
                             + V("HorizontalRule")
                             + V("BulletList")
                             + V("OrderedList")
@@ -934,6 +1008,7 @@ function M.new(writer, options)
 
       Blockquote            = Blockquote,
       Verbatim              = Verbatim,
+      FencedCodeBlock       = FencedCodeBlock,
       HorizontalRule        = HorizontalRule,
       BulletList            = BulletList,
       OrderedList           = OrderedList,
@@ -982,6 +1057,10 @@ function M.new(writer, options)
 
   if not options.definition_lists then
     syntax.DefinitionList = fail
+  end
+
+  if not options.fenced_code_blocks then
+    syntax.FencedCodeBlock = fail
   end
 
   if not options.notes then
