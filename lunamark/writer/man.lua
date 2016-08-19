@@ -74,6 +74,8 @@ function M.new(options)
     return {".IP\n.nf\n\\f[C]\n",s,".fi"}
   end
 
+  Man.fenced_code = Man.verbatim
+
   function Man.header(s,level)
     local hcode = ".SS"
     if level == 1 then hcode = ".SH" end

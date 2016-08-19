@@ -82,6 +82,15 @@ function M.new(options)
     return {"\\starttyping\n",s,"\\stoptyping"}
   end
 
+  function ConTeXt.fenced_code(s,i)
+    if i ~= "" then
+      return {"\\starttyping[option=",i:match("[^ ]*"),
+        "]\n",s,"\\stoptyping"}
+    else
+      return ConTeXt.verbatim(s)
+    end
+  end
+
   function ConTeXt.header(s,level)
     local cmd
     if level == 1 then
