@@ -269,7 +269,7 @@ function M.new(writer, options)
   local function indented_blocks(bl)
     return Cs( bl
              * (blankline^1 * indent * -blankline * bl)^0
-             * blankline^1 )
+             * (blankline^1 + eof) )
   end
 
   -----------------------------------------------------------------------------
