@@ -710,7 +710,8 @@ function M.new(writer, options)
           )^1) / parse_blocks_toplevel / writer.blockquote
 
   local function lineof(c)
-      return (leader * (P(c) * optionalspace)^3 * newline * blankline^1)
+      return (leader * (P(c) * optionalspace)^3 * (newline * blankline^1
+          + newline^-1 * eof))
   end
 
   local HorizontalRule = ( lineof(asterisk)
