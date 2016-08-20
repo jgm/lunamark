@@ -1,0 +1,20 @@
+lunamark -Xdefinition_lists
+<<<
+Multiple definitions, loose:
+
+apple
+:   red fruit
+
+:   computer
+>>>
+<p>Multiple definitions, loose:</p>
+
+<dl>
+<dt>apple</dt>
+<dd>
+<p>red fruit</p>
+</dd>
+<dd>
+<p>computer</p>
+</dd>
+</dl>

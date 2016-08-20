@@ -51,6 +51,36 @@ local function normalize_tag(tag)
   return utf8_lower(gsub(rope_to_string(tag), "[ \n\r\t]+", " "))
 end
 
+------------------------------------------------------------------------------
+-- Character parsers
+------------------------------------------------------------------------------
+
+local percent                = P("%")
+local asterisk               = P("*")
+local dash                   = P("-")
+local plus                   = P("+")
+local underscore             = P("_")
+local period                 = P(".")
+local hash                   = P("#")
+local ampersand              = P("&")
+local backtick               = P("`")
+local less                   = P("<")
+local more                   = P(">")
+local space                  = P(" ")
+local squote                 = P("'")
+local dquote                 = P('"')
+local lparent                = P("(")
+local rparent                = P(")")
+local lbracket               = P("[")
+local rbracket               = P("]")
+local circumflex             = P("^")
+local slash                  = P("/")
+local equal                  = P("=")
+local colon                  = P(":")
+local semicolon              = P(";")
+local exclamation            = P("!")
+local tilde                  = P("~")
+
 --- Create a new markdown parser.
 --
 -- *   `writer` is a writer table (see [lunamark.writer.generic]).
@@ -87,6 +117,9 @@ end
 --     `definition_lists`
 --     :   Enable definition lists as in pandoc.
 --
+--     `fenced_code_blocks`
+--     :   Enable commonmark fenced code blocks.
+--
 --     `pandoc_title_blocks`
 --     :   Parse pandoc-style title block at the beginning of document:
 --
@@ -110,6 +143,10 @@ end
 --     `require_blank_before_header`
 --     :   Require a blank line between a paragraph and a following
 --         header.
+--
+--     `require_blank_before_fenced_code_block`
+--     :   Require a blank line between a paragraph and a following
+--         fenced code block.
 --
 --     `hash_enumerators`
 --     :   Allow `#` instead of a digit for an ordered list enumerator
@@ -139,6 +176,7 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   local syntax
+  local blocks_toplevel
   local blocks
   local inlines
   local inlines_no_link
@@ -146,6 +184,15 @@ function M.new(writer, options)
   local parse_blocks =
     function(str)
       local res = lpegmatch(blocks, str)
+      if res == nil
+        then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
+        else return res
+        end
+    end
+
+  local parse_blocks_toplevel =
+    function(str)
+      local res = lpegmatch(blocks_toplevel, str)
       if res == nil
         then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
         else return res
@@ -175,31 +222,6 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
   -- Generic parsers
   ------------------------------------------------------------------------------
-
-  local percent                = P("%")
-  local asterisk               = P("*")
-  local dash                   = P("-")
-  local plus                   = P("+")
-  local underscore             = P("_")
-  local period                 = P(".")
-  local hash                   = P("#")
-  local ampersand              = P("&")
-  local backtick               = P("`")
-  local less                   = P("<")
-  local more                   = P(">")
-  local space                  = P(" ")
-  local squote                 = P("'")
-  local dquote                 = P('"')
-  local lparent                = P("(")
-  local rparent                = P(")")
-  local lbracket               = P("[")
-  local rbracket               = P("]")
-  local circumflex             = P("^")
-  local slash                  = P("/")
-  local equal                  = P("=")
-  local colon                  = P(":")
-  local semicolon              = P(";")
-  local exclamation            = P("!")
 
   local digit                  = R("09")
   local hexdigit               = R("09","af","AF")
@@ -259,7 +281,7 @@ function M.new(writer, options)
   local function indented_blocks(bl)
     return Cs( bl
              * (blankline^1 * indent * -blankline * bl)^0
-             * blankline^1 )
+             * (blankline^1 + eof) )
   end
 
   -----------------------------------------------------------------------------
@@ -306,7 +328,41 @@ function M.new(writer, options)
                     + (space - closeticks)
                     + (backtick^1 - closeticks)
 
-  local inticks     = openticks * space^-1 * C(intickschar^1) * closeticks
+  local inticks     = openticks * space^-1 * C(intickschar^0) * closeticks
+
+  -----------------------------------------------------------------------------
+  -- Parsers used for commonmark fenced code blocks
+  -----------------------------------------------------------------------------
+
+  local function captures_geq_length(s,i,a,b)
+    return #a >= #b and i
+  end
+
+  local infostring     = (linechar - (backtick + space^1 * (newline + eof)))^0
+
+  local fenceindent
+  local function fencehead(char)
+    return               C(nonindentspace) / function(s) fenceindent = #s end
+                       * Cg(char^3, "fencelength")
+                       * optionalspace * C(infostring) * optionalspace
+                       * (newline + eof)
+  end
+
+  local function fencetail(char)
+    return               nonindentspace
+                       * Cmt(C(char^3) * Cb("fencelength"),
+                             captures_geq_length)
+                       * optionalspace * (newline + eof)
+                       + eof
+  end
+
+  local function fencedline(char)
+    return               C(line - fencetail(char))
+                       / function(s)
+                             return s:gsub("^" .. string.rep(" ?",
+                                 fenceindent), "")
+                         end
+  end
 
   -----------------------------------------------------------------------------
   -- Parsers used for markdown tags and links
@@ -372,7 +428,7 @@ function M.new(writer, options)
     return function()
       local found = rawnotes[normalize_tag(ref)]
       if found then
-        return writer.note(parse_blocks(found))
+        return writer.note(parse_blocks_toplevel(found))
       else
         return {"[", parse_inlines("^" .. ref), "]"}
       end
@@ -596,6 +652,7 @@ function M.new(writer, options)
   local bqstart      = more
   local headerstart  = hash
                      + (line * (equal^1 + dash^1) * optionalspace * newline)
+  local fencestart   = fencehead(backtick) + fencehead(tilde)
 
   if options.require_blank_before_blockquote then
     bqstart = fail
@@ -605,12 +662,18 @@ function M.new(writer, options)
     headerstart = fail
   end
 
+  if not options.fenced_code_blocks or
+    options.blank_before_fenced_code_blocks then
+    fencestart = fail
+  end
+
   local Endline   = newline * -( -- newline, but not before...
                         blankline -- paragraph break
                       + tightblocksep  -- nested list
                       + eof       -- end of document
                       + bqstart
                       + headerstart
+                      + fencestart
                     ) * spacechar^0 / writer.space
 
   local Space     = spacechar^2 * Endline / writer.linebreak
@@ -692,15 +755,34 @@ function M.new(writer, options)
                            * ((indentedline - blankline))^1)^1
                            ) / expandtabs / writer.verbatim
 
+  local TildeFencedCodeBlock
+                       = fencehead(tilde)
+                       * Cs(fencedline(tilde)^0)
+                       * fencetail(tilde)
+
+  local BacktickFencedCodeBlock
+                       = fencehead(backtick)
+                       * Cs(fencedline(backtick)^0)
+                       * fencetail(backtick)
+
+  local FencedCodeBlock
+                       = (TildeFencedCodeBlock + BacktickFencedCodeBlock)
+                       / function(infostring, code)
+                             return writer.fenced_code(
+                                 expandtabs(code),
+                                 writer.string(infostring))
+                         end
+
   -- strip off leading > and indents, and run through blocks
   local Blockquote     = Cs((
             ((leader * more * space^-1)/"" * linechar^0 * newline)^1
           * (-blankline * linechar^1 * newline)^0
-          * blankline^0
-          )^1) / parse_blocks / writer.blockquote
+          * ( blankline^0 / "")
+          )^1) / parse_blocks_toplevel / writer.blockquote
 
   local function lineof(c)
-      return (leader * (P(c) * optionalspace)^3 * newline * blankline^1)
+      return (leader * (P(c) * optionalspace)^3 * (newline * blankline^1
+          + newline^-1 * eof))
   end
 
   local HorizontalRule = ( lineof(asterisk)
@@ -715,6 +797,18 @@ function M.new(writer, options)
                          + #hash
                          + #(leader * more * space^-1)
                          )
+                       / writer.paragraph
+
+  local ToplevelParagraph
+                       = nonindentspace * Ct(Inline^1) * (newline
+                       * ( blankline^1
+                         + #hash
+                         + #(leader * more * space^-1)
+                         + #(fencehead(backtick))
+                         + #(fencehead(tilde))
+                         + eof
+                         )
+                       + eof )
                        / writer.paragraph
 
   local Plain          = nonindentspace * Ct(Inline^1) / writer.plain
@@ -786,7 +880,7 @@ function M.new(writer, options)
   end
 
   local DefinitionListItemLoose = C(line) * skipblanklines
-                           * Ct((defstart * indented_blocks(dlchunk) / parse_blocks)^1)
+                           * Ct((defstart * indented_blocks(dlchunk) / parse_blocks_toplevel)^1)
                            * Cc(false)
                            / definition_list_item
 
@@ -805,7 +899,7 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   local function lua_metadata(s)  -- run lua code in comment in sandbox
-    local env = { m = parse_markdown, markdown = parse_blocks }
+    local env = { m = parse_markdown, markdown = parse_blocks_toplevel }
     local scode = s:match("^<!%-%-@%s*(.*)%-%->")
     local untrusted_table, message = load(scode, nil, "t", env)
     if not untrusted_table then
@@ -902,6 +996,7 @@ function M.new(writer, options)
 
       Block                 = V("Blockquote")
                             + V("Verbatim")
+                            + V("FencedCodeBlock")
                             + V("HorizontalRule")
                             + V("BulletList")
                             + V("OrderedList")
@@ -913,6 +1008,7 @@ function M.new(writer, options)
 
       Blockquote            = Blockquote,
       Verbatim              = Verbatim,
+      FencedCodeBlock       = FencedCodeBlock,
       HorizontalRule        = HorizontalRule,
       BulletList            = BulletList,
       OrderedList           = OrderedList,
@@ -963,6 +1059,10 @@ function M.new(writer, options)
     syntax.DefinitionList = fail
   end
 
+  if not options.fenced_code_blocks then
+    syntax.FencedCodeBlock = fail
+  end
+
   if not options.notes then
     syntax.NoteRef = fail
   end
@@ -974,6 +1074,10 @@ function M.new(writer, options)
   if options.alter_syntax and type(options.alter_syntax) == "function" then
     syntax = options.alter_syntax(syntax)
   end
+
+  local blocks_toplevel_t = util.table_copy(syntax)
+  blocks_toplevel_t.Paragraph = ToplevelParagraph
+  blocks_toplevel = Ct(blocks_toplevel_t)
 
   blocks = Ct(syntax)
 
@@ -1002,7 +1106,7 @@ function M.new(writer, options)
         writer.set_metadata("date",date)
         inp = rest
       end
-      local result = { writer.start_document(), parse_blocks(inp), writer.stop_document() }
+      local result = { writer.start_document(), parse_blocks_toplevel(inp), writer.stop_document() }
       return rope_to_string(result), writer.get_metadata()
     end
 

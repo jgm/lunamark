@@ -1,0 +1,13 @@
+lunamark -Xnotes
+<<<
+Here is a footnote reference[^longnote]
+
+[^longnote]: Here&#39;s the long note.
+>>>
+<p>Here is a footnote reference<sup><a href="#fn1" class="footnoteRef" id="fnref1">1</a></sup></p>
+
+<hr />
+
+<ol class="notes">
+<li id="fn1"><p>Here&#39;s the long note. <a href="#fnref1" class="footnoteBackLink">↩</a></p></li>
+</ol>

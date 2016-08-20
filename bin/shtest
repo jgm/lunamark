@@ -21,7 +21,7 @@ local function do_matching_tests(path, patt, fun)
       elseif fpath:match(patt) and fpath:match("%.test$") then
         local fh = io.open(fpath, "r")
         local contents = fh:read("*all"):gsub("\r","")
-        local cmd, inp, out = contents:match("^([^\n]*)\n<<<[ \t]*\n(.-\n)>>>[ \t]*\n(.*)$")
+        local cmd, inp, out = contents:match("^([^\n]*)\n<<<[ \t]*\n(.-)\n>>>[ \t]*\n(.*)$")
         assert(cmd ~= nil, "Command not found in " .. f)
         if cmdname then
           cmd = cmd:gsub("^%S+",cmdname)
