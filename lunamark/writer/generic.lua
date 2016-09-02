@@ -118,6 +118,9 @@ function M.new(options)
   --- En dash (string).
   W.ndash = "–"
 
+  --- Non-breaking space.
+  W.nbsp = " "
+
   --- String in curly single quotes.
   function W.singlequoted(s)
     return {"‘", s, "’"}
@@ -213,6 +216,45 @@ function M.new(options)
 
   --- Horizontal rule.
   W.hrule = ""
+
+  --- A string of one or more citations. `text_cites` is a boolean, true if the
+  -- citations are in-text citations. `cites` - is an array of tables, each of
+  -- the form `{ prenote = q, name = n, postnote = e, suppress_author = s }`,
+  -- where:
+  -- - `q` is a nil or a rope that should be inserted before the citation,
+  -- - `e` is a nil or a rope that should be inserted after the citation,
+  -- - `n` is a string with the citation name, and
+  -- - `s` is a boolean, true if the author should be omitted from the
+  --   citation.
+  function W.citations(text_cites, cites)
+    local buffer = {}
+    local opened_brackets = false
+    for i, cite in ipairs(cites) do
+      if i == 1 then -- Opening in-text citation
+        if text_cites then
+          buffer[#buffer + 1] = {cite.suppress_author and "-" or "", "@",
+            cite.name}
+          if cite.postnote then
+            opened_brackets = true
+            buffer[#buffer + 1] = {" [", cite.postnote}
+          end
+        else -- Opening regular citation
+          opened_brackets = true
+          buffer[#buffer + 1] = {"[", cite.prenote and {cite.prenote, " "} or "",
+            cite.suppress_author and "-" or "", "@", cite.name, cite.postnote and
+            {" ", cite.postnote}}
+        end
+      else -- Continuation citation
+        buffer[#buffer + 1] = {"; ", cite.prenote and {cite.prenote, " "} or "",
+          cite.suppress_author and "-" or "", "@", cite.name, cite.postnote and
+          {" ", cite.postnote}}
+      end
+    end
+    if opened_brackets then
+      buffer[#buffer + 1] = "]"
+    end
+    return buffer
+  end
 
   --- A footnote or endnote.
   function W.note(contents)

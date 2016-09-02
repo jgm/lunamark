@@ -17,6 +17,8 @@ function M.new(options)
 
   Docbook.linebreak = "<literallayout>&#xA;</literallayout>"
 
+  Docbook.nbsp = "&nbsp;"
+
   function Docbook.code(s)
     return {"<literal>",Docbook.string(s),"</literal>"}
   end

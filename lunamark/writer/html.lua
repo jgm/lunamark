@@ -36,6 +36,7 @@ function M.new(options)
 
   Html.container = "div"
   Html.linebreak = "<br/>"
+  Html.nbsp = "&nbsp;"
 
   function Html.code(s)
     return {"<code>", Html.string(s), "</code>"}

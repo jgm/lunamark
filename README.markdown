@@ -39,6 +39,7 @@ Lunamark's markdown parser currently supports a number of extensions
   - Footnotes
   - Definition lists
   - Pandoc-style title blocks
+  - Pandoc-style citations
   - Fenced code blocks
   - Flexible metadata using lua declarations
 

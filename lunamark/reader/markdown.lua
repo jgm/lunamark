@@ -56,6 +56,8 @@ end
 ------------------------------------------------------------------------------
 
 local percent                = P("%")
+local at                     = P("@")
+local comma                  = P(",")
 local asterisk               = P("*")
 local dash                   = P("-")
 local plus                   = P("+")
@@ -80,6 +82,8 @@ local colon                  = P(":")
 local semicolon              = P(";")
 local exclamation            = P("!")
 local tilde                  = P("~")
+local tab                    = P("\t")
+local newline                = P("\n")
 
 --- Create a new markdown parser.
 --
@@ -116,6 +120,9 @@ local tilde                  = P("~")
 --
 --     `definition_lists`
 --     :   Enable definition lists as in pandoc.
+--
+--     `citations`
+--     :   Enable citations as in pandoc.
 --
 --     `fenced_code_blocks`
 --     :   Enable fenced code blocks.
@@ -179,33 +186,27 @@ function M.new(writer, options)
   local blocks
   local inlines
   local inlines_no_link
+  local inlines_nbsp
 
-  local parse_blocks =
-    function(str)
-      local res = lpegmatch(blocks, str)
-      if res == nil
-        then error(format("parse_blocks failed on:\n%s", str:sub(1,20)))
-        else return res
-        end
+  local function create_parser(name, grammar)
+    return function(str)
+      local res = lpeg.match(grammar(), str)
+      if res == nil then
+        error(format("%s failed on:\n%s", name, str:sub(1,20)))
+      else
+        return res
+      end
     end
+  end
 
-  local parse_inlines =
-    function(str)
-      local res = lpegmatch(inlines, str)
-      if res == nil
-        then error(format("parse_inlines failed on:\n%s", str:sub(1,20)))
-        else return res
-        end
-    end
-
-  local parse_inlines_no_link =
-    function(str)
-      local res = lpegmatch(inlines_no_link, str)
-      if res == nil
-        then error(format("parse_inlines_no_link failed on:\n%s", str:sub(1,20)))
-        else return res
-        end
-    end
+  local parse_blocks = create_parser("parse_blocks",
+    function() return blocks end)
+  local parse_inlines = create_parser("parse_inlines",
+    function() return inlines end)
+  local parse_inlines_no_link = create_parser("parse_inlines_no_link",
+    function() return inlines_no_link end)
+  local parse_inlines_nbsp = create_parser("parse_inlines_nbsp",
+    function() return inlines_nbsp end)
 
   local parse_markdown
 
@@ -218,6 +219,7 @@ function M.new(writer, options)
   local letter                 = R("AZ","az")
   local alphanumeric           = R("AZ","az","09")
   local keyword                = letter * alphanumeric^0
+  local internal_punctuation   = S(":;,.#$%&-+?<>~/")
 
   local doubleasterisks        = P("**")
   local doubleunderscores      = P("__")
@@ -226,22 +228,20 @@ function M.new(writer, options)
   local any                    = P(1)
   local fail                   = any - 1
 
-  local escapable              = S("\\`*_{}[]()+_.!<>#-~:^")
+  local escapable              = S("\\`*_{}[]()+_.!<>#-~:^@;")
   local anyescaped             = P("\\") / "" * escapable
                                + any
 
-  local tab                    = P("\t")
   local spacechar              = S("\t ")
   local spacing                = S(" \n\r\t")
-  local newline                = P("\n")
   local nonspacechar           = any - spacing
   local tightblocksep          = P("\001")
 
   local specialchar
   if options.smart then
-    specialchar                = S("*_`&[]<!\\'\"-.")
+    specialchar                = S("*_`&[]<!\\'\"-.@")
   else
-    specialchar                = S("*_`&[]<!\\")
+    specialchar                = S("*_`&[]<!\\-@")
   end
 
   local normalchar             = any -
@@ -401,6 +401,72 @@ function M.new(writer, options)
 
   local optionaltitle = spnl * title * spacechar^0
                       + Cc("")
+
+  ------------------------------------------------------------------------------
+  -- Citations
+  ------------------------------------------------------------------------------
+
+  local citation_name = Cs(dash^-1) * at
+                      * Cs(alphanumeric
+                          * (alphanumeric + internal_punctuation
+                              - comma - semicolon)^0)
+
+  local citation_body_prenote
+                      = Cs((alphanumeric^1
+                           + bracketed
+                           + inticks
+                           + (anyescaped
+                               - (rbracket + blankline^2))
+                           - (spnl * dash^-1 * at))^0)
+
+  local citation_body_postnote
+                      = Cs((alphanumeric^1
+                           + bracketed
+                           + inticks
+                           + (anyescaped
+                               - (rbracket + semicolon + blankline^2))
+                           - (spnl * rbracket))^0)
+
+  local citation_body_chunk
+                      = citation_body_prenote
+                      * spnl * citation_name
+                      * (comma * spnl)^-1
+                      * citation_body_postnote
+
+  local citation_body = citation_body_chunk
+                      * (semicolon * spnl * citation_body_chunk)^0
+
+  local citation_headless_body
+                      = Cs((alphanumeric^1
+                           + bracketed
+                           + inticks
+                           + (anyescaped
+                               - (rbracket + at + semicolon + blankline^2))
+                           - (spnl * rbracket))^0)
+                      * (sp * semicolon * spnl * citation_body_chunk)^0
+
+  local function citations(text_cites, raw_cites)
+      local function normalize(str)
+          if str == "" then
+              str = nil
+          else
+              str = (options.citation_nbsps and parse_inlines_nbsp or
+                parse_inlines)(str)
+          end
+          return str
+      end
+
+      local cites = {}
+      for i = 1,#raw_cites,4 do
+          cites[#cites+1] = {
+              prenote = normalize(raw_cites[i]),
+              suppress_author = raw_cites[i+1] == "-",
+              name = writer.string(raw_cites[i+2]),
+              postnote = normalize(raw_cites[i+3]),
+          }
+      end
+      return writer.citations(text_cites, cites)
+  end
 
   ------------------------------------------------------------------------------
   -- Footnotes
@@ -669,6 +735,12 @@ function M.new(writer, options)
                   + spacechar^1 * Endline^-1 * eof / ""
                   + spacechar^1 * Endline^-1 * optionalspace / writer.space
 
+
+  local NonbreakingSpace
+                  = spacechar^2 * Endline / writer.linebreak
+                  + spacechar^1 * Endline^-1 * eof / ""
+                  + spacechar^1 * Endline^-1 * optionalspace / writer.nbsp
+
   -- parse many p between starter and ender
   local function between(p, starter, ender)
       local ender2 = B(nonspacechar) * ender
@@ -720,6 +792,26 @@ function M.new(writer, options)
   local IndirectImage  = exclamation * tag * (C(spnl) * tag)^-1 / indirect_image
 
   local Image         = DirectImage + IndirectImage
+
+  local TextCitations = Ct(Cc("")
+                      * citation_name
+                      * ((spnl
+                           * lbracket
+                           * citation_headless_body
+                           * rbracket) + Cc(""))) /
+                        function(raw_cites)
+                            return citations(true, raw_cites)
+                        end
+
+  local ParenthesizedCitations
+                      = Ct(lbracket
+                      * citation_body
+                      * rbracket) /
+                        function(raw_cites)
+                            return citations(false, raw_cites)
+                        end
+
+  local Citations     = TextCitations + ParenthesizedCitations
 
   -- avoid parsing long strings of * or _ as emph/strong
   local UlOrStarLine  = asterisk^4 + underscore^4 / writer.string
@@ -1001,6 +1093,7 @@ function M.new(writer, options)
                             + V("Strong")
                             + V("Emph")
                             + V("NoteRef")
+                            + V("Citations")
                             + V("Link")
                             + V("Image")
                             + V("Code")
@@ -1019,6 +1112,7 @@ function M.new(writer, options)
       Strong                = Strong,
       Emph                  = Emph,
       NoteRef               = NoteRef,
+      Citations             = Citations,
       Link                  = Link,
       Image                 = Image,
       Code                  = Code,
@@ -1037,6 +1131,10 @@ function M.new(writer, options)
 
   if not options.fenced_code_blocks then
     syntax.FencedCodeBlock = fail
+  end
+
+  if not options.citations then
+    syntax.Citations = fail
   end
 
   if not options.notes then
@@ -1061,6 +1159,10 @@ function M.new(writer, options)
   local inlines_no_link_t = util.table_copy(inlines_t)
   inlines_no_link_t.Link = fail
   inlines_no_link = Ct(inlines_no_link_t)
+
+  local inlines_nbsp_t = util.table_copy(inlines_t)
+  inlines_nbsp_t.Space = NonbreakingSpace
+  inlines_nbsp = Ct(inlines_nbsp_t)
 
   ------------------------------------------------------------------------------
   -- Exported conversion function

@@ -29,6 +29,8 @@ function M.new(options)
 
   TeX.ndash = "--"
 
+  TeX.nbsp = "~"
+
   function TeX.singlequoted(s)
     return format("`%s'",s)
   end
