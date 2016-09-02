@@ -1,0 +1,290 @@
+lunamark -Xfenced_code_blocks
+<<<
+Here is a simple example with backticks:
+
+```
+<
+ >
+```
+
+With tildes:
+
+~~~
+<
+ >
+~~~
+
+The closing code fence must use the same character as the opening fence:
+
+```
+aaa
+~~~
+```
+
+~~~
+aaa
+```
+~~~
+
+The closing code fence must be at least as long as the opening fence:
+
+````
+aaa
+```
+``````
+
+~~~~
+aaa
+~~~
+~~~~
+
+A code block can have all empty lines as its content:
+
+```
+
+  
+```
+
+A code block can be empty:
+
+```
+```
+
+Fences can be indented. If the opening fence is indented, content lines will
+have equivalent opening indentation removed, if present:
+ ```
+ aaa
+aaa
+```
+
+  ```
+aaa
+  aaa
+aaa
+  ```
+
+   ```
+   aaa
+    aaa
+  aaa
+   ```
+
+Four spaces indentation produces an indented code block:
+
+    ```
+    aaa
+    ```
+
+Closing fences may be indented by 0-3 spaces, and their indentation need not
+match that of the opening fence:
+
+```
+aaa
+  ```
+
+   ```
+aaa
+  ```
+
+This is not a closing fence, because it is indented 4 spaces:
+
+```
+aaa
+    ```
+```
+
+Code fences (opening and closing) cannot contain internal spaces:
+
+``` ```
+aaa
+
+```
+aaa
+``` ```
+```
+~~~~~~
+aaa
+~~~ ~~
+~~~~~~
+
+Fenced code blocks can interrupt paragraphs, and can be followed directly by
+paragraphs, without a blank line between:
+
+foo
+```
+bar
+```
+baz
+
+Other blocks can also occur before and after fenced code blocks without an
+intervening blank line:
+
+foo
+---
+~~~
+bar
+~~~
+# baz
+
+An info string can be provided after the opening code fence. Opening and
+closing spaces will be stripped, and the first word, prefixed with language-,
+is used as the value for the class attribute of the code element within the
+enclosing pre element.
+
+```ruby
+def foo(x)
+  return 3
+end
+```
+
+~~~~    ruby startline=3 $%@#$
+def foo(x)
+  return 3
+end
+~~~~~~~
+
+````;
+````
+
+Info strings for backtick code blocks cannot contain backticks:
+
+``` aa ```
+foo
+
+Closing code fences cannot have info strings:
+
+```
+``` aaa
+```
+>>>
+<p>Here is a simple example with backticks:</p>
+
+<pre><code>&lt;
+ &gt;
+</code></pre>
+
+<p>With tildes:</p>
+
+<pre><code>&lt;
+ &gt;
+</code></pre>
+
+<p>The closing code fence must use the same character as the opening fence:</p>
+
+<pre><code>aaa
+~~~
+</code></pre>
+
+<pre><code>aaa
+```
+</code></pre>
+
+<p>The closing code fence must be at least as long as the opening fence:</p>
+
+<pre><code>aaa
+```
+</code></pre>
+
+<pre><code>aaa
+~~~
+</code></pre>
+
+<p>A code block can have all empty lines as its content:</p>
+
+<pre><code>
+  
+</code></pre>
+
+<p>A code block can be empty:</p>
+
+<pre><code></code></pre>
+
+Fences can be indented. If the opening fence is indented, content lines will have equivalent opening indentation removed, if present:
+
+<pre><code>aaa
+aaa
+</code></pre>
+
+<pre><code>aaa
+aaa
+aaa
+</code></pre>
+
+<pre><code>aaa
+ aaa
+aaa
+</code></pre>
+
+<p>Four spaces indentation produces an indented code block:</p>
+
+<pre><code>```
+aaa
+```
+</code></pre>
+
+<p>Closing fences may be indented by 0-3 spaces, and their indentation need not match that of the opening fence:</p>
+
+<pre><code>aaa
+</code></pre>
+
+<pre><code>aaa
+</code></pre>
+
+<p>This is not a closing fence, because it is indented 4 spaces:</p>
+
+<pre><code>aaa
+    ```
+</code></pre>
+
+<p>Code fences (opening and closing) cannot contain internal spaces:</p>
+
+<p>``` ``` aaa</p>
+
+<pre><code>aaa
+``` ```
+</code></pre>
+
+<pre><code>aaa
+~~~ ~~
+</code></pre>
+
+<p>Fenced code blocks can interrupt paragraphs, and can be followed directly by paragraphs, without a blank line between:</p>
+
+foo
+
+<pre><code>bar
+</code></pre>
+
+<p>baz</p>
+
+<p>Other blocks can also occur before and after fenced code blocks without an intervening blank line:</p>
+
+<h2>foo</h2>
+
+<pre><code>bar
+</code></pre>
+
+<h1>baz</h1>
+
+<p>An info string can be provided after the opening code fence. Opening and closing spaces will be stripped, and the first word, prefixed with language-, is used as the value for the class attribute of the code element within the enclosing pre element.</p>
+
+<pre><code class="language-ruby">def foo(x)
+  return 3
+end
+</code></pre>
+
+<pre><code class="language-ruby">def foo(x)
+  return 3
+end
+</code></pre>
+
+<pre><code class="language-;"></code></pre>
+
+<p>Info strings for backtick code blocks cannot contain backticks:</p>
+
+<p><code>aa</code> foo</p>
+
+<p>Closing code fences cannot have info strings:</p>
+
+<pre><code>``` aaa
+</code></pre>

@@ -201,6 +201,11 @@ function M.new(options)
     return s
   end
 
+  --- Fenced code block, with infostring `i`.
+  function W.fenced_code(s, i)
+    return s
+  end
+
   --- Header level `level`, with text `s`.
   function W.header(s, level)
     return s
