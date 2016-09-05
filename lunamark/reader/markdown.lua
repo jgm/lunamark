@@ -84,6 +84,7 @@ local exclamation            = P("!")
 local tilde                  = P("~")
 local tab                    = P("\t")
 local newline                = P("\n")
+local tightblocksep          = P("\001")
 
 --- Create a new markdown parser.
 --
@@ -235,7 +236,6 @@ function M.new(writer, options)
   local spacechar              = S("\t ")
   local spacing                = S(" \n\r\t")
   local nonspacechar           = any - spacing
-  local tightblocksep          = P("\001")
 
   local specialchar
   if options.smart then
@@ -735,6 +735,15 @@ function M.new(writer, options)
                   + spacechar^1 * Endline^-1 * eof / ""
                   + spacechar^1 * Endline^-1 * optionalspace / writer.space
 
+  local NonbreakingEndline
+                  = newline * -( -- newline, but not before...
+                        blankline -- paragraph break
+                      + tightblocksep  -- nested list
+                      + eof       -- end of document
+                      + bqstart
+                      + headerstart
+                      + fencestart
+                    ) * spacechar^0 / writer.nbsp
 
   local NonbreakingSpace
                   = spacechar^2 * Endline / writer.linebreak
@@ -1161,6 +1170,7 @@ function M.new(writer, options)
   inlines_no_link = Ct(inlines_no_link_t)
 
   local inlines_nbsp_t = util.table_copy(inlines_t)
+  inlines_nbsp_t.Endline = NonbreakingEndline
   inlines_nbsp_t.Space = NonbreakingSpace
   inlines_nbsp = Ct(inlines_nbsp_t)
 
