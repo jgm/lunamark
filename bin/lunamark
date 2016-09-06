@@ -28,6 +28,7 @@ can be turned on or off individually):
   - Definition lists
   - Metadata
   - Pandoc title blocks
+  - Pandoc citations
   - Fenced code blocks
 
 More extensions will be supported in later versions.
@@ -49,9 +50,10 @@ It is slightly faster than the author's own C library
 `--extensions,-X` *extensions*
 :   Use the specified syntax extensions in parsing markdown.
     *extensions* is a comma-separated list of extensions, each optionally
-    prefixed by `+` (enable) or `-` (disable).  See EXTENSIONS, below, for
-    a list of supported extensions.  The keyword 'all' may also be used,
-    to set all extensions simultaneously.
+    prefixed with `-` (disable), `+` (enable), or followed by
+    `=parameter` (enable and parametrize).  See EXTENSIONS, below, for
+    a list of supported extensions.  The keyword 'all' may also be
+    used, to set all extensions simultaneously.
 `--output,-o` *file*
 :   Write output to *file*.
 `--standalone,-s`
@@ -134,6 +136,40 @@ environment variable `LUNAMARK_EXTENSIONS` (see ENVIRONMENT below).
             (paragraph two of definition one.)
 
         :   a ruby build system.
+
+`(-) citations`
+:   Pandoc citations. Citations go inside square brackets and are
+    separated by semicolons. Each citation must have a key, composed
+    of `@` + the citation identifier from the database, and may
+    optionally have a prenote, and a postnote. The citation key must
+    begin with a letter, digit, or `_`, and may contain alphanumerics,
+    `_`, and internal punctuation characters (`:.#$%&-+?<>~/`).
+    Examples:
+
+        Blah blah [see @doe99, pp. 33-35; also @smith04, chap. 1].
+
+        Blah blah [@doe99, pp. 33-35, 38-39 and *passim*].
+
+        Blah blah [@smith04; @doe99].
+
+    A minus sign (`-`) before the `@` will suppress mention of the
+    author in the citation. This can be useful when the author is
+    already mentioned in the text:
+
+        Smith says blah [-@smith04].
+
+    You can also write an in-text citation, as follows:
+
+        @smith04 says blah.
+
+        @smith04 [p. 33] says blah.
+
+    Some writers will accept finer-grained configuration of the
+    citations extension via `-X citations=configuration`.
+
+`(+) citation_nbsps`
+:   Convert any spacing in citation prenotes and postnotes into
+    non-breaking spaces.
 
 `(-) fenced_code_blocks`
 :   Fenced code blocks. A code fence is a sequence of at least three
@@ -326,8 +362,9 @@ LAYOUT can be default, compact (no unnecessary blank lines), or
 minimize (no unnecessary blank space).
 
 EXTENSIONS is a comma-separated list of extensions, each optionally prefixed
-by + (enable) or - (disable).  The following extensions are defined,
-with the default setting given in parentheses:
+with - (disable), + (enable), or followed by `=parameter` (enable and
+parametrize). The following extensions are defined, with the default setting
+given in parentheses:
   (-) containers           Put sections in containers (e.g. div or section tags)
   (-) slides               Like containers, but do not nest them
   (-) startnum             Start number of an ordered list is significant
@@ -335,7 +372,15 @@ with the default setting given in parentheses:
   (-) preserve_tabs        Don't expand tabs to spaces
   (-) notes                Footnotes
   (-) definition_lists     Definition lists
+  (-) citations            Citations
+  (+) citation_nbsps       Turn spacing into non-breaking spaces in citations
   (-) fenced_code_blocks   Fenced code blocks
+  (-) lua_metadata         Lua metadata
+  (-) pandoc_title_blocks  Pandoc style title blocks
+  (-) hash_enumerators     # may be used as ordered list enumerator
+  (-) require_blank_before_blockquote
+  (-) require_blank_before_header
+  (-) require_blank_before_fenced_code_block
 The keyword 'all' may also be used, to set all extensions simultaneously.
 Setting the environment variable LUNAMARK_EXTENSIONS can change the
 defaults.
@@ -381,6 +426,8 @@ local extensions = {  -- defaults
   smart = false,
   preserve_tabs = false,
   notes = false,
+  citations = false,
+  citation_nbsps = true,
   definition_lists = false,
   fenced_code_blocks = false,
   lua_metadata = false,
@@ -397,12 +444,19 @@ end
 
 local default_extensions = os.getenv("LUNAMARK_EXTENSIONS") or ""
 local extensions_opt = default_extensions .. "," .. (optarg.X or "")
-for x in extensions_opt:gmatch("[%+%-]?[%a_]+") do
+for x in extensions_opt:gmatch("[%+%-]?[%a_=]+") do
   local val = true
-  if x:sub(1,1) == "+" then
-    val = true
+  if x:find("=") then
+    x, val = x:match("([%+%-]?[%a_]+)=([%a_]+)")
+    if x:find("^[%+%-]") then
+      lunamark.util.err("You may either:\n" ..
+        " - disable an extension (-" .. x:sub(2) .. "),\n" ..
+        " - enable an extension (+" .. x:sub(2) .. "), or\n" ..
+        " - enable and parametrize an extension (" .. x:sub(2) .. "=parameter).")
+    end
+  elseif x:find("^%+") then
     x = x:sub(2)
-  elseif x:sub(1,1) == "-" then
+  elseif x:find("^%-") then
     val = false
     x = x:sub(2)
   end
@@ -410,8 +464,6 @@ for x in extensions_opt:gmatch("[%+%-]?[%a_]+") do
     for k,_ in pairs(extensions) do
       extensions[k] = val
     end
-  elseif type(extensions[x]) ~= "boolean" then
-    lunamark.util.err("Unrecognized extension: " .. x, 15)
   else
     extensions[x] = val
   end

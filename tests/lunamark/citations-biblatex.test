@@ -1,0 +1,87 @@
+lunamark -t latex -Xcitations=biblatex
+<<<
+Blah blah [see @doe99, pp. 33-35; also @smith04, chap. 1].
+
+Blah blah [see @doe99,
+pp. 33-35; also @smith04,
+chap. 1].
+
+Blah blah [@doe99, pp. 33-35, 38-39 and *passim*].
+
+Blah blah [@smith04; @doe99].
+
+Smith says blah [-@smith04].
+
+@smith04 says blah.
+
+@smith04 [p. 33] says blah.
+
+[@this; @is; @a; @string; @of; @simple; @no-suppress-author; @bracketed; @citations]
+
+@this [; @is; @a; @string; @of; @simple; @no-suppress-author; @in-text; @citations]
+
+[-@this; -@is; -@a; -@string; -@of; -@simple; -@suppress-author; -@bracketed; -@citations]
+
+-@this [; -@is; -@a; -@string; -@of; -@simple; -@suppress-author; -@in-text; -@citations]
+
+[-@this; @is; -@a; @string; -@of; @simple; -@combined; @bracketed; -@citations]
+
+-@this [; @is; -@a; @string; -@of; @simple; -@combined; @in-text; -@citations]
+
+[@this; is @a; @string of; complex no-suppress-author @bracketed citations]
+
+@this [; is @a; @string of; complex no-suppress-author @in-text citations]
+
+[-@this; is -@a; -@string of; complex suppress-author -@bracketed citations]
+
+-@this [; is -@a; -@string of; complex suppress-author -@in-text citations]
+
+[-@this; is -@a; @string of; complex combined -@bracketed citations]
+
+-@this [; is -@a; @string of; complex combined -@in-text citations]
+
+[@separate] [@bracketed] [@citations]
+
+@separate @in-text @citations
+>>>
+Blah blah \autocites[see][pp.~33-35]{doe99}[also][chap.~1]{smith04}.
+
+Blah blah \autocites[see][pp.~33-35]{doe99}[also][chap.~1]{smith04}.
+
+Blah blah \autocite[pp.~33-35,~38-39~and~\emph{passim}]{doe99}.
+
+Blah blah \autocites{smith04}{doe99}.
+
+Smith says blah \autocite*{smith04}.
+
+\textcite{smith04} says blah.
+
+\textcite[p.~33]{smith04} says blah.
+
+\autocites{this}{is}{a}{string}{of}{simple}{no-suppress-author}{bracketed}{citations}
+
+\textcites{this}{is}{a}{string}{of}{simple}{no-suppress-author}{in-text}{citations}
+
+\autocites{this}{is}{a}{string}{of}{simple}{suppress-author}{bracketed}{citations}
+
+\textcites{this}{is}{a}{string}{of}{simple}{suppress-author}{in-text}{citations}
+
+\autocites{this}{is}{a}{string}{of}{simple}{combined}{bracketed}{citations}
+
+\textcites{this}{is}{a}{string}{of}{simple}{combined}{in-text}{citations}
+
+\autocites{this}[is][]{a}[~of]{string}[complex~no-suppress-author][~citations]{bracketed}
+
+\textcites{this}[is][]{a}[~of]{string}[complex~no-suppress-author][~citations]{in-text}
+
+\autocites{this}[is][]{a}[~of]{string}[complex~suppress-author][~citations]{bracketed}
+
+\textcites{this}[is][]{a}[~of]{string}[complex~suppress-author][~citations]{in-text}
+
+\autocites{this}[is][]{a}[~of]{string}[complex~combined][~citations]{bracketed}
+
+\textcites{this}[is][]{a}[~of]{string}[complex~combined][~citations]{in-text}
+
+\autocite{separate} \autocite{bracketed} \autocite{citations}
+
+\textcite{separate} \textcite{in-text} \textcite{citations}

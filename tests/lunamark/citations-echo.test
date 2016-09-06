@@ -1,0 +1,87 @@
+lunamark -Xcitations,-citation_nbsps
+<<<
+Blah blah [see @doe99, pp. 33-35; also @smith04, chap. 1].
+
+Blah blah [see @doe99,
+pp. 33-35; also @smith04,
+chap. 1].
+
+Blah blah [@doe99, pp. 33-35, 38-39 and *passim*].
+
+Blah blah [@smith04; @doe99].
+
+Smith says blah [-@smith04].
+
+@smith04 says blah.
+
+@smith04 [p. 33] says blah.
+
+[@this; @is; @a; @string; @of; @simple; @no-suppress-author; @bracketed; @citations]
+
+@this [; @is; @a; @string; @of; @simple; @no-suppress-author; @in-text; @citations]
+
+[-@this; -@is; -@a; -@string; -@of; -@simple; -@suppress-author; -@bracketed; -@citations]
+
+-@this [; -@is; -@a; -@string; -@of; -@simple; -@suppress-author; -@in-text; -@citations]
+
+[-@this; @is; -@a; @string; -@of; @simple; -@combined; @bracketed; -@citations]
+
+-@this [; @is; -@a; @string; -@of; @simple; -@combined; @in-text; -@citations]
+
+[@this; is @a; @string of; complex no-suppress-author @bracketed citations]
+
+@this [; is @a; @string of; complex no-suppress-author @in-text citations]
+
+[-@this; is -@a; -@string of; complex suppress-author -@bracketed citations]
+
+-@this [; is -@a; -@string of; complex suppress-author -@in-text citations]
+
+[-@this; is -@a; @string of; complex combined -@bracketed citations]
+
+-@this [; is -@a; @string of; complex combined -@in-text citations]
+
+[@separate] [@bracketed] [@citations]
+
+@separate @in-text @citations
+>>>
+<p>Blah blah [see @doe99 pp. 33-35; also @smith04 chap. 1].</p>
+
+<p>Blah blah [see @doe99 pp. 33-35; also @smith04 chap. 1].</p>
+
+<p>Blah blah [@doe99 pp. 33-35, 38-39 and <em>passim</em>].</p>
+
+<p>Blah blah [@smith04; @doe99].</p>
+
+<p>Smith says blah [-@smith04].</p>
+
+<p>@smith04 says blah.</p>
+
+<p>@smith04 [p. 33] says blah.</p>
+
+<p>[@this; @is; @a; @string; @of; @simple; @no-suppress-author; @bracketed; @citations]</p>
+
+<p>@this; @is; @a; @string; @of; @simple; @no-suppress-author; @in-text; @citations</p>
+
+<p>[-@this; -@is; -@a; -@string; -@of; -@simple; -@suppress-author; -@bracketed; -@citations]</p>
+
+<p>-@this; -@is; -@a; -@string; -@of; -@simple; -@suppress-author; -@in-text; -@citations</p>
+
+<p>[-@this; @is; -@a; @string; -@of; @simple; -@combined; @bracketed; -@citations]</p>
+
+<p>-@this; @is; -@a; @string; -@of; @simple; -@combined; @in-text; -@citations</p>
+
+<p>[@this; is @a; @string  of; complex no-suppress-author @bracketed  citations]</p>
+
+<p>@this; is @a; @string  of; complex no-suppress-author @in-text  citations</p>
+
+<p>[-@this; is -@a; -@string  of; complex suppress-author -@bracketed  citations]</p>
+
+<p>-@this; is -@a; -@string  of; complex suppress-author -@in-text  citations</p>
+
+<p>[-@this; is -@a; @string  of; complex combined -@bracketed  citations]</p>
+
+<p>-@this; is -@a; @string  of; complex combined -@in-text  citations</p>
+
+<p>[@separate] [@bracketed] [@citations]</p>
+
+<p>@separate @in-text @citations</p>

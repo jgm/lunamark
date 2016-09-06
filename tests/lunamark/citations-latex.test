@@ -1,0 +1,87 @@
+lunamark -t latex -Xcitations=latex
+<<<
+Blah blah [see @doe99, pp. 33-35; also @smith04, chap. 1].
+
+Blah blah [see @doe99,
+pp. 33-35; also @smith04,
+chap. 1].
+
+Blah blah [@doe99, pp. 33-35, 38-39 and *passim*].
+
+Blah blah [@smith04; @doe99].
+
+Smith says blah [-@smith04].
+
+@smith04 says blah.
+
+@smith04 [p. 33] says blah.
+
+[@this; @is; @a; @string; @of; @simple; @no-suppress-author; @bracketed; @citations]
+
+@this [; @is; @a; @string; @of; @simple; @no-suppress-author; @in-text; @citations]
+
+[-@this; -@is; -@a; -@string; -@of; -@simple; -@suppress-author; -@bracketed; -@citations]
+
+-@this [; -@is; -@a; -@string; -@of; -@simple; -@suppress-author; -@in-text; -@citations]
+
+[-@this; @is; -@a; @string; -@of; @simple; -@combined; @bracketed; -@citations]
+
+-@this [; @is; -@a; @string; -@of; @simple; -@combined; @in-text; -@citations]
+
+[@this; is @a; @string of; complex no-suppress-author @bracketed citations]
+
+@this [; is @a; @string of; complex no-suppress-author @in-text citations]
+
+[-@this; is -@a; -@string of; complex suppress-author -@bracketed citations]
+
+-@this [; is -@a; -@string of; complex suppress-author -@in-text citations]
+
+[-@this; is -@a; @string of; complex combined -@bracketed citations]
+
+-@this [; is -@a; @string of; complex combined -@in-text citations]
+
+[@separate] [@bracketed] [@citations]
+
+@separate @in-text @citations
+>>>
+Blah blah see~\cite[pp.~33-35]{doe99} also~\cite[chap.~1]{smith04}.
+
+Blah blah see~\cite[pp.~33-35]{doe99} also~\cite[chap.~1]{smith04}.
+
+Blah blah \cite[pp.~33-35,~38-39~and~\emph{passim}]{doe99}.
+
+Blah blah \cite{smith04, doe99}.
+
+Smith says blah \cite{smith04}.
+
+\cite{smith04} says blah.
+
+\cite[p.~33]{smith04} says blah.
+
+\cite{this, is, a, string, of, simple, no-suppress-author, bracketed, citations}
+
+\cite{this, is, a, string, of, simple, no-suppress-author, in-text, citations}
+
+\cite{this, is, a, string, of, simple, suppress-author, bracketed, citations}
+
+\cite{this, is, a, string, of, simple, suppress-author, in-text, citations}
+
+\cite{this, is, a, string, of, simple, combined, bracketed, citations}
+
+\cite{this, is, a, string, of, simple, combined, in-text, citations}
+
+\cite{this} is~\cite{a} \cite[~of]{string} complex~no-suppress-author~\cite[~citations]{bracketed}
+
+\cite{this} is~\cite{a} \cite[~of]{string} complex~no-suppress-author~\cite[~citations]{in-text}
+
+\cite{this} is~\cite{a} \cite[~of]{string} complex~suppress-author~\cite[~citations]{bracketed}
+
+\cite{this} is~\cite{a} \cite[~of]{string} complex~suppress-author~\cite[~citations]{in-text}
+
+\cite{this} is~\cite{a} \cite[~of]{string} complex~combined~\cite[~citations]{bracketed}
+
+\cite{this} is~\cite{a} \cite[~of]{string} complex~combined~\cite[~citations]{in-text}
+
+\cite{separate} \cite{bracketed} \cite{citations}
+
+\cite{separate} \cite{in-text} \cite{citations}

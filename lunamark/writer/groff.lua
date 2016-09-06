@@ -28,6 +28,8 @@ function M.new(options)
 
   Groff.ndash = "\\[en]"
 
+  Groff.nbsp = "\\~"
+
   function Groff.singlequoted(s)
     return {"`",s,"'"}
   end

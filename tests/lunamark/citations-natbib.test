@@ -1,0 +1,87 @@
+lunamark -t latex -Xcitations=natbib
+<<<
+Blah blah [see @doe99, pp. 33-35; also @smith04, chap. 1].
+
+Blah blah [see @doe99,
+pp. 33-35; also @smith04,
+chap. 1].
+
+Blah blah [@doe99, pp. 33-35, 38-39 and *passim*].
+
+Blah blah [@smith04; @doe99].
+
+Smith says blah [-@smith04].
+
+@smith04 says blah.
+
+@smith04 [p. 33] says blah.
+
+[@this; @is; @a; @string; @of; @simple; @no-suppress-author; @bracketed; @citations]
+
+@this [; @is; @a; @string; @of; @simple; @no-suppress-author; @in-text; @citations]
+
+[-@this; -@is; -@a; -@string; -@of; -@simple; -@suppress-author; -@bracketed; -@citations]
+
+-@this [; -@is; -@a; -@string; -@of; -@simple; -@suppress-author; -@in-text; -@citations]
+
+[-@this; @is; -@a; @string; -@of; @simple; -@combined; @bracketed; -@citations]
+
+-@this [; @is; -@a; @string; -@of; @simple; -@combined; @in-text; -@citations]
+
+[@this; is @a; @string of; complex no-suppress-author @bracketed citations]
+
+@this [; is @a; @string of; complex no-suppress-author @in-text citations]
+
+[-@this; is -@a; -@string of; complex suppress-author -@bracketed citations]
+
+-@this [; is -@a; -@string of; complex suppress-author -@in-text citations]
+
+[-@this; is -@a; @string of; complex combined -@bracketed citations]
+
+-@this [; is -@a; @string of; complex combined -@in-text citations]
+
+[@separate] [@bracketed] [@citations]
+
+@separate @in-text @citations
+>>>
+Blah blah \citetext{\citealp[see][pp.~33-35]{doe99}; \citealp[also][chap.~1]{smith04}}.
+
+Blah blah \citetext{\citealp[see][pp.~33-35]{doe99}; \citealp[also][chap.~1]{smith04}}.
+
+Blah blah \citep[pp.~33-35,~38-39~and~\emph{passim}]{doe99}.
+
+Blah blah \citep{smith04, doe99}.
+
+Smith says blah \citeyearpar{smith04}.
+
+\citet{smith04} says blah.
+
+\citet[p.~33]{smith04} says blah.
+
+\citep{this, is, a, string, of, simple, no-suppress-author, bracketed, citations}
+
+\citet{this, is, a, string, of, simple, no-suppress-author, in-text, citations}
+
+\citetext{\citeyear{this}; \citeyear{is}; \citeyear{a}; \citeyear{string}; \citeyear{of}; \citeyear{simple}; \citeyear{suppress-author}; \citeyear{bracketed}; \citeyear{citations}}
+
+\citetext{\citeyear{this}; \citeyear{is}; \citeyear{a}; \citeyear{string}; \citeyear{of}; \citeyear{simple}; \citeyear{suppress-author}; \citeyear{in-text}; \citeyear{citations}}
+
+\citetext{\citeyear{this}; \citealp{is}; \citeyear{a}; \citealp{string}; \citeyear{of}; \citealp{simple}; \citeyear{combined}; \citealp{bracketed}; \citeyear{citations}}
+
+\citetext{\citeyear{this}; \citealt{is}; \citeyear{a}; \citealt{string}; \citeyear{of}; \citealt{simple}; \citeyear{combined}; \citealt{in-text}; \citeyear{citations}}
+
+\citetext{\citealp{this}; \citealp[is][]{a}; \citealp[~of]{string}; \citealp[complex~no-suppress-author][~citations]{bracketed}}
+
+\citetext{\citealt{this}; \citealt[is][]{a}; \citealt[~of]{string}; \citealt[complex~no-suppress-author][~citations]{in-text}}
+
+\citetext{\citeyear{this}; \citeyear[is][]{a}; \citeyear[~of]{string}; \citeyear[complex~suppress-author][~citations]{bracketed}}
+
+\citetext{\citeyear{this}; \citeyear[is][]{a}; \citeyear[~of]{string}; \citeyear[complex~suppress-author][~citations]{in-text}}
+
+\citetext{\citeyear{this}; \citeyear[is][]{a}; \citealp[~of]{string}; \citeyear[complex~combined][~citations]{bracketed}}
+
+\citetext{\citeyear{this}; \citeyear[is][]{a}; \citealt[~of]{string}; \citeyear[complex~combined][~citations]{in-text}}
+
+\citep{separate} \citep{bracketed} \citep{citations}
+
+\citet{separate} \citet{in-text} \citet{citations}
