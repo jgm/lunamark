@@ -23,7 +23,7 @@ and three orders of magnitude faster than `markdown.lua`.
 
 [Source code repository]: https://github.com/jgm/lunamark
 [Issue tracker]: https://github.com/jgm/lunamark/issues
-[Website]: http:jgm.github.com/lunamark
+[Website]: http://jgm.github.com/lunamark
 [API documentation]: http://jgm.github.com/lunamark/doc/
 [lunamark(1)]: http://jgm.github.com/lunamark/lunamark.1.html
 [lunadoc(1)]: http://jgm.github.com/lunamark/lunadoc.1.html
