@@ -284,7 +284,7 @@ function M.new(writer, options)
                      + space * bulletchar * #spacing * (tab + space^-2)
                      + space * space * bulletchar * #spacing * (tab + space^-1)
                      + space * space * space * bulletchar * #spacing
-                     ) * -bulletchar
+                     )
 
   local dig
   if options.hash_enumerators then
