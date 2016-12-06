@@ -52,7 +52,7 @@ local function normalize_tag(tag)
 end
 
 ------------------------------------------------------------------------------
--- Character parsers
+-- Generic parsers (global to circumvent the 200 local variable limit)
 ------------------------------------------------------------------------------
 
 local percent                = P("%")
@@ -85,6 +85,13 @@ local tilde                  = P("~")
 local tab                    = P("\t")
 local newline                = P("\n")
 local tightblocksep          = P("\001")
+
+local digit                  = R("09")
+local hexdigit               = R("09","af","AF")
+local letter                 = R("AZ","az")
+local alphanumeric           = R("AZ","az","09")
+local keyword                = letter * alphanumeric^0
+local internal_punctuation   = S(":;,.#$%&-+?<>~/")
 
 --- Create a new markdown parser.
 --
@@ -187,6 +194,7 @@ function M.new(writer, options)
   local blocks
   local inlines
   local inlines_no_link
+  local inlines_no_inline_note
   local inlines_nbsp
 
   local function create_parser(name, grammar)
@@ -206,6 +214,9 @@ function M.new(writer, options)
     function() return inlines end)
   local parse_inlines_no_link = create_parser("parse_inlines_no_link",
     function() return inlines_no_link end)
+  local parse_inlines_no_inline_note = create_parser(
+    "parse_inlines_no_inline_note",
+    function() return inlines_no_inline_note end)
   local parse_inlines_nbsp = create_parser("parse_inlines_nbsp",
     function() return inlines_nbsp end)
 
@@ -214,13 +225,6 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
   -- Generic parsers
   ------------------------------------------------------------------------------
-
-  local digit                  = R("09")
-  local hexdigit               = R("09","af","AF")
-  local letter                 = R("AZ","az")
-  local alphanumeric           = R("AZ","az","09")
-  local keyword                = letter * alphanumeric^0
-  local internal_punctuation   = S(":;,.#$%&-+?<>~/")
 
   local doubleasterisks        = P("**")
   local doubleunderscores      = P("__")
@@ -239,9 +243,9 @@ function M.new(writer, options)
 
   local specialchar
   if options.smart then
-    specialchar                = S("*_`&[]<!\\'\"-.@")
+    specialchar                = S("*_`&[]<!\\'\"-.@^")
   else
-    specialchar                = S("*_`&[]<!\\-@")
+    specialchar                = S("*_`&[]<!\\-@^")
   end
 
   local normalchar             = any -
@@ -499,14 +503,12 @@ function M.new(writer, options)
 
   local NoteRef    = RawNoteRef / lookup_note
 
-  local NoteBlock
+  local NoteBlock  = leader * RawNoteRef * colon * spnl * indented_blocks(chunk)
+                   / register_note
 
-  if options.notes then
-    NoteBlock = leader * RawNoteRef * colon * spnl * indented_blocks(chunk)
-              / register_note
-  else
-    NoteBlock = fail
-  end
+  local InlineNote = circumflex -- no notes inside notes
+                   * (tag / parse_inlines_no_inline_note)
+                   / writer.note
 
   ------------------------------------------------------------------------------
   -- Helpers for links and references
@@ -1101,6 +1103,7 @@ function M.new(writer, options)
                             + V("UlOrStarLine")
                             + V("Strong")
                             + V("Emph")
+                            + V("InlineNote")
                             + V("NoteRef")
                             + V("Citations")
                             + V("Link")
@@ -1120,6 +1123,7 @@ function M.new(writer, options)
       UlOrStarLine          = UlOrStarLine,
       Strong                = Strong,
       Emph                  = Emph,
+      InlineNote            = InlineNote,
       NoteRef               = NoteRef,
       Citations             = Citations,
       Link                  = Link,
@@ -1150,6 +1154,10 @@ function M.new(writer, options)
     syntax.NoteRef = fail
   end
 
+  if not options.inline_notes then
+    syntax.InlineNote = fail
+  end
+
   if not options.smart then
     syntax.Smart = fail
   end
@@ -1168,6 +1176,10 @@ function M.new(writer, options)
   local inlines_no_link_t = util.table_copy(inlines_t)
   inlines_no_link_t.Link = fail
   inlines_no_link = Ct(inlines_no_link_t)
+
+  local inlines_no_inline_note_t = util.table_copy(inlines_t)
+  inlines_no_inline_note_t.InlineNote = fail
+  inlines_no_inline_note = Ct(inlines_no_inline_note_t)
 
   local inlines_nbsp_t = util.table_copy(inlines_t)
   inlines_nbsp_t.Endline = NonbreakingEndline

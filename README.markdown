@@ -36,7 +36,7 @@ Lunamark's markdown parser currently supports a number of extensions
 
   - Smart typography (fancy quotes, dashes, ellipses)
   - Significant start numbers in ordered lists
-  - Footnotes
+  - Footnotes (both regular and inline)
   - Definition lists
   - Pandoc-style title blocks
   - Pandoc-style citations

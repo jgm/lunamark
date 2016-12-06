@@ -24,7 +24,7 @@ can be turned on or off individually):
 
   - Smart typography (fancy quotes, dashes, ellipses)
   - Significant start numbers in ordered lists
-  - Footnotes
+  - Footnotes (both regular and inline)
   - Definition lists
   - Metadata
   - Pandoc title blocks
@@ -120,6 +120,14 @@ environment variable `LUNAMARK_EXTENSIONS` (see ENVIRONMENT below).
         [^mynote]: This note has two paragraphs.
 
             Here is the second one.
+
+`(-) inline_notes`
+:   Inline footnotes. An inline footnote is like a markdown bracketed
+    reference, but preceded with a circumflex (`^`). Example:
+
+        Here is an inline note.^[Inlines notes are easier to write,
+        since you don't have to pick an identifier and move down to
+        type the note.]
 
 `(-) definition_lists`
 :   Definition lists.  A list item consists of a term, on a single
@@ -371,6 +379,7 @@ given in parentheses:
   (-) smart                Smart typography (quotes, dashes, ellipses)
   (-) preserve_tabs        Don't expand tabs to spaces
   (-) notes                Footnotes
+  (-) inline_notes         Inline footnotes
   (-) definition_lists     Definition lists
   (-) citations            Citations
   (+) citation_nbsps       Turn spacing into non-breaking spaces in citations
@@ -426,6 +435,7 @@ local extensions = {  -- defaults
   smart = false,
   preserve_tabs = false,
   notes = false,
+  inline_notes = false,
   citations = false,
   citation_nbsps = true,
   definition_lists = false,
