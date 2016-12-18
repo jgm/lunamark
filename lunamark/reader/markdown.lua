@@ -52,46 +52,91 @@ local function normalize_tag(tag)
 end
 
 ------------------------------------------------------------------------------
--- Generic parsers (global to circumvent the 200 local variable limit)
+
+local parsers                  = {}
+
+------------------------------------------------------------------------------
+-- Basic parsers
 ------------------------------------------------------------------------------
 
-local percent                = P("%")
-local at                     = P("@")
-local comma                  = P(",")
-local asterisk               = P("*")
-local dash                   = P("-")
-local plus                   = P("+")
-local underscore             = P("_")
-local period                 = P(".")
-local hash                   = P("#")
-local ampersand              = P("&")
-local backtick               = P("`")
-local less                   = P("<")
-local more                   = P(">")
-local space                  = P(" ")
-local squote                 = P("'")
-local dquote                 = P('"')
-local lparent                = P("(")
-local rparent                = P(")")
-local lbracket               = P("[")
-local rbracket               = P("]")
-local circumflex             = P("^")
-local slash                  = P("/")
-local equal                  = P("=")
-local colon                  = P(":")
-local semicolon              = P(";")
-local exclamation            = P("!")
-local tilde                  = P("~")
-local tab                    = P("\t")
-local newline                = P("\n")
-local tightblocksep          = P("\001")
+parsers.percent                = P("%")
+parsers.at                     = P("@")
+parsers.comma                  = P(",")
+parsers.asterisk               = P("*")
+parsers.dash                   = P("-")
+parsers.plus                   = P("+")
+parsers.underscore             = P("_")
+parsers.period                 = P(".")
+parsers.hash                   = P("#")
+parsers.ampersand              = P("&")
+parsers.backtick               = P("`")
+parsers.less                   = P("<")
+parsers.more                   = P(">")
+parsers.space                  = P(" ")
+parsers.squote                 = P("'")
+parsers.dquote                 = P('"')
+parsers.lparent                = P("(")
+parsers.rparent                = P(")")
+parsers.lbracket               = P("[")
+parsers.rbracket               = P("]")
+parsers.circumflex             = P("^")
+parsers.slash                  = P("/")
+parsers.equal                  = P("=")
+parsers.colon                  = P(":")
+parsers.semicolon              = P(";")
+parsers.exclamation            = P("!")
+parsers.tilde                  = P("~")
+parsers.tab                    = P("\t")
+parsers.newline                = P("\n")
+parsers.tightblocksep          = P("\001")
 
-local digit                  = R("09")
-local hexdigit               = R("09","af","AF")
-local letter                 = R("AZ","az")
-local alphanumeric           = R("AZ","az","09")
-local keyword                = letter * alphanumeric^0
-local internal_punctuation   = S(":;,.#$%&-+?<>~/")
+parsers.digit                  = R("09")
+parsers.hexdigit               = R("09","af","AF")
+parsers.letter                 = R("AZ","az")
+parsers.alphanumeric           = R("AZ","az","09")
+parsers.keyword                = parsers.letter
+                                * parsers.alphanumeric^0
+parsers.internal_punctuation   = S(":;,.#$%&-+?<>~/")
+
+parsers.doubleasterisks        = P("**")
+parsers.doubleunderscores      = P("__")
+parsers.fourspaces             = P("    ")
+
+parsers.any                    = P(1)
+parsers.fail                   = parsers.any - 1
+
+parsers.escapable              = S("\\`*_{}[]()+_.!<>#-~:^@;")
+parsers.anyescaped             = P("\\") / "" * parsers.escapable
+                                + parsers.any
+
+parsers.spacechar              = S("\t ")
+parsers.spacing                = S(" \n\r\t")
+parsers.nonspacechar           = parsers.any - parsers.spacing
+parsers.optionalspace          = parsers.spacechar^0
+
+parsers.eof                    = -parsers.any
+parsers.nonindentspace         = parsers.space^-3 * -parsers.spacechar
+parsers.indent                 = parsers.space^-3 * parsers.tab
+                               + parsers.fourspaces / ""
+parsers.linechar               = P(1 - parsers.newline)
+
+parsers.blankline              = parsers.optionalspace
+                               * parsers.newline / "\n"
+parsers.blanklines             = parsers.blankline^0
+parsers.skipblanklines         = (parsers.optionalspace * parsers.newline)^0
+parsers.indentedline           = parsers.indent    /""
+                               * C(parsers.linechar^1 * parsers.newline^-1)
+parsers.optionallyindentedline = parsers.indent^-1 /""
+                               * C(parsers.linechar^1 * parsers.newline^-1)
+parsers.sp                     = parsers.spacing^0
+parsers.spnl                   = parsers.optionalspace
+                               * (parsers.newline * parsers.optionalspace)^-1
+parsers.line                   = parsers.linechar^0 * parsers.newline
+                               + parsers.linechar^1 * parsers.eof
+parsers.nonemptyline           = parsers.line - parsers.blankline
+
+parsers.chunk                  = parsers.line * (parsers.optionallyindentedline
+                                                - parsers.blankline)^0
 
 --- Create a new markdown parser.
 --
@@ -189,6 +234,8 @@ function M.new(writer, options)
   end
 
   ------------------------------------------------------------------------------
+  -- Top-level parser functions
+  ------------------------------------------------------------------------------
 
   local syntax
   local blocks
@@ -223,106 +270,87 @@ function M.new(writer, options)
   local parse_markdown
 
   ------------------------------------------------------------------------------
-  -- Generic parsers
+
+  local local_parsers         = {}
+  setmetatable(local_parsers, {__index = parsers}) -- look up globally
+  local parsers               = local_parsers -- but store locally
+  
+  ------------------------------------------------------------------------------
+  -- Basic parsers (local)
   ------------------------------------------------------------------------------
 
-  local doubleasterisks        = P("**")
-  local doubleunderscores      = P("__")
-  local fourspaces             = P("    ")
-
-  local any                    = P(1)
-  local fail                   = any - 1
-
-  local escapable              = S("\\`*_{}[]()+_.!<>#-~:^@;")
-  local anyescaped             = P("\\") / "" * escapable
-                               + any
-
-  local spacechar              = S("\t ")
-  local spacing                = S(" \n\r\t")
-  local nonspacechar           = any - spacing
-
-  local specialchar
   if options.smart then
-    specialchar                = S("*_`&[]<!\\'\"-.@^")
+    parsers.specialchar       = S("*_`&[]<!\\'\"-.@^")
   else
-    specialchar                = S("*_`&[]<!\\-@^")
+    parsers.specialchar       = S("*_`&[]<!\\-@^")
   end
 
-  local normalchar             = any -
-                                 (specialchar + spacing + tightblocksep)
-  local optionalspace          = spacechar^0
-  local eof                    = - any
-  local nonindentspace         = space^-3 * - spacechar
-  local indent                 = space^-3 * tab
-                               + fourspaces / ""
-  local linechar               = P(1 - newline)
-
-  local blankline              = optionalspace * newline / "\n"
-  local blanklines             = blankline^0
-  local skipblanklines         = (optionalspace * newline)^0
-  local indentedline           = indent    /"" * C(linechar^1 * newline^-1)
-  local optionallyindentedline = indent^-1 /"" * C(linechar^1 * newline^-1)
-  local sp                     = spacing^0
-  local spnl                   = optionalspace * (newline * optionalspace)^-1
-  local line                   = linechar^0 * newline
-                               + linechar^1 * eof
-  local nonemptyline           = line - blankline
-
-  local chunk = line * (optionallyindentedline - blankline)^0
+  parsers.normalchar          = parsers.any - (parsers.specialchar
+                                                + parsers.spacing
+                                                + parsers.tightblocksep)
 
   -- block followed by 0 or more optionally
   -- indented blocks with first line indented.
   local function indented_blocks(bl)
     return Cs( bl
-             * (blankline^1 * indent * -blankline * bl)^0
-             * blankline^1 )
+             * (parsers.blankline^1 * parsers.indent * -parsers.blankline * bl)^0
+             * parsers.blankline^1 )
   end
 
   -----------------------------------------------------------------------------
   -- Parsers used for markdown lists
   -----------------------------------------------------------------------------
 
-  local bulletchar = C(plus + asterisk + dash)
+  local bulletchar = C(parsers.plus + parsers.asterisk + parsers.dash)
 
-  local bullet     = ( bulletchar * #spacing * (tab + space^-3)
-                     + space * bulletchar * #spacing * (tab + space^-2)
-                     + space * space * bulletchar * #spacing * (tab + space^-1)
-                     + space * space * space * bulletchar * #spacing
+  local bullet     = ( bulletchar * #parsers.spacing
+                                  * (parsers.tab + parsers.space^-3)
+                     + parsers.space * bulletchar * #parsers.spacing
+                                      * (parsers.tab + parsers.space^-2)
+                     + parsers.space * parsers.space * bulletchar
+                                      * #parsers.spacing
+                                      * (parsers.tab + parsers.space^-1)
+                     + parsers.space * parsers.space * parsers.space
+                                      * bulletchar * #parsers.spacing
                      )
 
   local dig
   if options.hash_enumerators then
-    dig = digit + hash
+    dig = parsers.digit + parsers.hash
   else
-    dig = digit
+    dig = parsers.digit
   end
 
-  local enumerator = C(dig^3 * period) * #spacing
-                   + C(dig^2 * period) * #spacing * (tab + space^1)
-                   + C(dig * period) * #spacing * (tab + space^-2)
-                   + space * C(dig^2 * period) * #spacing
-                   + space * C(dig * period) * #spacing * (tab + space^-1)
-                   + space * space * C(dig^1 * period) * #spacing
+  local enumerator = C(dig^3 * parsers.period) * #parsers.spacing
+                   + C(dig^2 * parsers.period) * #parsers.spacing
+                             * (parsers.tab + parsers.space^1)
+                   + C(dig * parsers.period) * #parsers.spacing
+                                              * (parsers.tab + parsers.space^-2)
+                   + parsers.space * C(dig^2 * parsers.period) * #parsers.spacing
+                   + parsers.space * C(dig * parsers.period) * #parsers.spacing
+                                    * (parsers.tab + parsers.space^-1)
+                   + parsers.space * parsers.space * C(dig^1
+                                    * parsers.period) * #parsers.spacing
 
   -----------------------------------------------------------------------------
   -- Parsers used for markdown code spans
   -----------------------------------------------------------------------------
 
-  local openticks   = Cg(backtick^1, "ticks")
+  local openticks   = Cg(parsers.backtick^1, "ticks")
 
   local function captures_equal_length(s,i,a,b)
     return #a == #b and i
   end
 
-  local closeticks  = space^-1 *
-                      Cmt(C(backtick^1) * Cb("ticks"), captures_equal_length)
+  local closeticks  = parsers.space^-1 *
+                      Cmt(C(parsers.backtick^1) * Cb("ticks"), captures_equal_length)
 
-  local intickschar = (any - S(" \n\r`"))
-                    + (newline * -blankline)
-                    + (space - closeticks)
-                    + (backtick^1 - closeticks)
+  local intickschar = (parsers.any - S(" \n\r`"))
+                    + (parsers.newline * -parsers.blankline)
+                    + (parsers.space - closeticks)
+                    + (parsers.backtick^1 - closeticks)
 
-  local inticks     = openticks * space^-1 * C(intickschar^1) * closeticks
+  local inticks     = openticks * parsers.space^-1 * C(intickschar^1) * closeticks
 
   -----------------------------------------------------------------------------
   -- Parsers used for fenced code blocks
@@ -332,25 +360,26 @@ function M.new(writer, options)
     return #a >= #b and i
   end
 
-  local infostring     = (linechar - (backtick + space^1 * newline))^0
+  local infostring     = (parsers.linechar - (parsers.backtick
+                         + parsers.space^1 * parsers.newline))^0
 
   local fenceindent
   local function fencehead(char)
-    return               C(nonindentspace) / function(s) fenceindent = #s end
+    return               C(parsers.nonindentspace) / function(s) fenceindent = #s end
                        * Cg(char^3, "fencelength")
-                       * optionalspace * C(infostring) * optionalspace
-                       * newline + eof
+                       * parsers.optionalspace * C(infostring)
+                       * parsers.optionalspace * parsers.newline + parsers.eof
   end
 
   local function fencetail(char)
-    return               nonindentspace
+    return               parsers.nonindentspace
                        * Cmt(C(char^3) * Cb("fencelength"),
                              captures_geq_length)
-                       * optionalspace * (newline + eof)
+                       * parsers.optionalspace * (parsers.newline + parsers.eof)
   end
 
   local function fencedline(char)
-    return               C(line - fencetail(char))
+    return               C(parsers.line - fencetail(char))
                        / function(s)
                            return s:gsub("^" .. string.rep(" ?",
                              fenceindent), "")
@@ -361,93 +390,113 @@ function M.new(writer, options)
   -- Parsers used for markdown tags and links
   -----------------------------------------------------------------------------
 
-  local leader        = space^-3
+  local leader        = parsers.space^-3
 
   -- in balanced brackets, parentheses, quotes:
-  local bracketed     = P{ lbracket
-                         * ((anyescaped - (lbracket + rbracket + blankline^2)) + V(1))^0
-                         * rbracket }
+  local bracketed     = P{ parsers.lbracket
+                         * ((parsers.anyescaped - (parsers.lbracket
+                                                   + parsers.rbracket
+                                                   + parsers.blankline^2)
+                            ) + V(1))^0
+                         * parsers.rbracket }
 
-  local inparens      = P{ lparent
-                         * ((anyescaped - (lparent + rparent + blankline^2)) + V(1))^0
-                         * rparent }
+  local inparens      = P{ parsers.lparent
+                         * ((parsers.anyescaped - (parsers.lparent
+                                                   + parsers.rparent
+                                                   + parsers.blankline^2)
+                            ) + V(1))^0
+                         * parsers.rparent }
 
-  local squoted       = P{ squote * alphanumeric
-                         * ((anyescaped - (squote + blankline^2)) + V(1))^0
-                         * squote }
+  local squoted       = P{ parsers.squote * parsers.alphanumeric
+                         * ((parsers.anyescaped - (parsers.squote
+                                                   + parsers.blankline^2)
+                            ) + V(1))^0
+                         * parsers.squote }
 
-  local dquoted       = P{ dquote * alphanumeric
-                         * ((anyescaped - (dquote + blankline^2)) + V(1))^0
-                         * dquote }
+  local dquoted       = P{ parsers.dquote * parsers.alphanumeric
+                         * ((parsers.anyescaped - (parsers.dquote
+                                                  + parsers.blankline^2)
+                            ) + V(1))^0
+                         * parsers.dquote }
 
   -- bracketed 'tag' for markdown links, allowing nested brackets:
-  local tag           = lbracket
-                      * Cs((alphanumeric^1
+  local tag           = parsers.lbracket
+                      * Cs((parsers.alphanumeric^1
                            + bracketed
                            + inticks
-                           + (anyescaped - (rbracket + blankline^2)))^0)
-                      * rbracket
+                           + (parsers.anyescaped - (parsers.rbracket
+                                                   + parsers.blankline^2)))^0)
+                      * parsers.rbracket
 
   -- url for markdown links, allowing balanced parentheses:
-  local url           = less * Cs((anyescaped-more)^0) * more
-                      + Cs((inparens + (anyescaped-spacing-rparent))^1)
+  local url           = parsers.less * Cs((parsers.anyescaped-parsers.more)^0)
+                                      * parsers.more
+                      + Cs((inparens + (parsers.anyescaped-parsers.spacing-parsers.rparent))^1)
 
   -- quoted text possibly with nested quotes:
-  local title_s       = squote  * Cs(((anyescaped-squote) + squoted)^0) * squote
+  local title_s       = parsers.squote * Cs(((parsers.anyescaped-parsers.squote)
+                                             + squoted)^0)
+                                        * parsers.squote
 
-  local title_d       = dquote  * Cs(((anyescaped-dquote) + dquoted)^0) * dquote
+  local title_d       = parsers.dquote  * Cs(((parsers.anyescaped-parsers.dquote)
+                                             + dquoted
+                                             )^0)
+                                         * parsers.dquote
 
-  local title_p       = lparent
-                      * Cs((inparens + (anyescaped-rparent))^0)
-                      * rparent
+  local title_p       = parsers.lparent
+                      * Cs((inparens + (parsers.anyescaped-parsers.rparent))^0)
+                      * parsers.rparent
 
   local title         = title_d + title_s + title_p
 
-  local optionaltitle = spnl * title * spacechar^0
+  local optionaltitle = parsers.spnl * title * parsers.spacechar^0
                       + Cc("")
 
   ------------------------------------------------------------------------------
   -- Citations
   ------------------------------------------------------------------------------
 
-  local citation_name = Cs(dash^-1) * at
-                      * Cs(alphanumeric
-                          * (alphanumeric + internal_punctuation
-                              - comma - semicolon)^0)
+  local citation_name = Cs(parsers.dash^-1) * parsers.at
+                      * Cs(parsers.alphanumeric
+                          * (parsers.alphanumeric + parsers.internal_punctuation
+                            - parsers.comma - parsers.semicolon)^0)
 
   local citation_body_prenote
-                      = Cs((alphanumeric^1
+                      = Cs((parsers.alphanumeric^1
                            + bracketed
                            + inticks
-                           + (anyescaped
-                               - (rbracket + blankline^2))
-                           - (spnl * dash^-1 * at))^0)
+                           + (parsers.anyescaped
+                             - (parsers.rbracket + parsers.blankline^2))
+                           - (parsers.spnl * parsers.dash^-1 * parsers.at))^0)
 
   local citation_body_postnote
-                      = Cs((alphanumeric^1
+                      = Cs((parsers.alphanumeric^1
                            + bracketed
                            + inticks
-                           + (anyescaped
-                               - (rbracket + semicolon + blankline^2))
-                           - (spnl * rbracket))^0)
+                           + (parsers.anyescaped
+                             - (parsers.rbracket + parsers.semicolon
+                               + parsers.blankline^2))
+                           - (parsers.spnl * parsers.rbracket))^0)
 
   local citation_body_chunk
                       = citation_body_prenote
-                      * spnl * citation_name
-                      * (comma * spnl)^-1
+                      * parsers.spnl * citation_name
+                      * (parsers.comma * parsers.spnl)^-1
                       * citation_body_postnote
 
   local citation_body = citation_body_chunk
-                      * (semicolon * spnl * citation_body_chunk)^0
+                      * (parsers.semicolon * parsers.spnl * citation_body_chunk)^0
 
   local citation_headless_body
-                      = Cs((alphanumeric^1
+                      = Cs((parsers.alphanumeric^1
                            + bracketed
                            + inticks
-                           + (anyescaped
-                               - (rbracket + at + semicolon + blankline^2))
-                           - (spnl * rbracket))^0)
-                      * (sp * semicolon * spnl * citation_body_chunk)^0
+                           + (parsers.anyescaped
+                             - (parsers.rbracket + parsers.at
+                               + parsers.semicolon + parsers.blankline^2))
+                           - (parsers.spnl * parsers.rbracket))^0)
+                      * (parsers.sp * parsers.semicolon * parsers.spnl
+                        * citation_body_chunk)^0
 
   local function citations(text_cites, raw_cites)
       local function normalize(str)
@@ -499,15 +548,16 @@ function M.new(writer, options)
     return ""
   end
 
-  local RawNoteRef = #(lbracket * circumflex) * tag / strip_first_char
+  local RawNoteRef = #(parsers.lbracket * parsers.circumflex)
+                   * tag / strip_first_char
 
   local NoteRef    = RawNoteRef / lookup_note
 
-  local NoteBlock  = leader * RawNoteRef * colon * spnl * indented_blocks(chunk)
-                   / register_note
+  local NoteBlock  = leader * RawNoteRef * parsers.colon * parsers.spnl
+                   * indented_blocks(parsers.chunk) / register_note
 
-  local InlineNote = circumflex -- no notes inside notes
-                   * (tag / parse_inlines_no_inline_note)
+  local InlineNote = parsers.circumflex
+                   * (tag / parse_inlines_no_inline_note) -- no notes inside notes
                    / writer.note
 
   ------------------------------------------------------------------------------
@@ -524,8 +574,9 @@ function M.new(writer, options)
   end
 
   -- parse a reference definition:  [foo]: /bar "title"
-  local define_reference_parser =
-    leader * tag * colon * spacechar^0 * url * optionaltitle * blankline^1
+  local define_reference_parser = leader * tag * parsers.colon
+                                * parsers.spacechar^0 * url * optionaltitle
+                                * parsers.blankline^1
 
   -- lookup link reference and return either
   -- the link or nil and fallback text.
@@ -610,49 +661,63 @@ function M.new(writer, options)
       keyword_exact("td") + keyword_exact("tr")
 
   -- There is no reason to support bad html, so we expect quoted attributes
-  local htmlattributevalue  = squote * (any - (blankline + squote))^0 * squote
-                            + dquote * (any - (blankline + dquote))^0 * dquote
+  local htmlattributevalue  = parsers.squote * (parsers.any - (parsers.blankline
+                                                              + parsers.squote))^0
+                                             * parsers.squote
+                            + parsers.dquote * (parsers.any - (parsers.blankline
+                                                              + parsers.dquote))^0
+                                             * parsers.dquote
 
-  local htmlattribute       = spacing^1 * (alphanumeric + S("_-"))^1 * sp * equal
-                            * sp * htmlattributevalue
+  local htmlattribute       = parsers.spacing^1 * (parsers.alphanumeric + S("_-"))^1
+                            * parsers.sp * parsers.equal * parsers.sp
+                            * htmlattributevalue
 
-  local htmlcomment         = P("<!--") * (any - P("-->"))^0 * P("-->")
+  local htmlcomment         = P("<!--") * (parsers.any - P("-->"))^0 * P("-->")
 
-  local htmlinstruction     = P("<?")   * (any - P("?>" ))^0 * P("?>" )
+  local htmlinstruction     = P("<?")   * (parsers.any - P("?>" ))^0 * P("?>" )
 
-  local openelt_any = less * keyword * htmlattribute^0 * sp * more
+  local openelt_any = parsers.less * parsers.keyword * htmlattribute^0
+                    * parsers.sp * parsers.more
 
   local function openelt_exact(s)
-    return (less * sp * keyword_exact(s) * htmlattribute^0 * sp * more)
+    return parsers.less * parsers.sp * keyword_exact(s) * htmlattribute^0
+         * parsers.sp * parsers.more
   end
 
-  local openelt_block = sp * block_keyword * htmlattribute^0 * sp * more
+  local openelt_block = parsers.sp * block_keyword * htmlattribute^0
+                      * parsers.sp * parsers.more
 
-  local closeelt_any = less * sp * slash * keyword * sp * more
+  local closeelt_any = parsers.less * parsers.sp * parsers.slash
+                     * parsers.keyword * parsers.sp * parsers.more
 
   local function closeelt_exact(s)
-    return (less * sp * slash * keyword_exact(s) * sp * more)
+    return parsers.less * parsers.sp * parsers.slash * keyword_exact(s)
+         * parsers.sp * parsers.more
   end
 
-  local emptyelt_any = less * sp * keyword * htmlattribute^0 * sp * slash * more
+  local emptyelt_any = parsers.less * parsers.sp * parsers.keyword
+                     * htmlattribute^0 * parsers.sp * parsers.slash
+                     * parsers.more
 
-  local emptyelt_block = less * sp * block_keyword * htmlattribute^0 * sp * slash * more
+  local emptyelt_block = parsers.less * parsers.sp * block_keyword
+                       * htmlattribute^0 * parsers.sp * parsers.slash
+                       * parsers.more
 
-  local displaytext         = (any - less)^1
+  local displaytext = (parsers.any - parsers.less)^1
 
   -- return content between two matched HTML tags
   local function in_matched(s)
     return { openelt_exact(s)
-           * (V(1) + displaytext + (less - closeelt_exact(s)))^0
+           * (V(1) + displaytext + (parsers.less - closeelt_exact(s)))^0
            * closeelt_exact(s) }
   end
 
   local function parse_matched_tags(s,pos)
-    local t = lower(lpegmatch(C(keyword),s,pos))
+    local t = lower(lpegmatch(C(parsers.keyword),s,pos))
     return lpegmatch(in_matched(t),s,pos-1)
   end
 
-  local in_matched_block_tags = less * Cmt(#openelt_block, parse_matched_tags)
+  local in_matched_block_tags = parsers.less * Cmt(#openelt_block, parse_matched_tags)
 
   local displayhtml = htmlcomment
                     + emptyelt_block
@@ -670,9 +735,12 @@ function M.new(writer, options)
   -- Entities
   ------------------------------------------------------------------------------
 
-  local hexentity = ampersand * hash * S("Xx") * C(hexdigit    ^1) * semicolon
-  local decentity = ampersand * hash           * C(digit       ^1) * semicolon
-  local tagentity = ampersand *                  C(alphanumeric^1) * semicolon
+  local hexentity = parsers.ampersand * parsers.hash * S("Xx")
+                  * C(parsers.hexdigit^1) * parsers.semicolon
+  local decentity = parsers.ampersand * parsers.hash
+                  * C(parsers.digit^1) * parsers.semicolon
+  local tagentity = parsers.ampersand * C(parsers.alphanumeric^1)
+                  * parsers.semicolon
 
   ------------------------------------------------------------------------------
   -- Inline elements
@@ -680,144 +748,148 @@ function M.new(writer, options)
 
   local Inline    = V("Inline")
 
-  local Str       = normalchar^1 / writer.string
+  local Str       = larsers.normalchar^1 / writer.string
 
   local Ellipsis  = P("...") / writer.ellipsis
 
-  local Dash      = P("---") * -dash / writer.mdash
-                  + P("--") * -dash / writer.ndash
-                  + P("-") * #digit * B(digit*1, 2) / writer.ndash
+  local Dash      = P("---") * -parsers.dash / writer.mdash
+                  + P("--") * -parsers.dash / writer.ndash
+                  + P("-") * #parsers.digit * B(parsers.digit*1, 2) / writer.ndash
 
-  local DoubleQuoted = dquote * Ct((Inline - dquote)^1) * dquote
-                     / writer.doublequoted
+  local DoubleQuoted = parsers.dquote * Ct((Inline - parsers.dquote)^1)
+                     * parsers.dquote / writer.doublequoted
 
-  local squote_start = squote * -spacing
+  local squote_start = parsers.squote * -parsers.spacing
 
-  local squote_end = squote * B(nonspacechar*1, 2)
+  local squote_end = parsers.squote * B(parsers.nonspacechar*1, 2)
 
   local SingleQuoted = squote_start * Ct((Inline - squote_end)^1) * squote_end
                      / writer.singlequoted
 
-  local Apostrophe = squote * B(nonspacechar*1, 2) / "’"
+  local Apostrophe = parsers.squote * B(parsers.nonspacechar*1, 2) / "’"
 
   local Smart      = Ellipsis + Dash + SingleQuoted + DoubleQuoted + Apostrophe
 
-  local Symbol    = (specialchar - tightblocksep) / writer.string
+  local Symbol    = (larsers.specialchar - parsers.tightblocksep) / writer.string
 
   local Code      = inticks / writer.code
 
-  local bqstart      = more
-  local headerstart  = hash
-                     + (line * (equal^1 + dash^1) * optionalspace * newline)
-  local fencestart   = fencehead(backtick) + fencehead(tilde)
+  local bqstart      = parsers.more
+  local headerstart  = parsers.hash
+                     + (parsers.line * (parsers.equal^1 + parsers.dash^1)
+                             * parsers.optionalspace * parsers.newline)
+  local fencestart   = fencehead(parsers.backtick) + fencehead(parsers.tilde)
 
   if options.require_blank_before_blockquote then
-    bqstart = fail
+    bqstart = parsers.fail
   end
 
   if options.require_blank_before_header then
-    headerstart = fail
+    headerstart = parsers.fail
   end
 
   if not options.fenced_code_blocks or
     options.blank_before_fenced_code_blocks then
-    fencestart = fail
+    fencestart = parsers.fail
   end
 
-  local Endline   = newline * -( -- newline, but not before...
-                        blankline -- paragraph break
-                      + tightblocksep  -- nested list
-                      + eof       -- end of document
+  local Endline   = parsers.newline * -( -- newline, but not before...
+                        parsers.blankline -- paragraph break
+                      + parsers.tightblocksep  -- nested list
+                      + parsers.eof       -- end of document
                       + bqstart
                       + headerstart
                       + fencestart
-                    ) * spacechar^0 / writer.space
+                    ) * parsers.spacechar^0 / writer.space
 
-  local Space     = spacechar^2 * Endline / writer.linebreak
-                  + spacechar^1 * Endline^-1 * eof / ""
-                  + spacechar^1 * Endline^-1 * optionalspace / writer.space
+  local Space     = parsers.spacechar^2 * Endline / writer.linebreak
+                  + parsers.spacechar^1 * Endline^-1 * parsers.eof / ""
+                  + parsers.spacechar^1 * Endline^-1
+                                         * parsers.optionalspace / writer.space
 
   local NonbreakingEndline
-                  = newline * -( -- newline, but not before...
-                        blankline -- paragraph break
-                      + tightblocksep  -- nested list
-                      + eof       -- end of document
+                  = parsers.newline * -( -- newline, but not before...
+                        parsers.blankline -- paragraph break
+                      + parsers.tightblocksep  -- nested list
+                      + parsers.eof       -- end of document
                       + bqstart
                       + headerstart
                       + fencestart
-                    ) * spacechar^0 / writer.nbsp
+                    ) * parsers.spacechar^0 / writer.nbsp
 
   local NonbreakingSpace
-                  = spacechar^2 * Endline / writer.linebreak
-                  + spacechar^1 * Endline^-1 * eof / ""
-                  + spacechar^1 * Endline^-1 * optionalspace / writer.nbsp
+                  = parsers.spacechar^2 * Endline / writer.linebreak
+                  + parsers.spacechar^1 * Endline^-1 * parsers.eof / ""
+                  + parsers.spacechar^1 * Endline^-1
+                                         * parsers.optionalspace / writer.nbsp
 
   -- parse many p between starter and ender
   local function between(p, starter, ender)
-      local ender2 = B(nonspacechar) * ender
-      return (starter * #nonspacechar * Ct(p * (p - ender2)^0) * ender2)
+      local ender2 = B(parsers.nonspacechar) * ender
+      return (starter * #parsers.nonspacechar * Ct(p * (p - ender2)^0) * ender2)
   end
 
-  local Strong = ( between(Inline, doubleasterisks, doubleasterisks)
-                 + between(Inline, doubleunderscores, doubleunderscores)
+  local Strong = ( between(Inline, parsers.doubleasterisks, parsers.doubleasterisks)
+                 + between(Inline, parsers.doubleunderscores, parsers.doubleunderscores)
                  ) / writer.strong
 
-  local Emph   = ( between(Inline, asterisk, asterisk)
-                 + between(Inline, underscore, underscore)
+  local Emph   = ( between(Inline, parsers.asterisk, parsers.asterisk)
+                 + between(Inline, parsers.underscore, parsers.underscore)
                  ) / writer.emphasis
 
-  local urlchar = anyescaped - newline - more
+  local urlchar = parsers.anyescaped - parsers.newline - parsers.more
 
-  local AutoLinkUrl   = less
-                      * C(alphanumeric^1 * P("://") * urlchar^1)
-                      * more
+  local AutoLinkUrl   = parsers.less
+                      * C(parsers.alphanumeric^1 * P("://") * urlchar^1)
+                      * parsers.more
                       / function(url) return writer.link(writer.string(url),url) end
 
-  local AutoLinkEmail = less
-                      * C((alphanumeric + S("-._+"))^1 * P("@") * urlchar^1)
-                      * more
+  local AutoLinkEmail = parsers.less
+                      * C((parsers.alphanumeric + S("-._+"))^1 * P("@") * urlchar^1)
+                      * parsers.more
                       / function(email) return writer.link(writer.string(email),"mailto:"..email) end
 
   local DirectLink    = (tag / parse_inlines_no_link)  -- no links inside links
-                      * spnl
-                      * lparent
+                      * parsers.spnl
+                      * parsers.lparent
                       * (url + Cc(""))  -- link can be empty [foo]()
                       * optionaltitle
-                      * rparent
+                      * parsers.rparent
                       / writer.link
 
-  local IndirectLink = tag * (C(spnl) * tag)^-1 / indirect_link
+  local IndirectLink = tag * (C(parsers.spnl) * tag)^-1 / indirect_link
 
   -- parse a link or image (direct or indirect)
   local Link          = DirectLink + IndirectLink
 
-  local DirectImage   = exclamation
+  local DirectImage   = parsers.exclamation
                       * (tag / parse_inlines)
-                      * spnl
-                      * lparent
+                      * parsers.spnl
+                      * parsers.lparent
                       * (url + Cc(""))  -- link can be empty [foo]()
                       * optionaltitle
-                      * rparent
+                      * parsers.rparent
                       / writer.image
 
-  local IndirectImage  = exclamation * tag * (C(spnl) * tag)^-1 / indirect_image
+  local IndirectImage = parsers.exclamation * tag * (C(parsers.spnl) * tag)^-1
+                      / indirect_image
 
   local Image         = DirectImage + IndirectImage
 
   local TextCitations = Ct(Cc("")
                       * citation_name
-                      * ((spnl
-                           * lbracket
+                      * ((parsers.spnl
+                           * parsers.lbracket
                            * citation_headless_body
-                           * rbracket) + Cc(""))) /
+                           * parsers.rbracket) + Cc(""))) /
                         function(raw_cites)
                             return citations(true, raw_cites)
                         end
 
   local ParenthesizedCitations
-                      = Ct(lbracket
+                      = Ct(parsers.lbracket
                       * citation_body
-                      * rbracket) /
+                      * parsers.rbracket) /
                         function(raw_cites)
                             return citations(false, raw_cites)
                         end
@@ -825,9 +897,9 @@ function M.new(writer, options)
   local Citations     = TextCitations + ParenthesizedCitations
 
   -- avoid parsing long strings of * or _ as emph/strong
-  local UlOrStarLine  = asterisk^4 + underscore^4 / writer.string
+  local UlOrStarLine  = parsers.asterisk^4 + parsers.underscore^4 / writer.string
 
-  local EscapedChar   = S("\\") * C(escapable) / writer.string
+  local EscapedChar   = S("\\") * C(parsers.escapable) / writer.string
 
   local InlineHtml    = C(inlinehtml) / writer.inline_html
 
@@ -843,19 +915,19 @@ function M.new(writer, options)
 
   local DisplayHtml    = C(displayhtml) / expandtabs / writer.display_html
 
-  local Verbatim       = Cs( (blanklines
-                           * ((indentedline - blankline))^1)^1
+  local Verbatim       = Cs( (parsers.blanklines
+                           * ((parsers.indentedline - parsers.blankline))^1)^1
                            ) / expandtabs / writer.verbatim
 
   local TildeFencedCodeBlock
-                       = fencehead(tilde)
-                       * Cs(fencedline(tilde)^0)
-                       * fencetail(tilde)
+                       = fencehead(parsers.tilde)
+                       * Cs(fencedline(parsers.tilde)^0)
+                       * fencetail(parsers.tilde)
 
   local BacktickFencedCodeBlock
-                       = fencehead(backtick)
-                       * Cs(fencedline(backtick)^0)
-                       * fencetail(backtick)
+                       = fencehead(parsers.backtick)
+                       * Cs(fencedline(parsers.backtick)^0)
+                       * fencetail(parsers.backtick)
 
   local FencedCodeBlock
                        = (TildeFencedCodeBlock + BacktickFencedCodeBlock)
@@ -867,30 +939,32 @@ function M.new(writer, options)
 
   -- strip off leading > and indents, and run through blocks
   local Blockquote     = Cs((
-            ((leader * more * space^-1)/"" * linechar^0 * newline)^1
-          * (-blankline * linechar^1 * newline)^0
-          * blankline^0
+            ((leader * parsers.more * parsers.space^-1)/""
+                     * parsers.linechar^0 * parsers.newline)^1
+          * (-parsers.blankline * parsers.linechar^1 * parsers.newline)^0
+          * parsers.blankline^0
           )^1) / parse_blocks / writer.blockquote
 
   local function lineof(c)
-      return (leader * (P(c) * optionalspace)^3 * newline * blankline^1)
+      return (leader * (P(c) * parsers.optionalspace)^3
+             * parsers.newline * parsers.blankline^1)
   end
 
-  local HorizontalRule = ( lineof(asterisk)
-                         + lineof(dash)
-                         + lineof(underscore)
+  local HorizontalRule = ( lineof(parsers.asterisk)
+                         + lineof(parsers.dash)
+                         + lineof(parsers.underscore)
                          ) / writer.hrule
 
   local Reference      = define_reference_parser / register_link
 
-  local Paragraph      = nonindentspace * Ct(Inline^1) * newline
-                       * ( blankline^1
-                         + #hash
-                         + #(leader * more * space^-1)
+  local Paragraph      = parsers.nonindentspace * Ct(Inline^1) * parsers.newline
+                       * ( parsers.blankline^1
+                         + #parsers.hash
+                         + #(leader * parsers.more * parsers.space^-1)
                          )
                        / writer.paragraph
 
-  local Plain          = nonindentspace * Ct(Inline^1) / writer.plain
+  local Plain          = parsers.nonindentspace * Ct(Inline^1) / writer.plain
 
   ------------------------------------------------------------------------------
   -- Lists
@@ -900,34 +974,37 @@ function M.new(writer, options)
 
   -- we use \001 as a separator between a tight list item and a
   -- nested list under it.
-  local NestedList            = Cs((optionallyindentedline - starter)^1)
+  local NestedList            = Cs((parsers.optionallyindentedline - starter)^1)
                               / function(a) return "\001"..a end
 
-  local ListBlockLine         = optionallyindentedline
-                                - blankline - (indent^-1 * starter)
+  local ListBlockLine         = parsers.optionallyindentedline
+                              - parsers.blankline - (parsers.indent^-1 * starter)
 
-  local ListBlock             = line * ListBlockLine^0
+  local ListBlock             = parsers.line * ListBlockLine^0
 
-  local ListContinuationBlock = blanklines * (indent / "") * ListBlock
+  local ListContinuationBlock = parsers.blanklines * (parsers.indent / "")
+                              * ListBlock
 
   local function TightListItem(starter)
       return -HorizontalRule
              * (Cs(starter / "" * ListBlock * NestedList^-1) / parse_blocks)
-             * -(blanklines * indent)
+             * -(parsers.blanklines * parsers.indent)
   end
 
   local function LooseListItem(starter)
       return -HorizontalRule
              * Cs( starter / "" * ListBlock * Cc("\n")
                * (NestedList + ListContinuationBlock^0)
-               * (blanklines / "\n\n")
+               * (parsers.blanklines / "\n\n")
                ) / parse_blocks
   end
 
-  local BulletList = ( Ct(TightListItem(bullet)^1)
-                       * Cc(true) * skipblanklines * -bullet
-                     + Ct(LooseListItem(bullet)^1)
-                       * Cc(false) * skipblanklines ) / writer.bulletlist
+  local BulletList = ( Ct(TightListItem(bullet)^1) * Cc(true)
+                                                   * parsers.skipblanklines
+                                                   * -bullet
+                     + Ct(LooseListItem(bullet)^1) * Cc(false)
+                                                   * parsers.skipblanklines )
+                   / writer.bulletlist
 
   local function ordered_list(s,tight,startnum)
     if options.startnum then
@@ -940,37 +1017,43 @@ function M.new(writer, options)
 
   local OrderedList = Cg(enumerator, "listtype") *
                       ( Ct(TightListItem(Cb("listtype")) * TightListItem(enumerator)^0)
-                        * Cc(true) * skipblanklines * -enumerator
+                        * Cc(true) * parsers.skipblanklines * -enumerator
                       + Ct(LooseListItem(Cb("listtype")) * LooseListItem(enumerator)^0)
-                        * Cc(false) * skipblanklines
+                        * Cc(false) * parsers.skipblanklines
                       ) * Cb("listtype") / ordered_list
 
   local defstartchar = S("~:")
-  local defstart     = ( defstartchar * #spacing * (tab + space^-3)
-                     + space * defstartchar * #spacing * (tab + space^-2)
-                     + space * space * defstartchar * #spacing * (tab + space^-1)
-                     + space * space * space * defstartchar * #spacing
+  local defstart     = ( defstartchar * #parsers.spacing
+                                      * (parsers.tab + parsers.space^-3)
+                     + parsers.space * defstartchar * #parsers.spacing
+                                      * (parsers.tab + parsers.space^-2)
+                     + parsers.space * parsers.space * defstartchar
+                                      * #parsers.spacing
+                                      * (parsers.tab + parsers.space^-1)
+                     + parsers.space * parsers.space * parsers.space
+                                      * defstartchar * #parsers.spacing
                      )
 
-  local dlchunk = Cs(line * (indentedline - blankline)^0)
+  local dlchunk = Cs(parsers.line * (parsers.indentedline - parsers.blankline)^0)
 
   local function definition_list_item(term, defs, tight)
     return { term = parse_inlines(term), definitions = defs }
   end
 
-  local DefinitionListItemLoose = C(line) * skipblanklines
+  local DefinitionListItemLoose = C(parsers.line) * parsers.skipblanklines
                            * Ct((defstart * indented_blocks(dlchunk) / parse_blocks)^1)
                            * Cc(false)
                            / definition_list_item
 
-  local DefinitionListItemTight = C(line)
+  local DefinitionListItemTight = C(parsers.line)
                            * Ct((defstart * dlchunk / parse_blocks)^1)
                            * Cc(true)
                            / definition_list_item
 
   local DefinitionList =  ( Ct(DefinitionListItemLoose^1) * Cc(false)
                           +  Ct(DefinitionListItemTight^1)
-                             * (skipblanklines * -DefinitionListItemLoose * Cc(true))
+                             * (parsers.skipblanklines * -DefinitionListItemLoose
+                                                       * Cc(true))
                           ) / writer.definitionlist
 
   ------------------------------------------------------------------------------
@@ -994,7 +1077,7 @@ function M.new(writer, options)
     return ""
   end
 
-  local LuaMeta = fail
+  local LuaMeta = parsers.fail
   if options.lua_metadata then
     LuaMeta = #P("<!--@") * htmlcomment / lua_metadata
   end
@@ -1003,17 +1086,23 @@ function M.new(writer, options)
   -- Pandoc title block parser
   ------------------------------------------------------------------------------
 
-  local pandoc_title =
-      percent * optionalspace
-    * C(line * (spacechar * nonemptyline)^0) / parse_inlines
-  local pandoc_author =
-      spacechar * optionalspace
-    * C((anyescaped - newline - semicolon)^0)
-    * (semicolon + newline)
-  local pandoc_authors =
-    percent * Ct((pandoc_author / parse_inlines)^0) * newline^-1
-  local pandoc_date =
-    percent * optionalspace * C(line) / parse_inlines
+  local pandoc_title = parsers.percent * parsers.optionalspace
+                     * C(parsers.line * (parsers.spacechar * parsers.nonemptyline)^0)
+                     / parse_inlines
+
+  local pandoc_author = parsers.spacechar * parsers.optionalspace
+                      * C((parsers.anyescaped
+                          - parsers.newline
+                          - parsers.semicolon)^0)
+                      * (parsers.semicolon + parsers.newline)
+
+  local pandoc_authors = parsers.percent * Ct((pandoc_author
+                                               / parse_inlines)^0)
+                       * parsers.newline^-1
+
+  local pandoc_date = parsers.percent * parsers.optionalspace
+                    * C(parsers.line) / parse_inlines
+
   local pandoc_title_block =
       (pandoc_title + Cc(""))
     * (pandoc_authors + Cc({}))
@@ -1024,21 +1113,22 @@ function M.new(writer, options)
   -- Blank
   ------------------------------------------------------------------------------
 
-  local Blank          = blankline / ""
+  local Blank          = parsers.blankline / ""
                        + LuaMeta
                        + NoteBlock
                        + Reference
-                       + (tightblocksep / "\n")
+                       + (parsers.tightblocksep / "\n")
 
   ------------------------------------------------------------------------------
   -- Headers
   ------------------------------------------------------------------------------
 
   -- parse Atx heading start and return level
-  local HeadingStart = #hash * C(hash^-6) * -hash / length
+  local HeadingStart = #parsers.hash * C(parsers.hash^-6)
+                     * -parsers.hash / length
 
   -- parse setext header ending and return level
-  local HeadingLevel = equal^1 * Cc(1) + dash^1 * Cc(2)
+  local HeadingLevel = parsers.equal^1 * Cc(1) + parsers.dash^1 * Cc(2)
 
   local function strip_atx_end(s)
     return s:gsub("[#%s]*\n$","")
@@ -1046,16 +1136,16 @@ function M.new(writer, options)
 
   -- parse atx header
   local AtxHeader = Cg(HeadingStart,"level")
-                     * optionalspace
-                     * (C(line) / strip_atx_end / parse_inlines)
+                     * parsers.optionalspace
+                     * (C(parsers.line) / strip_atx_end / parse_inlines)
                      * Cb("level")
                      / writer.header
 
   -- parse setext header
-  local SetextHeader = #(line * S("=-"))
-                     * Ct(line / parse_inlines)
+  local SetextHeader = #(parsers.line * S("=-"))
+                     * Ct(parsers.line / parse_inlines)
                      * HeadingLevel
-                     * optionalspace * newline
+                     * parsers.optionalspace * parsers.newline
                      / writer.header
 
   ------------------------------------------------------------------------------
@@ -1069,7 +1159,7 @@ function M.new(writer, options)
                               Block^-1 *
                               (Blank^0 / function() return writer.interblocksep end * Block)^0 *
                               Blank^0 *
-                              eof,
+                              parsers.eof,
 
       Blank                 = Blank,
 
@@ -1139,27 +1229,27 @@ function M.new(writer, options)
     }
 
   if not options.definition_lists then
-    syntax.DefinitionList = fail
+    syntax.DefinitionList = parsers.fail
   end
 
   if not options.fenced_code_blocks then
-    syntax.FencedCodeBlock = fail
+    syntax.FencedCodeBlock = parsers.fail
   end
 
   if not options.citations then
-    syntax.Citations = fail
+    syntax.Citations = parsers.fail
   end
 
   if not options.notes then
-    syntax.NoteRef = fail
+    syntax.NoteRef = parsers.fail
   end
 
   if not options.inline_notes then
-    syntax.InlineNote = fail
+    syntax.InlineNote = parsers.fail
   end
 
   if not options.smart then
-    syntax.Smart = fail
+    syntax.Smart = parsers.fail
   end
 
   if options.alter_syntax and type(options.alter_syntax) == "function" then
@@ -1170,15 +1260,15 @@ function M.new(writer, options)
 
   local inlines_t = util.table_copy(syntax)
   inlines_t[1] = "Inlines"
-  inlines_t.Inlines = Inline^0 * (spacing^0 * eof / "")
+  inlines_t.Inlines = Inline^0 * (parsers.spacing^0 * parsers.eof / "")
   inlines = Ct(inlines_t)
 
   local inlines_no_link_t = util.table_copy(inlines_t)
-  inlines_no_link_t.Link = fail
+  inlines_no_link_t.Link = parsers.fail
   inlines_no_link = Ct(inlines_no_link_t)
 
   local inlines_no_inline_note_t = util.table_copy(inlines_t)
-  inlines_no_inline_note_t.InlineNote = fail
+  inlines_no_inline_note_t.InlineNote = parsers.fail
   inlines_no_inline_note = Ct(inlines_no_inline_note_t)
 
   local inlines_nbsp_t = util.table_copy(inlines_t)
