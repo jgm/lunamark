@@ -163,6 +163,27 @@ parsers.bullet     = ( parsers.bulletchar * #parsers.spacing
                                      * parsers.bulletchar * #parsers.spacing
                      )
 
+-----------------------------------------------------------------------------
+-- Parsers used for markdown code spans
+-----------------------------------------------------------------------------
+
+parsers.openticks   = Cg(parsers.backtick^1, "ticks")
+
+local function captures_equal_length(s,i,a,b)
+  return #a == #b and i
+end
+
+parsers.closeticks  = parsers.space^-1
+                    * Cmt(C(parsers.backtick^1)
+                    * Cb("ticks"), captures_equal_length)
+
+parsers.intickschar = (parsers.any - S(" \n\r`"))
+                    + (parsers.newline * -parsers.blankline)
+                    + (parsers.space - parsers.closeticks)
+                    + (parsers.backtick^1 - parsers.closeticks)
+
+parsers.inticks     = parsers.openticks * parsers.space^-1
+                    * C(parsers.intickschar^1) * parsers.closeticks
 
 --- Create a new markdown parser.
 --
@@ -261,10 +282,10 @@ function M.new(writer, options)
 
   ------------------------------------------------------------------------------
 
-  local local_parsers         = {}
+--  local local_parsers         = {}
 --  setmetatable(local_parsers, {__index = parsers}) -- look up globally
 --  local parsers               = local_parsers -- but store locally
-  local larsers               = local_parsers
+  local larsers               = {}
 
   ------------------------------------------------------------------------------
   -- Top-level parser functions (local)
@@ -329,26 +350,6 @@ function M.new(writer, options)
                                      * (parsers.tab + parsers.space^-1)
                      + parsers.space * parsers.space * C(larsers.dig^1
                                      * parsers.period) * #parsers.spacing
-
-  -----------------------------------------------------------------------------
-  -- Parsers used for markdown code spans
-  -----------------------------------------------------------------------------
-
-  local openticks   = Cg(parsers.backtick^1, "ticks")
-
-  local function captures_equal_length(s,i,a,b)
-    return #a == #b and i
-  end
-
-  local closeticks  = parsers.space^-1 *
-                      Cmt(C(parsers.backtick^1) * Cb("ticks"), captures_equal_length)
-
-  local intickschar = (parsers.any - S(" \n\r`"))
-                    + (parsers.newline * -parsers.blankline)
-                    + (parsers.space - closeticks)
-                    + (parsers.backtick^1 - closeticks)
-
-  local inticks     = openticks * parsers.space^-1 * C(intickschar^1) * closeticks
 
   -----------------------------------------------------------------------------
   -- Parsers used for fenced code blocks
@@ -421,7 +422,7 @@ function M.new(writer, options)
   local tag           = parsers.lbracket
                       * Cs((parsers.alphanumeric^1
                            + bracketed
-                           + inticks
+                           + parsers.inticks
                            + (parsers.anyescaped - (parsers.rbracket
                                                    + parsers.blankline^2)))^0)
                       * parsers.rbracket
@@ -462,7 +463,7 @@ function M.new(writer, options)
   local citation_body_prenote
                       = Cs((parsers.alphanumeric^1
                            + bracketed
-                           + inticks
+                           + parsers.inticks
                            + (parsers.anyescaped
                              - (parsers.rbracket + parsers.blankline^2))
                            - (parsers.spnl * parsers.dash^-1 * parsers.at))^0)
@@ -470,7 +471,7 @@ function M.new(writer, options)
   local citation_body_postnote
                       = Cs((parsers.alphanumeric^1
                            + bracketed
-                           + inticks
+                           + parsers.inticks
                            + (parsers.anyescaped
                              - (parsers.rbracket + parsers.semicolon
                                + parsers.blankline^2))
@@ -488,7 +489,7 @@ function M.new(writer, options)
   local citation_headless_body
                       = Cs((parsers.alphanumeric^1
                            + bracketed
-                           + inticks
+                           + parsers.inticks
                            + (parsers.anyescaped
                              - (parsers.rbracket + parsers.at
                                + parsers.semicolon + parsers.blankline^2))
@@ -770,7 +771,7 @@ function M.new(writer, options)
 
   local Symbol    = (larsers.specialchar - parsers.tightblocksep) / writer.string
 
-  local Code      = inticks / writer.code
+  local Code      = parsers.inticks / writer.code
 
   local bqstart      = parsers.more
   local headerstart  = parsers.hash
