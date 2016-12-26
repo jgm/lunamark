@@ -185,6 +185,40 @@ parsers.intickschar = (parsers.any - S(" \n\r`"))
 parsers.inticks     = parsers.openticks * parsers.space^-1
                     * C(parsers.intickschar^1) * parsers.closeticks
 
+-----------------------------------------------------------------------------
+-- Parsers used for fenced code blocks
+-----------------------------------------------------------------------------
+
+local function captures_geq_length(s,i,a,b)
+  return #a >= #b and i
+end
+
+parsers.infostring  = (parsers.linechar - (parsers.backtick
+                    + parsers.space^1 * parsers.newline))^0
+
+local fenceindent
+parsers.fencehead   = function(char)
+  return              C(parsers.nonindentspace) / function(s)
+                                                    fenceindent = #s
+                                                  end
+                    * Cg(char^3, "fencelength")
+                    * parsers.optionalspace * C(parsers.infostring)
+                    * parsers.optionalspace * parsers.newline + parsers.eof
+end
+
+parsers.fencetail   = function(char)
+  return              parsers.nonindentspace
+                    * Cmt(C(char^3) * Cb("fencelength"), captures_geq_length)
+                    * parsers.optionalspace * (parsers.newline + parsers.eof)
+end
+
+parsers.fencedline  = function(char)
+  return              C(parsers.line - parsers.fencetail(char))
+                    / function(s)
+                        return s:gsub("^" .. string.rep(" ?", fenceindent), "")
+                       end
+end
+
 --- Create a new markdown parser.
 --
 -- *   `writer` is a writer table (see [lunamark.writer.generic]).
@@ -350,40 +384,6 @@ function M.new(writer, options)
                                      * (parsers.tab + parsers.space^-1)
                      + parsers.space * parsers.space * C(larsers.dig^1
                                      * parsers.period) * #parsers.spacing
-
-  -----------------------------------------------------------------------------
-  -- Parsers used for fenced code blocks
-  -----------------------------------------------------------------------------
-
-  local function captures_geq_length(s,i,a,b)
-    return #a >= #b and i
-  end
-
-  local infostring     = (parsers.linechar - (parsers.backtick
-                         + parsers.space^1 * parsers.newline))^0
-
-  local fenceindent
-  local function fencehead(char)
-    return               C(parsers.nonindentspace) / function(s) fenceindent = #s end
-                       * Cg(char^3, "fencelength")
-                       * parsers.optionalspace * C(infostring)
-                       * parsers.optionalspace * parsers.newline + parsers.eof
-  end
-
-  local function fencetail(char)
-    return               parsers.nonindentspace
-                       * Cmt(C(char^3) * Cb("fencelength"),
-                             captures_geq_length)
-                       * parsers.optionalspace * (parsers.newline + parsers.eof)
-  end
-
-  local function fencedline(char)
-    return               C(parsers.line - fencetail(char))
-                       / function(s)
-                           return s:gsub("^" .. string.rep(" ?",
-                             fenceindent), "")
-                         end
-  end
 
   -----------------------------------------------------------------------------
   -- Parsers used for markdown tags and links
@@ -777,7 +777,8 @@ function M.new(writer, options)
   local headerstart  = parsers.hash
                      + (parsers.line * (parsers.equal^1 + parsers.dash^1)
                              * parsers.optionalspace * parsers.newline)
-  local fencestart   = fencehead(parsers.backtick) + fencehead(parsers.tilde)
+  local fencestart   = parsers.fencehead(parsers.backtick)
+                     + parsers.fencehead(parsers.tilde)
 
   if options.require_blank_before_blockquote then
     bqstart = parsers.fail
@@ -919,14 +920,14 @@ function M.new(writer, options)
                            ) / expandtabs / writer.verbatim
 
   local TildeFencedCodeBlock
-                       = fencehead(parsers.tilde)
-                       * Cs(fencedline(parsers.tilde)^0)
-                       * fencetail(parsers.tilde)
+                       = parsers.fencehead(parsers.tilde)
+                       * Cs(parsers.fencedline(parsers.tilde)^0)
+                       * parsers.fencetail(parsers.tilde)
 
   local BacktickFencedCodeBlock
-                       = fencehead(parsers.backtick)
-                       * Cs(fencedline(parsers.backtick)^0)
-                       * fencetail(parsers.backtick)
+                       = parsers.fencehead(parsers.backtick)
+                       * Cs(parsers.fencedline(parsers.backtick)^0)
+                       * parsers.fencetail(parsers.backtick)
 
   local FencedCodeBlock
                        = (TildeFencedCodeBlock + BacktickFencedCodeBlock)
