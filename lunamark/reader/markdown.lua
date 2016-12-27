@@ -466,6 +466,26 @@ parsers.decentity = parsers.ampersand * parsers.hash
 parsers.tagentity = parsers.ampersand * C(parsers.alphanumeric^1)
                   * parsers.semicolon
 
+------------------------------------------------------------------------------
+-- Inline elements
+------------------------------------------------------------------------------
+
+parsers.Inline = V("Inline")
+
+parsers.squote_start = parsers.squote * -parsers.spacing
+
+parsers.squote_end = parsers.squote * B(parsers.nonspacechar*1, 2)
+
+parsers.Apostrophe = parsers.squote * B(parsers.nonspacechar*1, 2) / "’"
+
+-- parse many p between starter and ender
+parsers.between = function(p, starter, ender)
+  local ender2 = B(parsers.nonspacechar) * ender
+  return (starter * #parsers.nonspacechar * Ct(p * (p - ender2)^0) * ender2)
+end
+
+parsers.urlchar = parsers.anyescaped - parsers.newline - parsers.more
+
 --- Create a new markdown parser.
 --
 -- *   `writer` is a writer table (see [lunamark.writer.generic]).
@@ -761,171 +781,169 @@ function M.new(writer, options)
   end
 
   ------------------------------------------------------------------------------
-  -- Inline elements
+  -- Inline elements (local)
   ------------------------------------------------------------------------------
 
-  local Inline    = V("Inline")
+  larsers.Str      = larsers.normalchar^1 / writer.string
 
-  local Str       = larsers.normalchar^1 / writer.string
+  larsers.Ellipsis = P("...") / writer.ellipsis
+  
+  larsers.Dash     = P("---") * -parsers.dash / writer.mdash
+                   + P("--") * -parsers.dash / writer.ndash
+                   + P("-") * #parsers.digit * B(parsers.digit*1, 2)
+                   / writer.ndash
+  
+  larsers.DoubleQuoted = parsers.dquote * Ct((parsers.Inline - parsers.dquote)^1)
+                       * parsers.dquote / writer.doublequoted
 
-  local Ellipsis  = P("...") / writer.ellipsis
+  larsers.SingleQuoted = parsers.squote_start
+                       * Ct((parsers.Inline - parsers.squote_end)^1)
+                       * parsers.squote_end / writer.singlequoted
 
-  local Dash      = P("---") * -parsers.dash / writer.mdash
-                  + P("--") * -parsers.dash / writer.ndash
-                  + P("-") * #parsers.digit * B(parsers.digit*1, 2) / writer.ndash
+  larsers.Smart        = larsers.Ellipsis + larsers.Dash + larsers.SingleQuoted
+                       + larsers.DoubleQuoted + parsers.Apostrophe
 
-  local DoubleQuoted = parsers.dquote * Ct((Inline - parsers.dquote)^1)
-                     * parsers.dquote / writer.doublequoted
-
-  local squote_start = parsers.squote * -parsers.spacing
-
-  local squote_end = parsers.squote * B(parsers.nonspacechar*1, 2)
-
-  local SingleQuoted = squote_start * Ct((Inline - squote_end)^1) * squote_end
-                     / writer.singlequoted
-
-  local Apostrophe = parsers.squote * B(parsers.nonspacechar*1, 2) / "’"
-
-  local Smart      = Ellipsis + Dash + SingleQuoted + DoubleQuoted + Apostrophe
-
-  local Symbol    = (larsers.specialchar - parsers.tightblocksep) / writer.string
-
-  local Code      = parsers.inticks / writer.code
-
-  local bqstart      = parsers.more
-  local headerstart  = parsers.hash
-                     + (parsers.line * (parsers.equal^1 + parsers.dash^1)
-                             * parsers.optionalspace * parsers.newline)
-  local fencestart   = parsers.fencehead(parsers.backtick)
-                     + parsers.fencehead(parsers.tilde)
-
+  larsers.Symbol       = (larsers.specialchar - parsers.tightblocksep)
+                       / writer.string
+  
+  larsers.Code         = parsers.inticks / writer.code
+  
   if options.require_blank_before_blockquote then
-    bqstart = parsers.fail
+    larsers.bqstart = parsers.fail
+  else
+    larsers.bqstart = parsers.more
   end
 
   if options.require_blank_before_header then
-    headerstart = parsers.fail
+    larsers.headerstart = parsers.fail
+  else
+    larsers.headerstart = parsers.hash
+                        + (parsers.line * (parsers.equal^1 + parsers.dash^1)
+                        * parsers.optionalspace * parsers.newline)
   end
 
-  if not options.fenced_code_blocks or
-    options.blank_before_fenced_code_blocks then
-    fencestart = parsers.fail
+  if not options.fenced_code_blocks or options.blank_before_fenced_code_blocks then
+    larsers.fencestart = parsers.fail
+  else
+    larsers.fencestart = parsers.fencehead(parsers.backtick)
+                       + parsers.fencehead(parsers.tilde)
   end
 
-  local Endline   = parsers.newline * -( -- newline, but not before...
+  larsers.Endline   = parsers.newline * -( -- newline, but not before...
                         parsers.blankline -- paragraph break
                       + parsers.tightblocksep  -- nested list
                       + parsers.eof       -- end of document
-                      + bqstart
-                      + headerstart
-                      + fencestart
+                      + larsers.bqstart
+                      + larsers.headerstart
+                      + larsers.fencestart
                     ) * parsers.spacechar^0 / writer.space
 
-  local Space     = parsers.spacechar^2 * Endline / writer.linebreak
-                  + parsers.spacechar^1 * Endline^-1 * parsers.eof / ""
-                  + parsers.spacechar^1 * Endline^-1
-                                         * parsers.optionalspace / writer.space
+  larsers.Space     = parsers.spacechar^2 * larsers.Endline / writer.linebreak
+                    + parsers.spacechar^1 * larsers.Endline^-1 * parsers.eof /""
+                    + parsers.spacechar^1 * larsers.Endline^-1
+                                          * parsers.optionalspace / writer.space
 
-  local NonbreakingEndline
-                  = parsers.newline * -( -- newline, but not before...
+  larsers.NonbreakingEndline
+                    = parsers.newline * -( -- newline, but not before...
                         parsers.blankline -- paragraph break
                       + parsers.tightblocksep  -- nested list
                       + parsers.eof       -- end of document
-                      + bqstart
-                      + headerstart
-                      + fencestart
+                      + larsers.bqstart
+                      + larsers.headerstart
+                      + larsers.fencestart
                     ) * parsers.spacechar^0 / writer.nbsp
 
-  local NonbreakingSpace
-                  = parsers.spacechar^2 * Endline / writer.linebreak
-                  + parsers.spacechar^1 * Endline^-1 * parsers.eof / ""
-                  + parsers.spacechar^1 * Endline^-1
-                                         * parsers.optionalspace / writer.nbsp
+  larsers.NonbreakingSpace
+                    = parsers.spacechar^2 * larsers.Endline / writer.linebreak
+                    + parsers.spacechar^1 * larsers.Endline^-1 * parsers.eof /""
+                    + parsers.spacechar^1 * larsers.Endline^-1
+                                          * parsers.optionalspace / writer.nbsp
 
-  -- parse many p between starter and ender
-  local function between(p, starter, ender)
-      local ender2 = B(parsers.nonspacechar) * ender
-      return (starter * #parsers.nonspacechar * Ct(p * (p - ender2)^0) * ender2)
-  end
+  larsers.Strong = ( parsers.between(parsers.Inline, parsers.doubleasterisks,
+                                     parsers.doubleasterisks)
+                   + parsers.between(parsers.Inline, parsers.doubleunderscores,
+                                     parsers.doubleunderscores)
+                   ) / writer.strong
+  
+  larsers.Emph   = ( parsers.between(parsers.Inline, parsers.asterisk,
+                                   parsers.asterisk)
+                   + parsers.between(parsers.Inline, parsers.underscore,
+                                   parsers.underscore)
+                   ) / writer.emphasis
 
-  local Strong = ( between(Inline, parsers.doubleasterisks, parsers.doubleasterisks)
-                 + between(Inline, parsers.doubleunderscores, parsers.doubleunderscores)
-                 ) / writer.strong
+  larsers.AutoLinkUrl   = parsers.less
+                        * C(parsers.alphanumeric^1 * P("://") * parsers.urlchar^1)
+                        * parsers.more
+                        / function(url)
+                            return writer.link(writer.string(url),url)
+                          end
+  
+  larsers.AutoLinkEmail = parsers.less
+                        * C((parsers.alphanumeric + S("-._+"))^1
+                        * P("@") * parsers.urlchar^1) * parsers.more
+                        / function(email)
+                            return writer.link(writer.string(email),"mailto:"..email)
+                          end
 
-  local Emph   = ( between(Inline, parsers.asterisk, parsers.asterisk)
-                 + between(Inline, parsers.underscore, parsers.underscore)
-                 ) / writer.emphasis
+  larsers.DirectLink    = (parsers.tag / larsers.parse_inlines_no_link)  -- no links inside links
+                        * parsers.spnl
+                        * parsers.lparent
+                        * (parsers.url + Cc(""))  -- link can be empty [foo]()
+                        * parsers.optionaltitle
+                        * parsers.rparent
+                        / writer.link
 
-  local urlchar = parsers.anyescaped - parsers.newline - parsers.more
-
-  local AutoLinkUrl   = parsers.less
-                      * C(parsers.alphanumeric^1 * P("://") * urlchar^1)
-                      * parsers.more
-                      / function(url) return writer.link(writer.string(url),url) end
-
-  local AutoLinkEmail = parsers.less
-                      * C((parsers.alphanumeric + S("-._+"))^1 * P("@") * urlchar^1)
-                      * parsers.more
-                      / function(email) return writer.link(writer.string(email),"mailto:"..email) end
-
-  local DirectLink    = (parsers.tag / larsers.parse_inlines_no_link)  -- no links inside links
-                      * parsers.spnl
-                      * parsers.lparent
-                      * (parsers.url + Cc(""))  -- link can be empty [foo]()
-                      * parsers.optionaltitle
-                      * parsers.rparent
-                      / writer.link
-
-  local IndirectLink  = parsers.tag * (C(parsers.spnl) * parsers.tag)^-1
-                      / indirect_link
+  larsers.IndirectLink  = parsers.tag * (C(parsers.spnl) * parsers.tag)^-1
+                        / indirect_link
 
   -- parse a link or image (direct or indirect)
-  local Link          = DirectLink + IndirectLink
+  larsers.Link          = larsers.DirectLink + larsers.IndirectLink
 
-  local DirectImage   = parsers.exclamation
-                      * (parsers.tag / larsers.parse_inlines)
-                      * parsers.spnl
-                      * parsers.lparent
-                      * (parsers.url + Cc(""))  -- link can be empty [foo]()
-                      * parsers.optionaltitle
-                      * parsers.rparent
-                      / writer.image
+  larsers.DirectImage   = parsers.exclamation
+                        * (parsers.tag / larsers.parse_inlines)
+                        * parsers.spnl
+                        * parsers.lparent
+                        * (parsers.url + Cc(""))  -- link can be empty [foo]()
+                        * parsers.optionaltitle
+                        * parsers.rparent
+                        / writer.image
 
-  local IndirectImage = parsers.exclamation * parsers.tag
-                      * (C(parsers.spnl) * parsers.tag)^-1 / indirect_image
+  larsers.IndirectImage = parsers.exclamation * parsers.tag
+                        * (C(parsers.spnl) * parsers.tag)^-1 / indirect_image
 
-  local Image         = DirectImage + IndirectImage
+  larsers.Image         = larsers.DirectImage + larsers.IndirectImage
 
-  local TextCitations = Ct(Cc("")
-                      * parsers.citation_name
-                      * ((parsers.spnl
+  larsers.TextCitations = Ct(Cc("")
+                        * parsers.citation_name
+                        * ((parsers.spnl
                            * parsers.lbracket
                            * parsers.citation_headless_body
-                           * parsers.rbracket) + Cc(""))) /
-                        function(raw_cites)
+                           * parsers.rbracket) + Cc("")))
+                        / function(raw_cites)
                             return larsers.citations(true, raw_cites)
-                        end
+                          end
 
-  local ParenthesizedCitations
-                      = Ct(parsers.lbracket
-                      * parsers.citation_body
-                      * parsers.rbracket) /
-                        function(raw_cites)
+  larsers.ParenthesizedCitations
+                        = Ct(parsers.lbracket
+                        * parsers.citation_body
+                        * parsers.rbracket)
+                        / function(raw_cites)
                             return larsers.citations(false, raw_cites)
-                        end
+                          end
 
-  local Citations     = TextCitations + ParenthesizedCitations
+  larsers.Citations     = larsers.TextCitations + larsers.ParenthesizedCitations
 
   -- avoid parsing long strings of * or _ as emph/strong
-  local UlOrStarLine  = parsers.asterisk^4 + parsers.underscore^4 / writer.string
-
-  local EscapedChar   = S("\\") * C(parsers.escapable) / writer.string
-
-  local InlineHtml    = C(parsers.inlinehtml) / writer.inline_html
-
-  local HtmlEntity    = parsers.hexentity / entities.hex_entity  / writer.string
-                      + parsers.decentity / entities.dec_entity  / writer.string
-                      + parsers.tagentity / entities.char_entity / writer.string
+  larsers.UlOrStarLine  = parsers.asterisk^4 + parsers.underscore^4
+                        / writer.string
+  
+  larsers.EscapedChar   = S("\\") * C(parsers.escapable) / writer.string
+  
+  larsers.InlineHtml    = C(parsers.inlinehtml) / writer.inline_html
+  
+  larsers.HtmlEntity    = parsers.hexentity / entities.hex_entity  / writer.string
+                        + parsers.decentity / entities.dec_entity  / writer.string
+                        + parsers.tagentity / entities.char_entity / writer.string
 
   ------------------------------------------------------------------------------
   -- Block elements
@@ -977,14 +995,16 @@ function M.new(writer, options)
 
   local Reference      = define_reference_parser / register_link
 
-  local Paragraph      = parsers.nonindentspace * Ct(Inline^1) * parsers.newline
+  local Paragraph      = parsers.nonindentspace * Ct(parsers.Inline^1)
+                       * parsers.newline
                        * ( parsers.blankline^1
                          + #parsers.hash
                          + #(parsers.leader * parsers.more * parsers.space^-1)
                          )
                        / writer.paragraph
 
-  local Plain          = parsers.nonindentspace * Ct(Inline^1) / writer.plain
+  local Plain          = parsers.nonindentspace * Ct(parsers.Inline^1)
+                       / writer.plain
 
   ------------------------------------------------------------------------------
   -- Lists
@@ -1229,25 +1249,25 @@ function M.new(writer, options)
                             + V("Smart")
                             + V("Symbol"),
 
-      Str                   = Str,
-      Space                 = Space,
-      Endline               = Endline,
-      UlOrStarLine          = UlOrStarLine,
-      Strong                = Strong,
-      Emph                  = Emph,
+      Str                   = larsers.Str,
+      Space                 = larsers.Space,
+      Endline               = larsers.Endline,
+      UlOrStarLine          = larsers.UlOrStarLine,
+      Strong                = larsers.Strong,
+      Emph                  = larsers.Emph,
       InlineNote            = larsers.InlineNote,
       NoteRef               = larsers.NoteRef,
-      Citations             = Citations,
-      Link                  = Link,
-      Image                 = Image,
-      Code                  = Code,
-      AutoLinkUrl           = AutoLinkUrl,
-      AutoLinkEmail         = AutoLinkEmail,
-      InlineHtml            = InlineHtml,
-      HtmlEntity            = HtmlEntity,
-      EscapedChar           = EscapedChar,
-      Smart                 = Smart,
-      Symbol                = Symbol,
+      Citations             = larsers.Citations,
+      Link                  = larsers.Link,
+      Image                 = larsers.Image,
+      Code                  = larsers.Code,
+      AutoLinkUrl           = larsers.AutoLinkUrl,
+      AutoLinkEmail         = larsers.AutoLinkEmail,
+      InlineHtml            = larsers.InlineHtml,
+      HtmlEntity            = larsers.HtmlEntity,
+      EscapedChar           = larsers.EscapedChar,
+      Smart                 = larsers.Smart,
+      Symbol                = larsers.Symbol,
     }
 
   if not options.definition_lists then
@@ -1282,7 +1302,7 @@ function M.new(writer, options)
 
   local inlines_t = util.table_copy(syntax)
   inlines_t[1] = "Inlines"
-  inlines_t.Inlines = Inline^0 * (parsers.spacing^0 * parsers.eof / "")
+  inlines_t.Inlines = parsers.Inline^0 * (parsers.spacing^0 * parsers.eof / "")
   larsers.inlines = Ct(inlines_t)
 
   local inlines_no_link_t = util.table_copy(inlines_t)
@@ -1294,8 +1314,8 @@ function M.new(writer, options)
   larsers.inlines_no_inline_note = Ct(inlines_no_inline_note_t)
 
   local inlines_nbsp_t = util.table_copy(inlines_t)
-  inlines_nbsp_t.Endline = NonbreakingEndline
-  inlines_nbsp_t.Space = NonbreakingSpace
+  inlines_nbsp_t.Endline = larsers.NonbreakingEndline
+  inlines_nbsp_t.Space = larsers.NonbreakingSpace
   larsers.inlines_nbsp = Ct(inlines_nbsp_t)
 
   ------------------------------------------------------------------------------
