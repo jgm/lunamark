@@ -1114,7 +1114,7 @@ function M.new(writer, options)
                            ) / writer.definitionlist
 
   ------------------------------------------------------------------------------
-  -- Lua metadata
+  -- Lua metadata (local)
   ------------------------------------------------------------------------------
 
   local function lua_metadata(s)  -- run lua code in comment in sandbox
@@ -1134,9 +1134,10 @@ function M.new(writer, options)
     return ""
   end
 
-  local LuaMeta = parsers.fail
   if options.lua_metadata then
-    LuaMeta = #P("<!--@") * parsers.htmlcomment / lua_metadata
+    larsers.LuaMeta = #P("<!--@") * parsers.htmlcomment / lua_metadata
+  else
+    larsers.LuaMeta = parsers.fail
   end
 
   ------------------------------------------------------------------------------
@@ -1171,7 +1172,7 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   local Blank          = parsers.blankline / ""
-                       + LuaMeta
+                       + larsers.LuaMeta
                        + larsers.NoteBlock
                        + larsers.Reference
                        + (parsers.tightblocksep / "\n")
