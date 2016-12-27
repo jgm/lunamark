@@ -219,6 +219,73 @@ parsers.fencedline  = function(char)
                        end
 end
 
+-----------------------------------------------------------------------------
+-- Parsers used for markdown tags and links
+-----------------------------------------------------------------------------
+
+parsers.leader      = parsers.space^-3
+
+-- in balanced brackets, parentheses, quotes:
+parsers.bracketed   = P{ parsers.lbracket
+                       * ((parsers.anyescaped - (parsers.lbracket
+                                                + parsers.rbracket
+                                                + parsers.blankline^2)
+                          ) + V(1))^0
+                       * parsers.rbracket }
+
+parsers.inparens    = P{ parsers.lparent
+                       * ((parsers.anyescaped - (parsers.lparent
+                                                 + parsers.rparent
+                                                 + parsers.blankline^2)
+                          ) + V(1))^0
+                       * parsers.rparent }
+
+parsers.squoted     = P{ parsers.squote * parsers.alphanumeric
+                       * ((parsers.anyescaped - (parsers.squote
+                                                 + parsers.blankline^2)
+                          ) + V(1))^0
+                       * parsers.squote }
+
+parsers.dquoted     = P{ parsers.dquote * parsers.alphanumeric
+                       * ((parsers.anyescaped - (parsers.dquote
+                                                + parsers.blankline^2)
+                          ) + V(1))^0
+                       * parsers.dquote }
+
+-- bracketed 'tag' for markdown links, allowing nested brackets:
+parsers.tag         = parsers.lbracket
+                    * Cs((parsers.alphanumeric^1
+                         + parsers.bracketed
+                         + parsers.inticks
+                         + (parsers.anyescaped - (parsers.rbracket
+                                                 + parsers.blankline^2)))^0)
+                    * parsers.rbracket
+
+-- url for markdown links, allowing balanced parentheses:
+parsers.url         = parsers.less * Cs((parsers.anyescaped-parsers.more)^0)
+                                   * parsers.more
+                    + Cs((parsers.inparens + (parsers.anyescaped
+                                             -parsers.spacing-parsers.rparent))^1)
+
+-- quoted text possibly with nested quotes:
+parsers.title_s     = parsers.squote * Cs(((parsers.anyescaped-parsers.squote)
+                                          + parsers.squoted)^0)
+                                     * parsers.squote
+
+parsers.title_d     = parsers.dquote  * Cs(((parsers.anyescaped-parsers.dquote)
+                                           + parsers.dquoted)^0)
+                                      * parsers.dquote
+
+parsers.title_p     = parsers.lparent
+                    * Cs((parsers.inparens + (parsers.anyescaped-parsers.rparent))^0)
+                    * parsers.rparent
+
+parsers.title       = parsers.title_d + parsers.title_s + parsers.title_p
+
+parsers.optionaltitle
+                    = parsers.spnl * parsers.title * parsers.spacechar^0
+                    + Cc("")
+
 --- Create a new markdown parser.
 --
 -- *   `writer` is a writer table (see [lunamark.writer.generic]).
@@ -385,72 +452,6 @@ function M.new(writer, options)
                      + parsers.space * parsers.space * C(larsers.dig^1
                                      * parsers.period) * #parsers.spacing
 
-  -----------------------------------------------------------------------------
-  -- Parsers used for markdown tags and links
-  -----------------------------------------------------------------------------
-
-  local leader        = parsers.space^-3
-
-  -- in balanced brackets, parentheses, quotes:
-  local bracketed     = P{ parsers.lbracket
-                         * ((parsers.anyescaped - (parsers.lbracket
-                                                   + parsers.rbracket
-                                                   + parsers.blankline^2)
-                            ) + V(1))^0
-                         * parsers.rbracket }
-
-  local inparens      = P{ parsers.lparent
-                         * ((parsers.anyescaped - (parsers.lparent
-                                                   + parsers.rparent
-                                                   + parsers.blankline^2)
-                            ) + V(1))^0
-                         * parsers.rparent }
-
-  local squoted       = P{ parsers.squote * parsers.alphanumeric
-                         * ((parsers.anyescaped - (parsers.squote
-                                                   + parsers.blankline^2)
-                            ) + V(1))^0
-                         * parsers.squote }
-
-  local dquoted       = P{ parsers.dquote * parsers.alphanumeric
-                         * ((parsers.anyescaped - (parsers.dquote
-                                                  + parsers.blankline^2)
-                            ) + V(1))^0
-                         * parsers.dquote }
-
-  -- bracketed 'tag' for markdown links, allowing nested brackets:
-  local tag           = parsers.lbracket
-                      * Cs((parsers.alphanumeric^1
-                           + bracketed
-                           + parsers.inticks
-                           + (parsers.anyescaped - (parsers.rbracket
-                                                   + parsers.blankline^2)))^0)
-                      * parsers.rbracket
-
-  -- url for markdown links, allowing balanced parentheses:
-  local url           = parsers.less * Cs((parsers.anyescaped-parsers.more)^0)
-                                      * parsers.more
-                      + Cs((inparens + (parsers.anyescaped-parsers.spacing-parsers.rparent))^1)
-
-  -- quoted text possibly with nested quotes:
-  local title_s       = parsers.squote * Cs(((parsers.anyescaped-parsers.squote)
-                                             + squoted)^0)
-                                        * parsers.squote
-
-  local title_d       = parsers.dquote  * Cs(((parsers.anyescaped-parsers.dquote)
-                                             + dquoted
-                                             )^0)
-                                         * parsers.dquote
-
-  local title_p       = parsers.lparent
-                      * Cs((inparens + (parsers.anyescaped-parsers.rparent))^0)
-                      * parsers.rparent
-
-  local title         = title_d + title_s + title_p
-
-  local optionaltitle = parsers.spnl * title * parsers.spacechar^0
-                      + Cc("")
-
   ------------------------------------------------------------------------------
   -- Citations
   ------------------------------------------------------------------------------
@@ -462,7 +463,7 @@ function M.new(writer, options)
 
   local citation_body_prenote
                       = Cs((parsers.alphanumeric^1
-                           + bracketed
+                           + parsers.bracketed
                            + parsers.inticks
                            + (parsers.anyescaped
                              - (parsers.rbracket + parsers.blankline^2))
@@ -470,7 +471,7 @@ function M.new(writer, options)
 
   local citation_body_postnote
                       = Cs((parsers.alphanumeric^1
-                           + bracketed
+                           + parsers.bracketed
                            + parsers.inticks
                            + (parsers.anyescaped
                              - (parsers.rbracket + parsers.semicolon
@@ -488,7 +489,7 @@ function M.new(writer, options)
 
   local citation_headless_body
                       = Cs((parsers.alphanumeric^1
-                           + bracketed
+                           + parsers.bracketed
                            + parsers.inticks
                            + (parsers.anyescaped
                              - (parsers.rbracket + parsers.at
@@ -548,15 +549,15 @@ function M.new(writer, options)
   end
 
   local RawNoteRef = #(parsers.lbracket * parsers.circumflex)
-                   * tag / strip_first_char
+                   * parsers.tag / strip_first_char
 
   local NoteRef    = RawNoteRef / lookup_note
 
-  local NoteBlock  = leader * RawNoteRef * parsers.colon * parsers.spnl
+  local NoteBlock  = parsers.leader * RawNoteRef * parsers.colon * parsers.spnl
                    * parsers.indented_blocks(parsers.chunk) / register_note
 
   local InlineNote = parsers.circumflex
-                   * (tag / larsers.parse_inlines_no_inline_note) -- no notes inside notes
+                   * (parsers.tag / larsers.parse_inlines_no_inline_note) -- no notes inside notes
                    / writer.note
 
   ------------------------------------------------------------------------------
@@ -573,9 +574,9 @@ function M.new(writer, options)
   end
 
   -- parse a reference definition:  [foo]: /bar "title"
-  local define_reference_parser = leader * tag * parsers.colon
-                                * parsers.spacechar^0 * url * optionaltitle
-                                * parsers.blankline^1
+  local define_reference_parser = parsers.leader * parsers.tag * parsers.colon
+                                * parsers.spacechar^0 * parsers.url
+                                * parsers.optionaltitle * parsers.blankline^1
 
   -- lookup link reference and return either
   -- the link or nil and fallback text.
@@ -849,30 +850,31 @@ function M.new(writer, options)
                       * parsers.more
                       / function(email) return writer.link(writer.string(email),"mailto:"..email) end
 
-  local DirectLink    = (tag / larsers.parse_inlines_no_link)  -- no links inside links
+  local DirectLink    = (parsers.tag / larsers.parse_inlines_no_link)  -- no links inside links
                       * parsers.spnl
                       * parsers.lparent
-                      * (url + Cc(""))  -- link can be empty [foo]()
-                      * optionaltitle
+                      * (parsers.url + Cc(""))  -- link can be empty [foo]()
+                      * parsers.optionaltitle
                       * parsers.rparent
                       / writer.link
 
-  local IndirectLink = tag * (C(parsers.spnl) * tag)^-1 / indirect_link
+  local IndirectLink  = parsers.tag * (C(parsers.spnl) * parsers.tag)^-1
+                      / indirect_link
 
   -- parse a link or image (direct or indirect)
   local Link          = DirectLink + IndirectLink
 
   local DirectImage   = parsers.exclamation
-                      * (tag / larsers.parse_inlines)
+                      * (parsers.tag / larsers.parse_inlines)
                       * parsers.spnl
                       * parsers.lparent
-                      * (url + Cc(""))  -- link can be empty [foo]()
-                      * optionaltitle
+                      * (parsers.url + Cc(""))  -- link can be empty [foo]()
+                      * parsers.optionaltitle
                       * parsers.rparent
                       / writer.image
 
-  local IndirectImage = parsers.exclamation * tag * (C(parsers.spnl) * tag)^-1
-                      / indirect_image
+  local IndirectImage = parsers.exclamation * parsers.tag
+                      * (C(parsers.spnl) * parsers.tag)^-1 / indirect_image
 
   local Image         = DirectImage + IndirectImage
 
@@ -938,15 +940,14 @@ function M.new(writer, options)
                          end
 
   -- strip off leading > and indents, and run through blocks
-  local Blockquote     = Cs((
-            ((leader * parsers.more * parsers.space^-1)/""
-                     * parsers.linechar^0 * parsers.newline)^1
-          * (-parsers.blankline * parsers.linechar^1 * parsers.newline)^0
-          * parsers.blankline^0
-          )^1) / larsers.parse_blocks / writer.blockquote
+  local Blockquote     = Cs((((parsers.leader * parsers.more * parsers.space^-1)/""
+                             * parsers.linechar^0 * parsers.newline)^1
+                            * (-parsers.blankline * parsers.linechar^1
+                            * parsers.newline)^0 * parsers.blankline^0
+                           )^1) / larsers.parse_blocks / writer.blockquote
 
   local function lineof(c)
-      return (leader * (P(c) * parsers.optionalspace)^3
+      return (parsers.leader * (P(c) * parsers.optionalspace)^3
              * parsers.newline * parsers.blankline^1)
   end
 
@@ -960,7 +961,7 @@ function M.new(writer, options)
   local Paragraph      = parsers.nonindentspace * Ct(Inline^1) * parsers.newline
                        * ( parsers.blankline^1
                          + #parsers.hash
-                         + #(leader * parsers.more * parsers.space^-1)
+                         + #(parsers.leader * parsers.more * parsers.space^-1)
                          )
                        / writer.paragraph
 
