@@ -467,16 +467,25 @@ parsers.tagentity = parsers.ampersand * C(parsers.alphanumeric^1)
                   * parsers.semicolon
 
 ------------------------------------------------------------------------------
+-- Helpers for links and references
+------------------------------------------------------------------------------
+
+-- parse a reference definition:  [foo]: /bar "title"
+parsers.define_reference_parser = parsers.leader * parsers.tag * parsers.colon
+                                * parsers.spacechar^0 * parsers.url
+                                * parsers.optionaltitle * parsers.blankline^1
+
+------------------------------------------------------------------------------
 -- Inline elements
 ------------------------------------------------------------------------------
 
-parsers.Inline = V("Inline")
+parsers.Inline       = V("Inline")
 
 parsers.squote_start = parsers.squote * -parsers.spacing
 
-parsers.squote_end = parsers.squote * B(parsers.nonspacechar*1, 2)
+parsers.squote_end   = parsers.squote * B(parsers.nonspacechar*1, 2)
 
-parsers.Apostrophe = parsers.squote * B(parsers.nonspacechar*1, 2) / "’"
+parsers.Apostrophe   = parsers.squote * B(parsers.nonspacechar*1, 2) / "’"
 
 -- parse many p between starter and ender
 parsers.between = function(p, starter, ender)
@@ -485,6 +494,27 @@ parsers.between = function(p, starter, ender)
 end
 
 parsers.urlchar = parsers.anyescaped - parsers.newline - parsers.more
+
+------------------------------------------------------------------------------
+-- Block elements
+------------------------------------------------------------------------------
+
+parsers.Block        = V("Block")
+
+parsers.TildeFencedCodeBlock
+                     = parsers.fencehead(parsers.tilde)
+                     * Cs(parsers.fencedline(parsers.tilde)^0)
+                     * parsers.fencetail(parsers.tilde)
+
+parsers.BacktickFencedCodeBlock
+                     = parsers.fencehead(parsers.backtick)
+                     * Cs(parsers.fencedline(parsers.backtick)^0)
+                     * parsers.fencetail(parsers.backtick)
+
+parsers.lineof = function(c)
+    return (parsers.leader * (P(c) * parsers.optionalspace)^3
+           * parsers.newline * parsers.blankline^1)
+end
 
 --- Create a new markdown parser.
 --
@@ -713,7 +743,7 @@ function M.new(writer, options)
                      / writer.note
 
   ------------------------------------------------------------------------------
-  -- Helpers for links and references
+  -- Helpers for links and references (local)
   ------------------------------------------------------------------------------
 
   -- List of references defined in the document
@@ -724,11 +754,6 @@ function M.new(writer, options)
       references[normalize_tag(tag)] = { url = url, title = title }
       return ""
   end
-
-  -- parse a reference definition:  [foo]: /bar "title"
-  local define_reference_parser = parsers.leader * parsers.tag * parsers.colon
-                                * parsers.spacechar^0 * parsers.url
-                                * parsers.optionaltitle * parsers.blankline^1
 
   -- lookup link reference and return either
   -- the link or nil and fallback text.
@@ -946,56 +971,39 @@ function M.new(writer, options)
                         + parsers.tagentity / entities.char_entity / writer.string
 
   ------------------------------------------------------------------------------
-  -- Block elements
+  -- Block elements (local)
   ------------------------------------------------------------------------------
 
-  local Block          = V("Block")
-
-  local DisplayHtml    = C(parsers.displayhtml)
+  larsers.DisplayHtml  = C(parsers.displayhtml)
                        / expandtabs / writer.display_html
 
-  local Verbatim       = Cs( (parsers.blanklines
+  larsers.Verbatim     = Cs( (parsers.blanklines
                            * ((parsers.indentedline - parsers.blankline))^1)^1
                            ) / expandtabs / writer.verbatim
 
-  local TildeFencedCodeBlock
-                       = parsers.fencehead(parsers.tilde)
-                       * Cs(parsers.fencedline(parsers.tilde)^0)
-                       * parsers.fencetail(parsers.tilde)
-
-  local BacktickFencedCodeBlock
-                       = parsers.fencehead(parsers.backtick)
-                       * Cs(parsers.fencedline(parsers.backtick)^0)
-                       * parsers.fencetail(parsers.backtick)
-
-  local FencedCodeBlock
-                       = (TildeFencedCodeBlock + BacktickFencedCodeBlock)
+  larsers.FencedCodeBlock
+                       = (parsers.TildeFencedCodeBlock
+                         + parsers.BacktickFencedCodeBlock)
                        / function(infostring, code)
-                             return writer.fenced_code(
-                                 expandtabs(code),
-                                 writer.string(infostring))
+                           return writer.fenced_code(expandtabs(code),
+                                                     writer.string(infostring))
                          end
 
   -- strip off leading > and indents, and run through blocks
-  local Blockquote     = Cs((((parsers.leader * parsers.more * parsers.space^-1)/""
+  larsers.Blockquote  = Cs((((parsers.leader * parsers.more * parsers.space^-1)/""
                              * parsers.linechar^0 * parsers.newline)^1
                             * (-parsers.blankline * parsers.linechar^1
-                            * parsers.newline)^0 * parsers.blankline^0
+                              * parsers.newline)^0 * parsers.blankline^0
                            )^1) / larsers.parse_blocks / writer.blockquote
 
-  local function lineof(c)
-      return (parsers.leader * (P(c) * parsers.optionalspace)^3
-             * parsers.newline * parsers.blankline^1)
-  end
+  larsers.HorizontalRule = ( parsers.lineof(parsers.asterisk)
+                           + parsers.lineof(parsers.dash)
+                           + parsers.lineof(parsers.underscore)
+                           ) / writer.hrule
 
-  local HorizontalRule = ( lineof(parsers.asterisk)
-                         + lineof(parsers.dash)
-                         + lineof(parsers.underscore)
-                         ) / writer.hrule
+  larsers.Reference    = parsers.define_reference_parser / register_link
 
-  local Reference      = define_reference_parser / register_link
-
-  local Paragraph      = parsers.nonindentspace * Ct(parsers.Inline^1)
+  larsers.Paragraph    = parsers.nonindentspace * Ct(parsers.Inline^1)
                        * parsers.newline
                        * ( parsers.blankline^1
                          + #parsers.hash
@@ -1003,7 +1011,7 @@ function M.new(writer, options)
                          )
                        / writer.paragraph
 
-  local Plain          = parsers.nonindentspace * Ct(parsers.Inline^1)
+  larsers.Plain        = parsers.nonindentspace * Ct(parsers.Inline^1)
                        / writer.plain
 
   ------------------------------------------------------------------------------
@@ -1026,13 +1034,13 @@ function M.new(writer, options)
                               * ListBlock
 
   local function TightListItem(starter)
-      return -HorizontalRule
+      return -larsers.HorizontalRule
              * (Cs(starter / "" * ListBlock * NestedList^-1) / larsers.parse_blocks)
              * -(parsers.blanklines * parsers.indent)
   end
 
   local function LooseListItem(starter)
-      return -HorizontalRule
+      return -larsers.HorizontalRule
              * Cs( starter / "" * ListBlock * Cc("\n")
                * (NestedList + ListContinuationBlock^0)
                * (parsers.blanklines / "\n\n")
@@ -1159,7 +1167,7 @@ function M.new(writer, options)
   local Blank          = parsers.blankline / ""
                        + LuaMeta
                        + larsers.NoteBlock
-                       + Reference
+                       + larsers.Reference
                        + (parsers.tightblocksep / "\n")
 
   ------------------------------------------------------------------------------
@@ -1198,9 +1206,9 @@ function M.new(writer, options)
   syntax =
     { "Blocks",
 
-      Blocks                = Blank^0 * Block^-1
+      Blocks                = Blank^0 * parsers.Block^-1
                             * (Blank^0 / function() return writer.interblocksep end
-                                       * Block)^0
+                                       * parsers.Block)^0
                             * Blank^0 * parsers.eof,
 
       Blank                 = Blank,
@@ -1217,17 +1225,17 @@ function M.new(writer, options)
                             + V("Paragraph")
                             + V("Plain"),
 
-      Blockquote            = Blockquote,
-      Verbatim              = Verbatim,
-      FencedCodeBlock       = FencedCodeBlock,
-      HorizontalRule        = HorizontalRule,
+      Blockquote            = larsers.Blockquote,
+      Verbatim              = larsers.Verbatim,
+      FencedCodeBlock       = larsers.FencedCodeBlock,
+      HorizontalRule        = larsers.HorizontalRule,
       BulletList            = BulletList,
       OrderedList           = OrderedList,
       Header                = AtxHeader + SetextHeader,
       DefinitionList        = DefinitionList,
-      DisplayHtml           = DisplayHtml,
-      Paragraph             = Paragraph,
-      Plain                 = Plain,
+      DisplayHtml           = larsers.DisplayHtml,
+      Paragraph             = larsers.Paragraph,
+      Plain                 = larsers.Plain,
 
       Inline                = V("Str")
                             + V("Space")
