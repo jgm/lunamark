@@ -544,6 +544,22 @@ parsers.pandoc_author = parsers.spacechar * parsers.optionalspace
                          - parsers.semicolon)^0)
                       * (parsers.semicolon + parsers.newline)
 
+------------------------------------------------------------------------------
+-- Headers
+------------------------------------------------------------------------------
+
+-- parse Atx heading start and return level
+parsers.HeadingStart = #parsers.hash * C(parsers.hash^-6)
+                     * -parsers.hash / length
+
+-- parse setext header ending and return level
+parsers.HeadingLevel = parsers.equal^1 * Cc(1) + parsers.dash^1 * Cc(2)
+
+local function strip_atx_end(s)
+  return s:gsub("[#%s]*\n$","")
+end
+
+
 --- Create a new markdown parser.
 --
 -- *   `writer` is a writer table (see [lunamark.writer.generic]).
@@ -1172,7 +1188,7 @@ function M.new(writer, options)
                              * C(P(1)^0)
 
   ------------------------------------------------------------------------------
-  -- Blank
+  -- Blank (local)
   ------------------------------------------------------------------------------
 
   larsers.Blank        = parsers.blankline / ""
@@ -1182,33 +1198,22 @@ function M.new(writer, options)
                        + (parsers.tightblocksep / "\n")
 
   ------------------------------------------------------------------------------
-  -- Headers
+  -- Headers (local)
   ------------------------------------------------------------------------------
 
-  -- parse Atx heading start and return level
-  local HeadingStart = #parsers.hash * C(parsers.hash^-6)
-                     * -parsers.hash / length
-
-  -- parse setext header ending and return level
-  local HeadingLevel = parsers.equal^1 * Cc(1) + parsers.dash^1 * Cc(2)
-
-  local function strip_atx_end(s)
-    return s:gsub("[#%s]*\n$","")
-  end
-
   -- parse atx header
-  local AtxHeader = Cg(HeadingStart,"level")
-                     * parsers.optionalspace
-                     * (C(parsers.line) / strip_atx_end / larsers.parse_inlines)
-                     * Cb("level")
-                     / writer.header
+  larsers.AtxHeader = Cg(parsers.HeadingStart,"level")
+                    * parsers.optionalspace
+                    * (C(parsers.line) / strip_atx_end / larsers.parse_inlines)
+                    * Cb("level")
+                    / writer.header
 
   -- parse setext header
-  local SetextHeader = #(parsers.line * S("=-"))
-                     * Ct(parsers.line / larsers.parse_inlines)
-                     * HeadingLevel
-                     * parsers.optionalspace * parsers.newline
-                     / writer.header
+  larsers.SetextHeader = #(parsers.line * S("=-"))
+                       * Ct(parsers.line / larsers.parse_inlines)
+                       * parsers.HeadingLevel
+                       * parsers.optionalspace * parsers.newline
+                       / writer.header
 
   ------------------------------------------------------------------------------
   -- Syntax specification
@@ -1244,7 +1249,7 @@ function M.new(writer, options)
       HorizontalRule        = larsers.HorizontalRule,
       BulletList            = larsers.BulletList,
       OrderedList           = larsers.OrderedList,
-      Header                = AtxHeader + SetextHeader,
+      Header                = larsers.AtxHeader + larsers.SetextHeader,
       DefinitionList        = larsers.DefinitionList,
       DisplayHtml           = larsers.DisplayHtml,
       Paragraph             = larsers.Paragraph,
