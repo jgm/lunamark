@@ -534,6 +534,16 @@ parsers.defstart     = ( parsers.defstartchar * #parsers.spacing
 
 parsers.dlchunk = Cs(parsers.line * (parsers.indentedline - parsers.blankline)^0)
 
+------------------------------------------------------------------------------
+-- Pandoc title block parser
+------------------------------------------------------------------------------
+
+parsers.pandoc_author = parsers.spacechar * parsers.optionalspace
+                      * C((parsers.anyescaped
+                         - parsers.newline
+                         - parsers.semicolon)^0)
+                      * (parsers.semicolon + parsers.newline)
+
 --- Create a new markdown parser.
 --
 -- *   `writer` is a writer table (see [lunamark.writer.generic]).
@@ -1141,37 +1151,31 @@ function M.new(writer, options)
   end
 
   ------------------------------------------------------------------------------
-  -- Pandoc title block parser
+  -- Pandoc title block parser (local)
   ------------------------------------------------------------------------------
 
-  local pandoc_title = parsers.percent * parsers.optionalspace
-                     * C(parsers.line * (parsers.spacechar * parsers.nonemptyline)^0)
-                     / larsers.parse_inlines
+  larsers.pandoc_title  = parsers.percent * parsers.optionalspace
+                        * C(parsers.line
+                           * (parsers.spacechar * parsers.nonemptyline)^0)
+                        / larsers.parse_inlines
 
-  local pandoc_author = parsers.spacechar * parsers.optionalspace
-                      * C((parsers.anyescaped
-                          - parsers.newline
-                          - parsers.semicolon)^0)
-                      * (parsers.semicolon + parsers.newline)
+  larsers.pandoc_authors = parsers.percent * Ct((parsers.pandoc_author
+                                                / larsers.parse_inlines)^0)
+                         * parsers.newline^-1
 
-  local pandoc_authors = parsers.percent * Ct((pandoc_author
-                                               / larsers.parse_inlines)^0)
-                       * parsers.newline^-1
+  larsers.pandoc_date = parsers.percent * parsers.optionalspace
+                      * C(parsers.line) / larsers.parse_inlines
 
-  local pandoc_date = parsers.percent * parsers.optionalspace
-                    * C(parsers.line) / larsers.parse_inlines
-
-  local pandoc_title_block =
-      (pandoc_title + Cc(""))
-    * (pandoc_authors + Cc({}))
-    * (pandoc_date + Cc(""))
-    * C(P(1)^0)
+  larsers.pandoc_title_block = (larsers.pandoc_title + Cc(""))
+                             * (larsers.pandoc_authors + Cc({}))
+                             * (larsers.pandoc_date + Cc(""))
+                             * C(P(1)^0)
 
   ------------------------------------------------------------------------------
   -- Blank
   ------------------------------------------------------------------------------
 
-  local Blank          = parsers.blankline / ""
+  larsers.Blank        = parsers.blankline / ""
                        + larsers.LuaMeta
                        + larsers.NoteBlock
                        + larsers.Reference
@@ -1213,12 +1217,14 @@ function M.new(writer, options)
   syntax =
     { "Blocks",
 
-      Blocks                = Blank^0 * parsers.Block^-1
-                            * (Blank^0 / function() return writer.interblocksep end
-                                       * parsers.Block)^0
-                            * Blank^0 * parsers.eof,
+      Blocks                = larsers.Blank^0 * parsers.Block^-1
+                            * (larsers.Blank^0 / function()
+                                                   return writer.interblocksep
+                                                 end
+                              * parsers.Block)^0
+                            * larsers.Blank^0 * parsers.eof,
 
-      Blank                 = Blank,
+      Blank                 = larsers.Blank,
 
       Block                 = V("Blockquote")
                             + V("Verbatim")
@@ -1343,7 +1349,7 @@ function M.new(writer, options)
     function(inp)
       references = options.references or {}
       if options.pandoc_title_blocks then
-        local title, authors, date, rest = lpegmatch(pandoc_title_block, inp)
+        local title, authors, date, rest = lpegmatch(larsers.pandoc_title_block, inp)
         writer.set_metadata("title",title)
         writer.set_metadata("author",authors)
         writer.set_metadata("date",date)
