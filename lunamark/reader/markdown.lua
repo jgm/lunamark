@@ -286,6 +286,54 @@ parsers.optionaltitle
                     = parsers.spnl * parsers.title * parsers.spacechar^0
                     + Cc("")
 
+------------------------------------------------------------------------------
+-- Parsers used for citations
+------------------------------------------------------------------------------
+
+parsers.citation_name = Cs(parsers.dash^-1) * parsers.at
+                      * Cs(parsers.alphanumeric
+                          * (parsers.alphanumeric + parsers.internal_punctuation
+                            - parsers.comma - parsers.semicolon)^0)
+
+parsers.citation_body_prenote
+                    = Cs((parsers.alphanumeric^1
+                         + parsers.bracketed
+                         + parsers.inticks
+                         + (parsers.anyescaped
+                           - (parsers.rbracket + parsers.blankline^2))
+                         - (parsers.spnl * parsers.dash^-1 * parsers.at))^0)
+
+parsers.citation_body_postnote
+                    = Cs((parsers.alphanumeric^1
+                         + parsers.bracketed
+                         + parsers.inticks
+                         + (parsers.anyescaped
+                           - (parsers.rbracket + parsers.semicolon
+                             + parsers.blankline^2))
+                         - (parsers.spnl * parsers.rbracket))^0)
+
+parsers.citation_body_chunk
+                    = parsers.citation_body_prenote
+                    * parsers.spnl * parsers.citation_name
+                    * (parsers.comma * parsers.spnl)^-1
+                    * parsers.citation_body_postnote
+
+parsers.citation_body
+                    = parsers.citation_body_chunk
+                    * (parsers.semicolon * parsers.spnl
+                      * parsers.citation_body_chunk)^0
+
+parsers.citation_headless_body
+                    = Cs((parsers.alphanumeric^1
+                         + parsers.bracketed
+                         + parsers.inticks
+                         + (parsers.anyescaped
+                           - (parsers.rbracket + parsers.at
+                             + parsers.semicolon + parsers.blankline^2))
+                         - (parsers.spnl * parsers.rbracket))^0)
+                    * (parsers.sp * parsers.semicolon * parsers.spnl
+                      * parsers.citation_body_chunk)^0
+
 --- Create a new markdown parser.
 --
 -- *   `writer` is a writer table (see [lunamark.writer.generic]).
@@ -453,52 +501,10 @@ function M.new(writer, options)
                                      * parsers.period) * #parsers.spacing
 
   ------------------------------------------------------------------------------
-  -- Citations
+  -- Parsers used for citations (local)
   ------------------------------------------------------------------------------
 
-  local citation_name = Cs(parsers.dash^-1) * parsers.at
-                      * Cs(parsers.alphanumeric
-                          * (parsers.alphanumeric + parsers.internal_punctuation
-                            - parsers.comma - parsers.semicolon)^0)
-
-  local citation_body_prenote
-                      = Cs((parsers.alphanumeric^1
-                           + parsers.bracketed
-                           + parsers.inticks
-                           + (parsers.anyescaped
-                             - (parsers.rbracket + parsers.blankline^2))
-                           - (parsers.spnl * parsers.dash^-1 * parsers.at))^0)
-
-  local citation_body_postnote
-                      = Cs((parsers.alphanumeric^1
-                           + parsers.bracketed
-                           + parsers.inticks
-                           + (parsers.anyescaped
-                             - (parsers.rbracket + parsers.semicolon
-                               + parsers.blankline^2))
-                           - (parsers.spnl * parsers.rbracket))^0)
-
-  local citation_body_chunk
-                      = citation_body_prenote
-                      * parsers.spnl * citation_name
-                      * (parsers.comma * parsers.spnl)^-1
-                      * citation_body_postnote
-
-  local citation_body = citation_body_chunk
-                      * (parsers.semicolon * parsers.spnl * citation_body_chunk)^0
-
-  local citation_headless_body
-                      = Cs((parsers.alphanumeric^1
-                           + parsers.bracketed
-                           + parsers.inticks
-                           + (parsers.anyescaped
-                             - (parsers.rbracket + parsers.at
-                               + parsers.semicolon + parsers.blankline^2))
-                           - (parsers.spnl * parsers.rbracket))^0)
-                      * (parsers.sp * parsers.semicolon * parsers.spnl
-                        * citation_body_chunk)^0
-
-  local function citations(text_cites, raw_cites)
+  larsers.citations = function(text_cites, raw_cites)
       local function normalize(str)
           if str == "" then
               str = nil
@@ -879,21 +885,21 @@ function M.new(writer, options)
   local Image         = DirectImage + IndirectImage
 
   local TextCitations = Ct(Cc("")
-                      * citation_name
+                      * parsers.citation_name
                       * ((parsers.spnl
                            * parsers.lbracket
-                           * citation_headless_body
+                           * parsers.citation_headless_body
                            * parsers.rbracket) + Cc(""))) /
                         function(raw_cites)
-                            return citations(true, raw_cites)
+                            return larsers.citations(true, raw_cites)
                         end
 
   local ParenthesizedCitations
                       = Ct(parsers.lbracket
-                      * citation_body
+                      * parsers.citation_body
                       * parsers.rbracket) /
                         function(raw_cites)
-                            return citations(false, raw_cites)
+                            return larsers.citations(false, raw_cites)
                         end
 
   local Citations     = TextCitations + ParenthesizedCitations
