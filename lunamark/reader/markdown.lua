@@ -455,6 +455,17 @@ parsers.inlinehtml  = parsers.emptyelt_any
                     + parsers.openelt_any
                     + parsers.closeelt_any
 
+------------------------------------------------------------------------------
+-- Parsers used for HTML entities
+------------------------------------------------------------------------------
+
+parsers.hexentity = parsers.ampersand * parsers.hash * S("Xx")
+                  * C(parsers.hexdigit^1) * parsers.semicolon
+parsers.decentity = parsers.ampersand * parsers.hash
+                  * C(parsers.digit^1) * parsers.semicolon
+parsers.tagentity = parsers.ampersand * C(parsers.alphanumeric^1)
+                  * parsers.semicolon
+
 --- Create a new markdown parser.
 --
 -- *   `writer` is a writer table (see [lunamark.writer.generic]).
@@ -750,17 +761,6 @@ function M.new(writer, options)
   end
 
   ------------------------------------------------------------------------------
-  -- Entities
-  ------------------------------------------------------------------------------
-
-  local hexentity = parsers.ampersand * parsers.hash * S("Xx")
-                  * C(parsers.hexdigit^1) * parsers.semicolon
-  local decentity = parsers.ampersand * parsers.hash
-                  * C(parsers.digit^1) * parsers.semicolon
-  local tagentity = parsers.ampersand * C(parsers.alphanumeric^1)
-                  * parsers.semicolon
-
-  ------------------------------------------------------------------------------
   -- Inline elements
   ------------------------------------------------------------------------------
 
@@ -923,9 +923,9 @@ function M.new(writer, options)
 
   local InlineHtml    = C(parsers.inlinehtml) / writer.inline_html
 
-  local HtmlEntity    = hexentity / entities.hex_entity  / writer.string
-                      + decentity / entities.dec_entity  / writer.string
-                      + tagentity / entities.char_entity / writer.string
+  local HtmlEntity    = parsers.hexentity / entities.hex_entity  / writer.string
+                      + parsers.decentity / entities.dec_entity  / writer.string
+                      + parsers.tagentity / entities.char_entity / writer.string
 
   ------------------------------------------------------------------------------
   -- Block elements
