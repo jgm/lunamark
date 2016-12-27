@@ -345,6 +345,116 @@ end
 parsers.RawNoteRef = #(parsers.lbracket * parsers.circumflex)
                    * parsers.tag / strip_first_char
 
+------------------------------------------------------------------------------
+-- Parsers used for HTML
+------------------------------------------------------------------------------
+
+-- case-insensitive match (we assume s is lowercase). must be single byte encoding
+parsers.keyword_exact = function(s)
+  local parser = P(0)
+  for i=1,#s do
+    local c = s:sub(i,i)
+    local m = c .. upper(c)
+    parser = parser * S(m)
+  end
+  return parser
+end
+
+parsers.block_keyword =
+    parsers.keyword_exact("address") + parsers.keyword_exact("blockquote") +
+    parsers.keyword_exact("center") + parsers.keyword_exact("del") +
+    parsers.keyword_exact("dir") + parsers.keyword_exact("div") +
+    parsers.keyword_exact("p") + parsers.keyword_exact("pre") +
+    parsers.keyword_exact("li") + parsers.keyword_exact("ol") +
+    parsers.keyword_exact("ul") + parsers.keyword_exact("dl") +
+    parsers.keyword_exact("dd") + parsers.keyword_exact("form") +
+    parsers.keyword_exact("fieldset") + parsers.keyword_exact("isindex") +
+    parsers.keyword_exact("ins") + parsers.keyword_exact("menu") +
+    parsers.keyword_exact("noframes") + parsers.keyword_exact("frameset") +
+    parsers.keyword_exact("h1") + parsers.keyword_exact("h2") +
+    parsers.keyword_exact("h3") + parsers.keyword_exact("h4") +
+    parsers.keyword_exact("h5") + parsers.keyword_exact("h6") +
+    parsers.keyword_exact("hr") + parsers.keyword_exact("script") +
+    parsers.keyword_exact("noscript") + parsers.keyword_exact("table") +
+    parsers.keyword_exact("tbody") + parsers.keyword_exact("tfoot") +
+    parsers.keyword_exact("thead") + parsers.keyword_exact("th") +
+    parsers.keyword_exact("td") + parsers.keyword_exact("tr")
+
+-- There is no reason to support bad html, so we expect quoted attributes
+parsers.htmlattributevalue
+                          = parsers.squote * (parsers.any - (parsers.blankline
+                                                            + parsers.squote))^0
+                                           * parsers.squote
+                          + parsers.dquote * (parsers.any - (parsers.blankline
+                                                            + parsers.dquote))^0
+                                           * parsers.dquote
+
+parsers.htmlattribute     = parsers.spacing^1
+                          * (parsers.alphanumeric + S("_-"))^1
+                          * parsers.sp * parsers.equal * parsers.sp
+                          * parsers.htmlattributevalue
+
+parsers.htmlcomment       = P("<!--") * (parsers.any - P("-->"))^0 * P("-->")
+
+parsers.htmlinstruction   = P("<?")   * (parsers.any - P("?>" ))^0 * P("?>" )
+
+parsers.openelt_any = parsers.less * parsers.keyword * parsers.htmlattribute^0
+                    * parsers.sp * parsers.more
+
+parsers.openelt_exact = function(s)
+  return parsers.less * parsers.sp * parsers.keyword_exact(s)
+       * parsers.htmlattribute^0 * parsers.sp * parsers.more
+end
+
+parsers.openelt_block = parsers.sp * parsers.block_keyword
+                      * parsers.htmlattribute^0 * parsers.sp * parsers.more
+
+parsers.closeelt_any = parsers.less * parsers.sp * parsers.slash
+                     * parsers.keyword * parsers.sp * parsers.more
+
+parsers.closeelt_exact = function(s)
+  return parsers.less * parsers.sp * parsers.slash * parsers.keyword_exact(s)
+       * parsers.sp * parsers.more
+end
+
+parsers.emptyelt_any = parsers.less * parsers.sp * parsers.keyword
+                     * parsers.htmlattribute^0 * parsers.sp * parsers.slash
+                     * parsers.more
+
+parsers.emptyelt_block = parsers.less * parsers.sp * parsers.block_keyword
+                       * parsers.htmlattribute^0 * parsers.sp * parsers.slash
+                       * parsers.more
+
+parsers.displaytext = (parsers.any - parsers.less)^1
+
+-- return content between two matched HTML tags
+parsers.in_matched = function(s)
+  return { parsers.openelt_exact(s)
+         * (V(1) + parsers.displaytext
+           + (parsers.less - parsers.closeelt_exact(s)))^0
+         * parsers.closeelt_exact(s) }
+end
+
+local function parse_matched_tags(s,pos)
+  local t = lower(lpegmatch(C(parsers.keyword),s,pos))
+  return lpegmatch(parsers.in_matched(t),s,pos-1)
+end
+
+parsers.in_matched_block_tags = parsers.less
+                              * Cmt(#parsers.openelt_block, parse_matched_tags)
+
+parsers.displayhtml = parsers.htmlcomment
+                    + parsers.emptyelt_block
+                    + parsers.openelt_exact("hr")
+                    + parsers.in_matched_block_tags
+                    + parsers.htmlinstruction
+
+parsers.inlinehtml  = parsers.emptyelt_any
+                    + parsers.htmlcomment
+                    + parsers.htmlinstruction
+                    + parsers.openelt_any
+                    + parsers.closeelt_any
+
 --- Create a new markdown parser.
 --
 -- *   `writer` is a writer table (see [lunamark.writer.generic]).
@@ -640,109 +750,6 @@ function M.new(writer, options)
   end
 
   ------------------------------------------------------------------------------
-  -- HTML
-  ------------------------------------------------------------------------------
-
-  -- case-insensitive match (we assume s is lowercase). must be single byte encoding
-  local function keyword_exact(s)
-    local parser = P(0)
-    for i=1,#s do
-      local c = s:sub(i,i)
-      local m = c .. upper(c)
-      parser = parser * S(m)
-    end
-    return parser
-  end
-
-  local block_keyword =
-      keyword_exact("address") + keyword_exact("blockquote") +
-      keyword_exact("center") + keyword_exact("del") +
-      keyword_exact("dir") + keyword_exact("div") +
-      keyword_exact("p") + keyword_exact("pre") + keyword_exact("li") +
-      keyword_exact("ol") + keyword_exact("ul") + keyword_exact("dl") +
-      keyword_exact("dd") + keyword_exact("form") + keyword_exact("fieldset") +
-      keyword_exact("isindex") + keyword_exact("ins") +
-      keyword_exact("menu") + keyword_exact("noframes") +
-      keyword_exact("frameset") + keyword_exact("h1") + keyword_exact("h2") +
-      keyword_exact("h3") + keyword_exact("h4") + keyword_exact("h5") +
-      keyword_exact("h6") + keyword_exact("hr") + keyword_exact("script") +
-      keyword_exact("noscript") + keyword_exact("table") +
-      keyword_exact("tbody") + keyword_exact("tfoot") +
-      keyword_exact("thead") + keyword_exact("th") +
-      keyword_exact("td") + keyword_exact("tr")
-
-  -- There is no reason to support bad html, so we expect quoted attributes
-  local htmlattributevalue  = parsers.squote * (parsers.any - (parsers.blankline
-                                                              + parsers.squote))^0
-                                             * parsers.squote
-                            + parsers.dquote * (parsers.any - (parsers.blankline
-                                                              + parsers.dquote))^0
-                                             * parsers.dquote
-
-  local htmlattribute       = parsers.spacing^1 * (parsers.alphanumeric + S("_-"))^1
-                            * parsers.sp * parsers.equal * parsers.sp
-                            * htmlattributevalue
-
-  local htmlcomment         = P("<!--") * (parsers.any - P("-->"))^0 * P("-->")
-
-  local htmlinstruction     = P("<?")   * (parsers.any - P("?>" ))^0 * P("?>" )
-
-  local openelt_any = parsers.less * parsers.keyword * htmlattribute^0
-                    * parsers.sp * parsers.more
-
-  local function openelt_exact(s)
-    return parsers.less * parsers.sp * keyword_exact(s) * htmlattribute^0
-         * parsers.sp * parsers.more
-  end
-
-  local openelt_block = parsers.sp * block_keyword * htmlattribute^0
-                      * parsers.sp * parsers.more
-
-  local closeelt_any = parsers.less * parsers.sp * parsers.slash
-                     * parsers.keyword * parsers.sp * parsers.more
-
-  local function closeelt_exact(s)
-    return parsers.less * parsers.sp * parsers.slash * keyword_exact(s)
-         * parsers.sp * parsers.more
-  end
-
-  local emptyelt_any = parsers.less * parsers.sp * parsers.keyword
-                     * htmlattribute^0 * parsers.sp * parsers.slash
-                     * parsers.more
-
-  local emptyelt_block = parsers.less * parsers.sp * block_keyword
-                       * htmlattribute^0 * parsers.sp * parsers.slash
-                       * parsers.more
-
-  local displaytext = (parsers.any - parsers.less)^1
-
-  -- return content between two matched HTML tags
-  local function in_matched(s)
-    return { openelt_exact(s)
-           * (V(1) + displaytext + (parsers.less - closeelt_exact(s)))^0
-           * closeelt_exact(s) }
-  end
-
-  local function parse_matched_tags(s,pos)
-    local t = lower(lpegmatch(C(parsers.keyword),s,pos))
-    return lpegmatch(in_matched(t),s,pos-1)
-  end
-
-  local in_matched_block_tags = parsers.less * Cmt(#openelt_block, parse_matched_tags)
-
-  local displayhtml = htmlcomment
-                    + emptyelt_block
-                    + openelt_exact("hr")
-                    + in_matched_block_tags
-                    + htmlinstruction
-
-  local inlinehtml  = emptyelt_any
-                    + htmlcomment
-                    + htmlinstruction
-                    + openelt_any
-                    + closeelt_any
-
-  ------------------------------------------------------------------------------
   -- Entities
   ------------------------------------------------------------------------------
 
@@ -914,7 +921,7 @@ function M.new(writer, options)
 
   local EscapedChar   = S("\\") * C(parsers.escapable) / writer.string
 
-  local InlineHtml    = C(inlinehtml) / writer.inline_html
+  local InlineHtml    = C(parsers.inlinehtml) / writer.inline_html
 
   local HtmlEntity    = hexentity / entities.hex_entity  / writer.string
                       + decentity / entities.dec_entity  / writer.string
@@ -926,7 +933,8 @@ function M.new(writer, options)
 
   local Block          = V("Block")
 
-  local DisplayHtml    = C(displayhtml) / expandtabs / writer.display_html
+  local DisplayHtml    = C(parsers.displayhtml)
+                       / expandtabs / writer.display_html
 
   local Verbatim       = Cs( (parsers.blanklines
                            * ((parsers.indentedline - parsers.blankline))^1)^1
@@ -1094,7 +1102,7 @@ function M.new(writer, options)
 
   local LuaMeta = parsers.fail
   if options.lua_metadata then
-    LuaMeta = #P("<!--@") * htmlcomment / lua_metadata
+    LuaMeta = #P("<!--@") * parsers.htmlcomment / lua_metadata
   end
 
   ------------------------------------------------------------------------------
