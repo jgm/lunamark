@@ -642,6 +642,7 @@ end
 --     line endings, a simple `gsub("\r","")` should take care of them.
 function M.new(writer, options)
   options = options or {}
+  local larsers = {} -- locally defined parsers
 
   local function expandtabs(s)
     if s:find("\t") then
@@ -656,14 +657,7 @@ function M.new(writer, options)
   end
 
   ------------------------------------------------------------------------------
-
---  local local_parsers         = {}
---  setmetatable(local_parsers, {__index = parsers}) -- look up globally
---  local parsers               = local_parsers -- but store locally
-  local larsers               = {}
-
-  ------------------------------------------------------------------------------
-  -- Top-level parser functions (local)
+  -- Top-level parser functions
   ------------------------------------------------------------------------------
 
   local function create_parser(name, grammar)
@@ -677,17 +671,37 @@ function M.new(writer, options)
     end
   end
 
-  larsers.parse_blocks = create_parser("parse_blocks",
-    function() return larsers.blocks end)
-  larsers.parse_inlines = create_parser("parse_inlines",
-    function() return larsers.inlines end)
-  larsers.parse_inlines_no_link = create_parser("parse_inlines_no_link",
-    function() return larsers.inlines_no_link end)
-  larsers.parse_inlines_no_inline_note = create_parser(
-    "parse_inlines_no_inline_note",
-    function() return larsers.inlines_no_inline_note end)
-  larsers.parse_inlines_nbsp = create_parser("parse_inlines_nbsp",
-    function() return larsers.inlines_nbsp end)
+  local parse_blocks
+    = create_parser("parse_blocks",
+                    function()
+                      return larsers.blocks
+                    end)
+
+  local parse_inlines
+    = create_parser("parse_inlines",
+                    function()
+                      return larsers.inlines
+                    end)
+
+  local parse_inlines_no_link
+    = create_parser("parse_inlines_no_link",
+                    function()
+                      return larsers.inlines_no_link
+                    end)
+
+  local parse_inlines_no_inline_note
+    = create_parser("parse_inlines_no_inline_note",
+                    function()
+                      return larsers.inlines_no_inline_note
+                    end)
+
+  local parse_inlines_nbsp
+    = create_parser("parse_inlines_nbsp",
+                    function()
+                      return larsers.inlines_nbsp
+                    end)
+
+  local parse_markdown
   
   ------------------------------------------------------------------------------
   -- Basic parsers (local)
@@ -735,8 +749,8 @@ function M.new(writer, options)
           if str == "" then
               str = nil
           else
-              str = (options.citation_nbsps and larsers.parse_inlines_nbsp or
-                larsers.parse_inlines)(str)
+              str = (options.citation_nbsps and parse_inlines_nbsp or
+                parse_inlines)(str)
           end
           return str
       end
@@ -764,9 +778,9 @@ function M.new(writer, options)
     return function()
       local found = rawnotes[normalize_tag(ref)]
       if found then
-        return writer.note(larsers.parse_blocks(found))
+        return writer.note(parse_blocks(found))
       else
-        return {"[", larsers.parse_inlines("^" .. ref), "]"}
+        return {"[", parse_inlines("^" .. ref), "]"}
       end
     end
   end
@@ -783,7 +797,7 @@ function M.new(writer, options)
                      / register_note
 
   larsers.InlineNote = parsers.circumflex
-                     * (parsers.tag / larsers.parse_inlines_no_inline_note) -- no notes inside notes
+                     * (parsers.tag / parse_inlines_no_inline_note) -- no notes inside notes
                      / writer.note
 
   ------------------------------------------------------------------------------
@@ -810,7 +824,7 @@ function M.new(writer, options)
           tag = label
           tagpart = "[]"
       else
-          tagpart = {"[", larsers.parse_inlines(tag), "]"}
+          tagpart = {"[", parse_inlines(tag), "]"}
       end
       if sps then
         tagpart = {sps, tagpart}
@@ -819,7 +833,7 @@ function M.new(writer, options)
       if r then
         return r
       else
-        return nil, {"[", larsers.parse_inlines(label), "]", tagpart}
+        return nil, {"[", parse_inlines(label), "]", tagpart}
       end
   end
 
@@ -829,7 +843,7 @@ function M.new(writer, options)
     return function()
       local r,fallback = lookup_reference(label,sps,tag)
       if r then
-        return writer.link(larsers.parse_inlines_no_link(label), r.url, r.title)
+        return writer.link(parse_inlines_no_link(label), r.url, r.title)
       else
         return fallback
       end
@@ -954,7 +968,7 @@ function M.new(writer, options)
                             return writer.link(writer.string(email),"mailto:"..email)
                           end
 
-  larsers.DirectLink    = (parsers.tag / larsers.parse_inlines_no_link)  -- no links inside links
+  larsers.DirectLink    = (parsers.tag / parse_inlines_no_link)  -- no links inside links
                         * parsers.spnl
                         * parsers.lparent
                         * (parsers.url + Cc(""))  -- link can be empty [foo]()
@@ -969,7 +983,7 @@ function M.new(writer, options)
   larsers.Link          = larsers.DirectLink + larsers.IndirectLink
 
   larsers.DirectImage   = parsers.exclamation
-                        * (parsers.tag / larsers.parse_inlines)
+                        * (parsers.tag / parse_inlines)
                         * parsers.spnl
                         * parsers.lparent
                         * (parsers.url + Cc(""))  -- link can be empty [foo]()
@@ -1038,7 +1052,7 @@ function M.new(writer, options)
                              * parsers.linechar^0 * parsers.newline)^1
                             * (-parsers.blankline * parsers.linechar^1
                               * parsers.newline)^0 * parsers.blankline^0
-                           )^1) / larsers.parse_blocks / writer.blockquote
+                           )^1) / parse_blocks / writer.blockquote
 
   larsers.HorizontalRule = ( parsers.lineof(parsers.asterisk)
                            + parsers.lineof(parsers.dash)
@@ -1082,7 +1096,7 @@ function M.new(writer, options)
   larsers.TightListItem = function(starter)
       return -larsers.HorizontalRule
              * (Cs(starter / "" * larsers.ListBlock * larsers.NestedList^-1)
-               / larsers.parse_blocks)
+               / parse_blocks)
              * -(parsers.blanklines * parsers.indent)
   end
 
@@ -1091,7 +1105,7 @@ function M.new(writer, options)
              * Cs( starter / "" * larsers.ListBlock * Cc("\n")
                * (larsers.NestedList + larsers.ListContinuationBlock^0)
                * (parsers.blanklines / "\n\n")
-               ) / larsers.parse_blocks
+               ) / parse_blocks
   end
 
   larsers.BulletList = ( Ct(larsers.TightListItem(parsers.bullet)^1) * Cc(true)
@@ -1119,18 +1133,18 @@ function M.new(writer, options)
                       ) * Cb("listtype") / ordered_list
 
   local function definition_list_item(term, defs, tight)
-    return { term = larsers.parse_inlines(term), definitions = defs }
+    return { term = parse_inlines(term), definitions = defs }
   end
 
   larsers.DefinitionListItemLoose = C(parsers.line) * parsers.skipblanklines
                                   * Ct((parsers.defstart
                                       * parsers.indented_blocks(parsers.dlchunk)
-                                      / larsers.parse_blocks)^1)
+                                      / parse_blocks)^1)
                                   * Cc(false) / definition_list_item
 
   larsers.DefinitionListItemTight = C(parsers.line)
                                   * Ct((parsers.defstart * parsers.dlchunk
-                                      / larsers.parse_blocks)^1)
+                                      / parse_blocks)^1)
                                   * Cc(true)  / definition_list_item
 
   larsers.DefinitionList = ( Ct(larsers.DefinitionListItemLoose^1) * Cc(false)
@@ -1144,7 +1158,7 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   local function lua_metadata(s)  -- run lua code in comment in sandbox
-    local env = { m = larsers.parse_markdown, markdown = larsers.parse_blocks }
+    local env = { m = parse_markdown, markdown = parse_blocks }
     local scode = s:match("^<!%-%-@%s*(.*)%-%->")
     local untrusted_table, message = load(scode, nil, "t", env)
     if not untrusted_table then
@@ -1173,14 +1187,14 @@ function M.new(writer, options)
   larsers.pandoc_title  = parsers.percent * parsers.optionalspace
                         * C(parsers.line
                            * (parsers.spacechar * parsers.nonemptyline)^0)
-                        / larsers.parse_inlines
+                        / parse_inlines
 
   larsers.pandoc_authors = parsers.percent * Ct((parsers.pandoc_author
-                                                / larsers.parse_inlines)^0)
+                                                / parse_inlines)^0)
                          * parsers.newline^-1
 
   larsers.pandoc_date = parsers.percent * parsers.optionalspace
-                      * C(parsers.line) / larsers.parse_inlines
+                      * C(parsers.line) / parse_inlines
 
   larsers.pandoc_title_block = (larsers.pandoc_title + Cc(""))
                              * (larsers.pandoc_authors + Cc({}))
@@ -1204,13 +1218,13 @@ function M.new(writer, options)
   -- parse atx header
   larsers.AtxHeader = Cg(parsers.HeadingStart,"level")
                     * parsers.optionalspace
-                    * (C(parsers.line) / strip_atx_end / larsers.parse_inlines)
+                    * (C(parsers.line) / strip_atx_end / parse_inlines)
                     * Cb("level")
                     / writer.header
 
   -- parse setext header
   larsers.SetextHeader = #(parsers.line * S("=-"))
-                       * Ct(parsers.line / larsers.parse_inlines)
+                       * Ct(parsers.line / parse_inlines)
                        * parsers.HeadingLevel
                        * parsers.optionalspace * parsers.newline
                        / writer.header
@@ -1350,7 +1364,7 @@ function M.new(writer, options)
 
   -- inp is a string; line endings are assumed to be LF (unix-style)
   -- and tabs are assumed to be expanded.
-  larsers.parse_markdown =
+  parse_markdown =
     function(inp)
       references = options.references or {}
       if options.pandoc_title_blocks then
@@ -1360,11 +1374,11 @@ function M.new(writer, options)
         writer.set_metadata("date",date)
         inp = rest
       end
-      local result = { writer.start_document(), larsers.parse_blocks(inp), writer.stop_document() }
+      local result = { writer.start_document(), parse_blocks(inp), writer.stop_document() }
       return rope_to_string(result), writer.get_metadata()
     end
 
-  return larsers.parse_markdown
+  return parse_markdown
 end
 
 return M
