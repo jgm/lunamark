@@ -516,6 +516,24 @@ parsers.lineof = function(c)
            * parsers.newline * parsers.blankline^1)
 end
 
+------------------------------------------------------------------------------
+-- Lists
+------------------------------------------------------------------------------
+
+parsers.defstartchar = S("~:")
+parsers.defstart     = ( parsers.defstartchar * #parsers.spacing
+                                              * (parsers.tab + parsers.space^-3)
+                     + parsers.space * parsers.defstartchar * #parsers.spacing
+                                     * (parsers.tab + parsers.space^-2)
+                     + parsers.space * parsers.space * parsers.defstartchar
+                                     * #parsers.spacing
+                                     * (parsers.tab + parsers.space^-1)
+                     + parsers.space * parsers.space * parsers.space
+                                     * parsers.defstartchar * #parsers.spacing
+                     )
+
+parsers.dlchunk = Cs(parsers.line * (parsers.indentedline - parsers.blankline)^0)
+
 --- Create a new markdown parser.
 --
 -- *   `writer` is a writer table (see [lunamark.writer.generic]).
@@ -1015,44 +1033,46 @@ function M.new(writer, options)
                        / writer.plain
 
   ------------------------------------------------------------------------------
-  -- Lists
+  -- Lists (local)
   ------------------------------------------------------------------------------
 
-  local starter = parsers.bullet + larsers.enumerator
+  larsers.starter = parsers.bullet + larsers.enumerator
 
   -- we use \001 as a separator between a tight list item and a
   -- nested list under it.
-  local NestedList            = Cs((parsers.optionallyindentedline - starter)^1)
-                              / function(a) return "\001"..a end
+  larsers.NestedList            = Cs((parsers.optionallyindentedline
+                                     - larsers.starter)^1)
+                                / function(a) return "\001"..a end
 
-  local ListBlockLine         = parsers.optionallyindentedline
-                              - parsers.blankline - (parsers.indent^-1 * starter)
+  larsers.ListBlockLine         = parsers.optionallyindentedline
+                                - parsers.blankline - (parsers.indent^-1
+                                                      * larsers.starter)
 
-  local ListBlock             = parsers.line * ListBlockLine^0
+  larsers.ListBlock             = parsers.line * larsers.ListBlockLine^0
 
-  local ListContinuationBlock = parsers.blanklines * (parsers.indent / "")
-                              * ListBlock
+  larsers.ListContinuationBlock = parsers.blanklines * (parsers.indent / "")
+                                * larsers.ListBlock
 
-  local function TightListItem(starter)
+  larsers.TightListItem = function(starter)
       return -larsers.HorizontalRule
-             * (Cs(starter / "" * ListBlock * NestedList^-1) / larsers.parse_blocks)
+             * (Cs(starter / "" * larsers.ListBlock * larsers.NestedList^-1)
+               / larsers.parse_blocks)
              * -(parsers.blanklines * parsers.indent)
   end
 
-  local function LooseListItem(starter)
+  larsers.LooseListItem = function(starter)
       return -larsers.HorizontalRule
-             * Cs( starter / "" * ListBlock * Cc("\n")
-               * (NestedList + ListContinuationBlock^0)
+             * Cs( starter / "" * larsers.ListBlock * Cc("\n")
+               * (larsers.NestedList + larsers.ListContinuationBlock^0)
                * (parsers.blanklines / "\n\n")
                ) / larsers.parse_blocks
   end
 
-  local BulletList = ( Ct(TightListItem(parsers.bullet)^1) * Cc(true)
-                                                   * parsers.skipblanklines
-                                                   * -parsers.bullet
-                     + Ct(LooseListItem(parsers.bullet)^1) * Cc(false)
-                                                   * parsers.skipblanklines )
-                   / writer.bulletlist
+  larsers.BulletList = ( Ct(larsers.TightListItem(parsers.bullet)^1) * Cc(true)
+                       * parsers.skipblanklines * -parsers.bullet
+                       + Ct(larsers.LooseListItem(parsers.bullet)^1) * Cc(false)
+                       * parsers.skipblanklines )
+                     / writer.bulletlist
 
   local function ordered_list(s,tight,startnum)
     if options.startnum then
@@ -1063,49 +1083,35 @@ function M.new(writer, options)
     return writer.orderedlist(s,tight,startnum)
   end
 
-  local OrderedList = Cg(larsers.enumerator, "listtype") *
-                      ( Ct(TightListItem(Cb("listtype"))
-                          * TightListItem(larsers.enumerator)^0)
-                          * Cc(true) * parsers.skipblanklines * -larsers.enumerator
-                      + Ct(LooseListItem(Cb("listtype"))
-                          * LooseListItem(larsers.enumerator)^0)
-                          * Cc(false) * parsers.skipblanklines
+  larsers.OrderedList = Cg(larsers.enumerator, "listtype") *
+                      ( Ct(larsers.TightListItem(Cb("listtype"))
+                          * larsers.TightListItem(larsers.enumerator)^0)
+                      * Cc(true) * parsers.skipblanklines * -larsers.enumerator
+                      + Ct(larsers.LooseListItem(Cb("listtype"))
+                          * larsers.LooseListItem(larsers.enumerator)^0)
+                      * Cc(false) * parsers.skipblanklines
                       ) * Cb("listtype") / ordered_list
-
-  local defstartchar = S("~:")
-  local defstart     = ( defstartchar * #parsers.spacing
-                                      * (parsers.tab + parsers.space^-3)
-                     + parsers.space * defstartchar * #parsers.spacing
-                                      * (parsers.tab + parsers.space^-2)
-                     + parsers.space * parsers.space * defstartchar
-                                      * #parsers.spacing
-                                      * (parsers.tab + parsers.space^-1)
-                     + parsers.space * parsers.space * parsers.space
-                                      * defstartchar * #parsers.spacing
-                     )
-
-  local dlchunk = Cs(parsers.line * (parsers.indentedline - parsers.blankline)^0)
 
   local function definition_list_item(term, defs, tight)
     return { term = larsers.parse_inlines(term), definitions = defs }
   end
 
-  local DefinitionListItemLoose = C(parsers.line) * parsers.skipblanklines
-                           * Ct((defstart
-                           * parsers.indented_blocks(dlchunk) / larsers.parse_blocks)^1)
-                           * Cc(false)
-                           / definition_list_item
+  larsers.DefinitionListItemLoose = C(parsers.line) * parsers.skipblanklines
+                                  * Ct((parsers.defstart
+                                      * parsers.indented_blocks(parsers.dlchunk)
+                                      / larsers.parse_blocks)^1)
+                                  * Cc(false) / definition_list_item
 
-  local DefinitionListItemTight = C(parsers.line)
-                           * Ct((defstart * dlchunk / larsers.parse_blocks)^1)
-                           * Cc(true)
-                           / definition_list_item
+  larsers.DefinitionListItemTight = C(parsers.line)
+                                  * Ct((parsers.defstart * parsers.dlchunk
+                                      / larsers.parse_blocks)^1)
+                                  * Cc(true)  / definition_list_item
 
-  local DefinitionList =  ( Ct(DefinitionListItemLoose^1) * Cc(false)
-                          +  Ct(DefinitionListItemTight^1)
-                             * (parsers.skipblanklines * -DefinitionListItemLoose
-                                                       * Cc(true))
-                          ) / writer.definitionlist
+  larsers.DefinitionList = ( Ct(larsers.DefinitionListItemLoose^1) * Cc(false)
+                           + Ct(larsers.DefinitionListItemTight^1)
+                           * (parsers.skipblanklines
+                             * -larsers.DefinitionListItemLoose * Cc(true))
+                           ) / writer.definitionlist
 
   ------------------------------------------------------------------------------
   -- Lua metadata
@@ -1229,10 +1235,10 @@ function M.new(writer, options)
       Verbatim              = larsers.Verbatim,
       FencedCodeBlock       = larsers.FencedCodeBlock,
       HorizontalRule        = larsers.HorizontalRule,
-      BulletList            = BulletList,
-      OrderedList           = OrderedList,
+      BulletList            = larsers.BulletList,
+      OrderedList           = larsers.OrderedList,
       Header                = AtxHeader + SetextHeader,
-      DefinitionList        = DefinitionList,
+      DefinitionList        = larsers.DefinitionList,
       DisplayHtml           = larsers.DisplayHtml,
       Paragraph             = larsers.Paragraph,
       Plain                 = larsers.Plain,
