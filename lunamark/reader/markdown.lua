@@ -334,6 +334,17 @@ parsers.citation_headless_body
                     * (parsers.sp * parsers.semicolon * parsers.spnl
                       * parsers.citation_body_chunk)^0
 
+------------------------------------------------------------------------------
+-- Parsers used for footnotes
+------------------------------------------------------------------------------
+
+local function strip_first_char(s)
+  return s:sub(2)
+end
+
+parsers.RawNoteRef = #(parsers.lbracket * parsers.circumflex)
+                   * parsers.tag / strip_first_char
+
 --- Create a new markdown parser.
 --
 -- *   `writer` is a writer table (see [lunamark.writer.generic]).
@@ -528,14 +539,10 @@ function M.new(writer, options)
   end
 
   ------------------------------------------------------------------------------
-  -- Footnotes
+  -- Parsers used for footnotes (local)
   ------------------------------------------------------------------------------
 
   local rawnotes = {}
-
-  local function strip_first_char(s)
-    return s:sub(2)
-  end
 
   -- like indirect_link
   local function lookup_note(ref)
@@ -554,17 +561,15 @@ function M.new(writer, options)
     return ""
   end
 
-  local RawNoteRef = #(parsers.lbracket * parsers.circumflex)
-                   * parsers.tag / strip_first_char
+  larsers.NoteRef    = parsers.RawNoteRef / lookup_note
 
-  local NoteRef    = RawNoteRef / lookup_note
+  larsers.NoteBlock  = parsers.leader * parsers.RawNoteRef * parsers.colon
+                     * parsers.spnl * parsers.indented_blocks(parsers.chunk)
+                     / register_note
 
-  local NoteBlock  = parsers.leader * RawNoteRef * parsers.colon * parsers.spnl
-                   * parsers.indented_blocks(parsers.chunk) / register_note
-
-  local InlineNote = parsers.circumflex
-                   * (parsers.tag / larsers.parse_inlines_no_inline_note) -- no notes inside notes
-                   / writer.note
+  larsers.InlineNote = parsers.circumflex
+                     * (parsers.tag / larsers.parse_inlines_no_inline_note) -- no notes inside notes
+                     / writer.note
 
   ------------------------------------------------------------------------------
   -- Helpers for links and references
@@ -1125,7 +1130,7 @@ function M.new(writer, options)
 
   local Blank          = parsers.blankline / ""
                        + LuaMeta
-                       + NoteBlock
+                       + larsers.NoteBlock
                        + Reference
                        + (parsers.tightblocksep / "\n")
 
@@ -1222,8 +1227,8 @@ function M.new(writer, options)
       UlOrStarLine          = UlOrStarLine,
       Strong                = Strong,
       Emph                  = Emph,
-      InlineNote            = InlineNote,
-      NoteRef               = NoteRef,
+      InlineNote            = larsers.InlineNote,
+      NoteRef               = larsers.NoteRef,
       Citations             = Citations,
       Link                  = Link,
       Image                 = Image,
