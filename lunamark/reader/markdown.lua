@@ -1167,7 +1167,7 @@ function M.new(writer, options)
   -- Syntax specification
   ------------------------------------------------------------------------------
 
-  larsers.syntax =
+  syntax =
     { "Blocks",
 
       Blocks                = Blank^0 * Block^-1
@@ -1243,36 +1243,36 @@ function M.new(writer, options)
     }
 
   if not options.definition_lists then
-    larsers.syntax.DefinitionList = parsers.fail
+    syntax.DefinitionList = parsers.fail
   end
 
   if not options.fenced_code_blocks then
-    larsers.syntax.FencedCodeBlock = parsers.fail
+    syntax.FencedCodeBlock = parsers.fail
   end
 
   if not options.citations then
-    larsers.syntax.Citations = parsers.fail
+    syntax.Citations = parsers.fail
   end
 
   if not options.notes then
-    larsers.syntax.NoteRef = parsers.fail
+    syntax.NoteRef = parsers.fail
   end
 
   if not options.inline_notes then
-    larsers.syntax.InlineNote = parsers.fail
+    syntax.InlineNote = parsers.fail
   end
 
   if not options.smart then
-    larsers.syntax.Smart = parsers.fail
+    syntax.Smart = parsers.fail
   end
 
   if options.alter_syntax and type(options.alter_syntax) == "function" then
-    larsers.syntax = options.alter_syntax(larsers.syntax)
+    syntax = options.alter_syntax(syntax)
   end
 
-  larsers.blocks = Ct(larsers.syntax)
+  larsers.blocks = Ct(syntax)
 
-  local inlines_t = util.table_copy(larsers.syntax)
+  local inlines_t = util.table_copy(syntax)
   inlines_t[1] = "Inlines"
   inlines_t.Inlines = Inline^0 * (parsers.spacing^0 * parsers.eof / "")
   larsers.inlines = Ct(inlines_t)
