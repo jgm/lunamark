@@ -1233,7 +1233,7 @@ function M.new(writer, options)
   -- Syntax specification
   ------------------------------------------------------------------------------
 
-  syntax =
+  local syntax =
     { "Blocks",
 
       Blocks                = larsers.Blank^0 * parsers.Block^-1
