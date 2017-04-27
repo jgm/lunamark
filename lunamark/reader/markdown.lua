@@ -96,7 +96,7 @@ parsers.letter                 = R("AZ","az")
 parsers.alphanumeric           = R("AZ","az","09")
 parsers.keyword                = parsers.letter
                                 * parsers.alphanumeric^0
-parsers.internal_punctuation   = S(":;,.#$%&-+?<>~/")
+parsers.internal_punctuation   = S(":;,.#$%&-+?<>~/_")
 
 parsers.doubleasterisks        = P("**")
 parsers.doubleunderscores      = P("__")
