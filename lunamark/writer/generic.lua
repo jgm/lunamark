@@ -136,6 +136,11 @@ function M.new(options)
     return s
   end
 
+  --- Citation key, escaped as needed for the output format.
+  function W.citation(s)
+    return s
+  end
+
   --- Inline (verbatim) code.
   function W.code(s)
     return s

@@ -760,7 +760,7 @@ function M.new(writer, options)
           cites[#cites+1] = {
               prenote = normalize(raw_cites[i]),
               suppress_author = raw_cites[i+1] == "-",
-              name = writer.string(raw_cites[i+2]),
+              name = writer.citation(raw_cites[i+2]),
               postnote = normalize(raw_cites[i+3]),
           }
       end
