@@ -43,6 +43,8 @@ Smith says blah [-@smith04].
 [@separate] [@bracketed] [@citations]
 
 @separate @in-text @citations
+
+some#$%&-+<>~/_text [@some#$%&-+<>~/_citation], @some#$%&-+<>~/_citation.
 >>>
 <p>Blah blah [see @doe99 pp. 33-35; also @smith04 chap. 1].</p>
 
@@ -85,3 +87,5 @@ Smith says blah [-@smith04].
 <p>[@separate] [@bracketed] [@citations]</p>
 
 <p>@separate @in-text @citations</p>
+
+<p>some#$%&amp;-+&lt;&gt;~/_text [@some#$%&amp;-+&lt;&gt;~/_citation], @some#$%&amp;-+&lt;&gt;~/_citation.</p>
