@@ -95,8 +95,10 @@ parsers.hexdigit               = R("09","af","AF")
 parsers.letter                 = R("AZ","az")
 parsers.alphanumeric           = R("AZ","az","09")
 parsers.keyword                = parsers.letter
-                                * parsers.alphanumeric^0
-parsers.internal_punctuation   = S(":;,.#$%&-+?<>~/")
+                               * parsers.alphanumeric^0
+parsers.citation_chars         = parsers.alphanumeric
+                               + S("#$%&-+<>~/_")
+parsers.internal_punctuation   = S(":;,.?")
 
 parsers.doubleasterisks        = P("**")
 parsers.doubleunderscores      = P("__")
@@ -291,9 +293,14 @@ parsers.optionaltitle
 ------------------------------------------------------------------------------
 
 parsers.citation_name = Cs(parsers.dash^-1) * parsers.at
-                      * Cs(parsers.alphanumeric
-                          * (parsers.alphanumeric + parsers.internal_punctuation
-                            - parsers.comma - parsers.semicolon)^0)
+                      * Cs(parsers.citation_chars
+                          * (((parsers.citation_chars + parsers.internal_punctuation
+                              - parsers.comma - parsers.semicolon)
+                             * -#((parsers.internal_punctuation - parsers.comma
+                                  - parsers.semicolon)^0
+                                 * -(parsers.citation_chars + parsers.internal_punctuation
+                                    - parsers.comma - parsers.semicolon)))^0
+                            * parsers.citation_chars)^-1)
 
 parsers.citation_body_prenote
                     = Cs((parsers.alphanumeric^1
@@ -315,7 +322,8 @@ parsers.citation_body_postnote
 parsers.citation_body_chunk
                     = parsers.citation_body_prenote
                     * parsers.spnl * parsers.citation_name
-                    * (parsers.comma * parsers.spnl)^-1
+                    * ((parsers.internal_punctuation - parsers.semicolon)
+                      * parsers.spnl)^-1
                     * parsers.citation_body_postnote
 
 parsers.citation_body
@@ -760,7 +768,7 @@ function M.new(writer, options)
           cites[#cites+1] = {
               prenote = normalize(raw_cites[i]),
               suppress_author = raw_cites[i+1] == "-",
-              name = writer.string(raw_cites[i+2]),
+              name = writer.citation(raw_cites[i+2]),
               postnote = normalize(raw_cites[i+3]),
           }
       end

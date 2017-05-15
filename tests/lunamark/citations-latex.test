@@ -43,6 +43,8 @@ Smith says blah [-@smith04].
 [@separate] [@bracketed] [@citations]
 
 @separate @in-text @citations
+
+some#$%&-+<>~/_text [@some#$%&-+<>~/_citation], @some#$%&-+<>~/_citation.
 >>>
 Blah blah see~\cite[pp.~33-35]{doe99} also~\cite[chap.~1]{smith04}.
 
@@ -85,3 +87,5 @@ Smith says blah \cite{smith04}.
 \cite{separate} \cite{bracketed} \cite{citations}
 
 \cite{separate} \cite{in-text} \cite{citations}
+
+some\#\$\%\&-+\char60{}\char62{}\char126{}/\_text \cite{some\#$\%&-+<>~/_citation}, \cite{some\#$\%&-+<>~/_citation}.

@@ -43,6 +43,8 @@ Smith says blah [-@smith04].
 [@separate] [@bracketed] [@citations]
 
 @separate @in-text @citations
+
+some#$%&-+<>~/_text [@some#$%&-+<>~/_citation], @some#$%&-+<>~/_citation.
 >>>
 Blah blah \citetext{\citealp[see][pp.~33-35]{doe99}; \citealp[also][chap.~1]{smith04}}.
 
@@ -85,3 +87,5 @@ Smith says blah \citeyearpar{smith04}.
 \citep{separate} \citep{bracketed} \citep{citations}
 
 \citet{separate} \citet{in-text} \citet{citations}
+
+some\#\$\%\&-+\char60{}\char62{}\char126{}/\_text \citep{some\#$\%&-+<>~/_citation}, \citet{some\#$\%&-+<>~/_citation}.
