@@ -1126,6 +1126,9 @@ function M.new(writer, options)
   local function ordered_list(s,tight,startnum)
     if options.startnum then
       startnum = tonumber(startnum) or 1  -- fallback for '#'
+      if startnum ~= nil then
+        startnum = math.floor(startnum)
+      end
     else
       startnum = nil
     end
