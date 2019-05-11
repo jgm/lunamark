@@ -2072,6 +2072,9 @@ end
 -- string encoding a unicode character.
 function M.char_entity(s)
   local n = character_entities[s]
+  if n == nil then
+    return "&" .. s .. ";"
+  end
   return utf8_char(n)
 end
 
