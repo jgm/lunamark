@@ -134,7 +134,6 @@ parsers.sp                     = parsers.spacing^0
 parsers.spnl                   = parsers.optionalspace
                                * (parsers.newline * parsers.optionalspace)^-1
 parsers.line                   = parsers.linechar^0 * parsers.newline
-                               + parsers.linechar^1 * parsers.eof
 parsers.nonemptyline           = parsers.line - parsers.blankline
 
 parsers.chunk                  = parsers.line * (parsers.optionallyindentedline
