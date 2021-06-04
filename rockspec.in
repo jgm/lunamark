@@ -14,7 +14,7 @@ description = {
      The markdown parser is written using a PEG grammar and can also
      be modified by the user.
    ]],
-   homepage = "http://jgm.github.com/lunamark",
+   homepage = "http://jgm.github.io/lunamark",
    license = "MIT/X11",
 }
 dependencies = {
