@@ -638,6 +638,10 @@ end
 --     `notes`
 --     :   Enable footnotes as in pandoc.
 --
+--     `inline_notes`
+--     :  Inline footnotes. An inline footnote is like a markdown bracketed
+--        reference, but preceded with a circumflex (`^`).
+--
 --     `definition_lists`
 --     :   Enable definition lists as in pandoc.
 --
