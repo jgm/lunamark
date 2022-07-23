@@ -1,0 +1,11 @@
+lunamark -Xsuperscript
+<<<
+Text^superscript^.
+
+Text^super\ script^.
+
+Text^super script^.
+>>>
+<p>Text<sup>superscript</sup>.</p>
+<p>Text<sup>super script</sup>.</p>
+<p>Text^super script^.</p>

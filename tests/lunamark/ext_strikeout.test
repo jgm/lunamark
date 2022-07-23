@@ -1,0 +1,5 @@
+lunamark -Xstrikeout
+<<<
+Some ~~deleted text~~.
+>>>
+<p>Some <strike>deleted text</strike>.</p>

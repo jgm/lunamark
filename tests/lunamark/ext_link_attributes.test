@@ -1,0 +1,8 @@
+lunamark -Xlink_attributes
+<<<
+![regular](image.png)
+
+![with attributes](image.png){width=150 height=100}
+>>>
+<p><img src="image.png" alt="regular"></p>
+<p><img src="image.png" alt="with attributes" width="150" height="100"></p>

@@ -1,0 +1,11 @@
+lunamark -Xsubscript
+<<<
+Text~subscript~.
+
+Text~sub\ script~.
+
+Text~sub script~.
+>>>
+<p>Text<sub>subscript</sub>.</p>
+<p>Text<sub>sub script</sub>.</p>
+<p>Text~sub script~.</p>

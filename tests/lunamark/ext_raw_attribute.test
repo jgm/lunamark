@@ -1,0 +1,5 @@
+lunamark -Xraw_attribute
+<<<
+`<mark>text</mark>`{=html}
+>>>
+<p><mark>text</mark></p>
