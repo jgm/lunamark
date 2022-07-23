@@ -31,7 +31,7 @@ $body
 </html>
 ]]
 
-  function Html5.strikethrough(s)
+  function Html5.strikeout(s)
     -- HTML5 obsoletes <strike> and recommends <del>
     return {"<del>", s, "</del>"}
   end

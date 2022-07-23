@@ -274,25 +274,78 @@ environment variable `LUNAMARK_EXTENSIONS` (see ENVIRONMENT below).
     So in the minimal case, this option allows such lists to be processed,
     albeit rendered as regular ordered lists.
 
-`(-) pandoc_extensions`
-:   Several Pandoc-like extensions are regrouped under that flag.
+    Compared to the Pandoc option by the same name, the implementation
+    does not support currently list markers enclosed in parentheses.
 
-    It encompasses strikethrough support (`~~text~~`), subscripts
-    and superscripts (as in `H~2~O,` and `2^10^`), inline spans with
-    atributes (`[test]{.class key=value}`), colon-fenced blocks
-    (a.k.a. divs, introduced by `:::` and also accepting an attribute
-    string).
+`(-) strikeout`
+:   Enable strike-through support for a text enclosed within double
+    tildes, as in `~~deleted~~`.
 
-    Attribute strings are also accepted on images and fenced-code blocks
-    (if the latter are enabled).
+`(-) subscript`
+:   Enable superscript support. Superscripts may be written by surrounding
+    the subscripted text by `~` characters, as in `2~10~`.
 
-    On code and fenced-code blocks, the special attribute string
-    `{=format ...}` marks raw inlines and raw blocks respectively,
-    which writers may use as pass-through to the target formatter.
+    The text thus marked may not contain spaces or newlines.
+    If the subscripted text contains spaces, these spaces must be escaped
+    with backslashes.
+
+`(-) superscript`
+:   Enable superscript support. Superscripts may be written by surrounding
+    the superscripted text by `^` characters, as in `2^10^.
+
+    The text thus marked may not contain spaces or newlines.
+    If the superscripted text contains spaces, these spaces must be escaped
+    with backslashes.
+
+`(-) bracketed_spans`
+:   When enabled, a bracketed sequence of inlines (as one would use to
+    begin a link), is treated as a Span with attributes if it is
+    followed immediately by attributes, e.g. `[text]{.class key=value}`.
+
+`(-) fenced_divs`
+:   Allow special fenced syntax for native Div blocks. A Div starts with a
+    fence containing at least three consecutive colons plus some attributes.
+
+    The Div ends with another line containing a string of at least
+    three consecutive colons. The fenced Div should be separated by blank
+    lines from preceding and following blocks.
+
+    Current implementation restrictions and differences with the Pandoc
+    option by the same name: fenced Divs cannot be nested, the attributes
+    cannot be followed by another optional string of consecutive colons,
+    attributes have to be in curly braces (and cannot be a single unbraced
+    word).
+
+`(-) raw_attribute`
+:   When enabled, inline code and fenced code blocks with a special kind
+    of attribute will be parsed as raw content with the designated format,
+    e.g. `{=format}`. Writers may pass relevant raw content to the
+    target formatter.
+
+    To use a raw attribute with fenced code blocks, `fenced_code_blocks`
+    must be enabled.
+
+    As opposed to the Pandoc option going by the same name, raw
+    attributes can be continued with key=value pairs.
 
     How these constructs are honored depends on the writer. In the
     minimal case, they are ignored, as if they were stripped from
     the input.
+
+`(-) fenced_code_attributes`
+:   Allow attaching attributes to fenced code blocks, if the latter.
+    are enabled.
+
+    Current implementation restrictions and differences with the Pandoc
+    option by the same name: attributes can only be set on fenced
+    code blocks.
+
+`(-) link_attributes`
+:   Allow attaching attributes to direct images.
+
+    Current implementation restrictions and differences with the Pandoc
+    option by the same name: attributes cannot be set on links
+    and indirect images (i.e. only direct images support them).
 
 # TEMPLATES
 

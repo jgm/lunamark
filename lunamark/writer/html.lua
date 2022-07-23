@@ -51,13 +51,15 @@ function M.new(options)
     return {"<a href=\"", Html.string(src), "\"", titattr, ">", lab, "</a>"}
   end
 
-  function Html.image(lab,src,tit)
+  function Html.image(lab,src,tit,attr)
     local titattr
     if type(tit) == "string" and #tit > 0
        then titattr = " title=\"" .. Html.string(tit) .. "\""
        else titattr = ""
-       end
-    return {"<img src=\"", Html.string(src), "\" alt=\"", lab, "\"", titattr, " />"}
+    end
+    local w = attr and attr.width and ' width="'..attr.width..'"'
+    local h = attr and attr.height and ' height="'..attr.height..'"'
+    return {"<img src=\"", Html.string(src), "\" alt=\"", lab, "\"", titattr, w, h, " />"}
   end
 
   function Html.paragraph(s)
@@ -86,7 +88,12 @@ function M.new(options)
     end
     local oltype = numstyle and listStyle[numstyle]
     local oltypeattr = oltype and (' type="'..oltype..'"') or ""
-    return {"<ol", start, oltypeattr, ">", containersep, intersperse(map(items, listitem), containersep), containersep, "</ol>"}
+    local olmark = numdelim == "OneParen" and ' class="custom-marker-oneparen"' or ""
+    return {
+        "<ol", start, oltypeattr, olmark, ">",
+        containersep, intersperse(map(items, listitem), containersep), containersep,
+        "</ol>"
+    }
   end
 
   local function tasklistitem(s)
@@ -115,7 +122,7 @@ function M.new(options)
     return {"<strong>", s, "</strong>"}
   end
 
-  function Html.strikethrough(s)
+  function Html.strikeout(s)
     return {"<strike>", s, "</strike>"}
   end
 
@@ -128,18 +135,20 @@ function M.new(options)
   end
 
   function Html.span(s, attr)
-    local class = attr.class or ""
+    local class = attr.class and attr.class ~="" and ' class="'..attr.class..'"' or ""
+    local id = attr.id and ' id="'..attr.id..'"' or ""
     local lang = attr.lang and ' lang="'..attr.lang..'"' or ""
-    local tag = (class and string.match(' ' .. class .. ' ',' underline ')) and "u" or "span"
-    local opentag = (attr.class ~= "") and "<"..tag.. ' class="'..class..'"'..lang..'>' or "<"..tag..">"
+    local tag = (class and string.match(' ' ..attr.class .. ' ',' underline ')) and "u" or "span"
+    local opentag = "<"..tag..id..class..lang..'>'
     local closetag = "</"..tag..">"
     return {opentag, s, closetag}
   end
 
   function Html.div(s, attr)
-    local class = attr.class or ""
+    local class = attr.class and attr.class ~="" and ' class="'..attr.class..'"' or ""
+    local id = attr.id and ' id="'..attr.id..'"' or ""
     local lang = attr.lang and ' lang="'..attr.lang..'"' or ""
-    local opentag = (attr.class ~= "") and '<div class="'..class..'"'..lang..'>' or "<div>"
+    local opentag = '<div'..id..class..lang..'>'
     local closetag = "</div>"
     return {opentag, s, closetag}
   end

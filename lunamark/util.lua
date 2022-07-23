@@ -225,7 +225,7 @@ function M.escaper(char_escapes, string_escapes)
 end
 
 --- Given a Roman number in uppercase, return its decimal value.
-function M.roman2number(roman)
+function M.roman_to_number(roman)
   -- Logic from https://rosettacode.org/wiki/Roman_numerals/Decode#Lua
   -- Assuming we don't need to go so far.
   local romans = { ["L"] = 50, ["X"] = 10, ["V"] = 5, ["I"] = 1 }
@@ -250,7 +250,7 @@ end
 --- Given an ordered list prefix (e.g. "1."", "iv."", "a)", return the
 -- the value converted to decimal, the numbering scheme and the end delimiter.
 -- The two latter are mapped to symbolic names loosely taken from Pandoc.
-function M.order2numberstyle(listprefix)
+function M.order_to_numberstyle(listprefix)
   local numstr, delimend = listprefix:match("^([A-Za-z0-9]*)([.)]*)")
   local numdelim
   if delimend == ")" then
@@ -265,11 +265,11 @@ function M.order2numberstyle(listprefix)
   local num
   num = numstr:match("^([IVXL]+)")
   if num then
-    return M.roman2number(num), "UpperRoman", numdelim
+    return M.roman_to_number(num), "UpperRoman", numdelim
   end
   num = numstr:match("^([ivxl]+)")
   if num then
-    return M.roman2number(string.upper(num)), "LowerRoman", numdelim
+    return M.roman_to_number(string.upper(num)), "LowerRoman", numdelim
   end
   num = numstr:match("^([A-Z])") -- One is mad to need more that 26 items here.
   if num then

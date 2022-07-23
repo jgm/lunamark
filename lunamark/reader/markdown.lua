@@ -148,7 +148,7 @@ parsers.indented_blocks = function(bl)
          *  parsers.blankline^1 )
 end
 
--- Attributes list as in Pandoc {.class .class-other key=value key2="value 2"}
+-- Attributes list as in Pandoc {#id .class .class-other key=value key2="value 2"}
 parsers.identifier  = parsers.letter
                       * (parsers.alphanumeric + S("_-"))^0
 parsers.attrvalue   = (parsers.dquote * C((parsers.alphanumeric + S("._- "))^1) * parsers.dquote)
@@ -163,10 +163,14 @@ parsers.attrlist    = Cf(Ct("") * parsers.attrpair^0, rawset)
 parsers.class       = parsers.period * C((parsers.identifier)^1)
 parsers.classes     = (parsers.class * parsers.optionalspace)^0
 
+parsers.hashid      = parsers.hash * C((parsers.identifier)^1)
+
 parsers.attributes  = P("{") * parsers.optionalspace
+                      * Cg(parsers.hashid^-1) * parsers.optionalspace
                       * Ct(parsers.classes) * Cg(parsers.attrlist)
                       * parsers.optionalspace * P("}")
-                      / function (classes, attr)
+                      / function (hashid, classes, attr)
+                          attr.id = hashid ~= "" and hashid or nil
                           attr.class = table.concat(classes or {}, " ")
                             return attr
                           end
@@ -697,25 +701,79 @@ end
 --         So in the minimal case, this option allows such lists to be processed,
 --         albeit rendered as regular ordered lists.
 --
---     `(-) pandoc_extensions`
---     :   Several Pandoc-like extensions are regrouped under that flag.
+--         Compared to the Pandoc option by the same name, the implementation
+--         does not support currently list markers enclosed in parentheses.
 --
---         It encompasses strikethrough support (`~~text~~`), subscripts
---         and superscripts (as in `H~2~O,` and `2^10^`), inline spans with
---         atributes (`[test]{.class key=value}`), colon-fenced blocks
---         (a.k.a. divs, introduced by `:::` and also accepting an attribute
---         string).
+--     `strikeout`
+--     :   Enable strike-through support for a text enclosed within double
+--         tildes, as in `~~deleted~~`.
 --
---         Attribute strings are also accepted on images and fenced-code blocks
---         (if the latter are enabled).
+--     `superscript`
+--     :   Enable superscript support. Superscripts may be written by surrounding
+--         the superscripted text by `^` characters, as in `2^10^.
 --
---         On code and fenced-code blocks, the special attribute string
---         `{=format ...}` marks raw inlines and raw blocks respectively,
---         which writers may use as pass-through to the target formatter.
+--         The text thus marked may not contain spaces or newlines.
+--         If the superscripted text contains spaces, these spaces must be escaped
+--         with backslashes.
+--
+--     `subscript`
+--     :   Enable superscript support. Superscripts may be written by surrounding
+--         the subscripted text by `~` characters, as in `2~10~`.
+--
+--         The text thus marked may not contain spaces or newlines.
+--         If the supbscripted text contains spaces, these spaces must be escaped
+--         with backslashes.
+--
+--     `bracketed_spans`
+--     :   When enabled, a bracketed sequence of inlines (as one would use to
+--         begin a link), is treated as a Span with attributes if it is
+--         followed immediately by attributes, e.g. `[text]{.class key=value}`.
+--
+--     `fenced_divs`
+--     :   Allow special fenced syntax for native Div blocks. A Div starts with a
+--         fence containing at least three consecutive colons plus some attributes.
+--
+--         The Div ends with another line containing a string of at least
+--         three consecutive colons. The fenced Div should be separated by blank
+--         lines from preceding and following blocks.
+--
+--         Current implementation restrictions and differences with the Pandoc
+--         option by the same name: fenced Divs cannot be nested, the attributes
+--         cannot be followed by another optional string of consecutive colons,
+--         attributes have to be in curly braces (and cannot be a single unbraced
+--         word.
+--
+--     `raw_attribute`
+--     :   When enabled, inline code and fenced code blocks with a special kind
+--         of attribute will be parsed as raw content with the designated format,
+--         e.g. `{=format}`. Writers may pass relevant raw content to the
+--         target formatter.
+--
+--         To use a raw attribute with fenced code blocks, `fenced_code_blocks`
+--         must be enabled.
+--
+--         As opposed to the Pandoc option going by the same name, raw
+--         attributes can be continued with key=value pairs.
 --
 --         How these constructs are honored depends on the writer. In the
 --         minimal case, they are ignored, as if they were stripped from
 --         the input.
+--
+--     `fenced_code_attributes`
+--     :   Allow attaching attributes to fenced code blocks, if the latter.
+--         are enabled.
+--
+--         Current implementation restrictions and differences with the Pandoc
+--         option by the same name: attributes can only be set on fenced
+--         code blocks.
+--
+--     `link_attributes`
+--     :   Allow attaching attributes to direct images.
+--
+--         Current implementation restrictions and differences with the Pandoc
+--         option by the same name: attributes cannot be set on links
+--         and indirect images (i.e. only direct images support them).
+--
 --
 -- *   Returns a converter function that converts a markdown string
 --     using `writer`, returning the parsed document as first result,
@@ -798,9 +856,9 @@ function M.new(writer, options)
   ------------------------------------------------------------------------------
 
   if options.smart then
-    larsers.specialchar       = S("*_~^`&[]<!\\'\"-.@^")
+    larsers.specialchar       = S("*_~`&[]<!\\'\"-.@^")
   else
-    larsers.specialchar       = S("*_~^`&[]<!\\-@^")
+    larsers.specialchar       = S("*_~`&[]<!\\-@^")
   end
 
   larsers.normalchar          = parsers.any - (larsers.specialchar
@@ -1053,19 +1111,21 @@ function M.new(writer, options)
                                    parsers.underscore)
                    ) / writer.emphasis
 
-  larsers.Strikethrough
+  larsers.Strikeout
                  = ( parsers.between(parsers.Inline, parsers.doubletildes,
                                    parsers.doubletildes)
-                   ) / writer.strikethrough
+                   ) / writer.strikeout
 
   larsers.Span   = ( parsers.between(parsers.Inline, parsers.lbracket,
                                    parsers.rbracket) ) * ( parsers.attributes )
                    / writer.span
 
-  larsers.Subscript   = ( parsers.between(larsers.Str, parsers.tilde, parsers.tilde) )
+  larsers.subsuperscripttext  = ( larsers.Str + P("\\ ") / writer.space )^1
+
+  larsers.Subscript   = ( parsers.between(larsers.subsuperscripttext, parsers.tilde, parsers.tilde) )
                         / writer.subscript
 
-  larsers.Superscript = ( parsers.between(larsers.Str, parsers.circumflex, parsers.circumflex) )
+  larsers.Superscript = ( parsers.between(larsers.subsuperscripttext, parsers.circumflex, parsers.circumflex) )
                          / writer.superscript
 
   larsers.AutoLinkUrl   = parsers.less
@@ -1096,7 +1156,7 @@ function M.new(writer, options)
   -- parse a link or image (direct or indirect)
   larsers.Link          = larsers.DirectLink + larsers.IndirectLink
 
-  if options.pandoc_extensions then
+  if options.link_attributes then
     -- Support additional attributes
     larsers.DirectImage   = parsers.exclamation
                           * (parsers.tag / parse_inlines)
@@ -1170,11 +1230,13 @@ function M.new(writer, options)
                        = (parsers.TildeFencedCodeBlock
                          + parsers.BacktickFencedCodeBlock)
                        / function(infostring, code)
-                           if options.pandoc_extensions then
+                           if options.raw_attribute then
                              local raw, attr = lpeg.match(parsers.rawattributes, infostring)
                              if raw then
                               return writer.rawblock(code, raw, attr)
                              end
+                           end
+                           if options.fenced_code_attributes then
                              local attr = lpeg.match(parsers.attributes, infostring)
                              if attr then
                               return writer.fenced_code(expandtabs(code),
@@ -1187,7 +1249,7 @@ function M.new(writer, options)
 
   larsers.FencedDiv    = (parsers.ColonFencedDivBlock)
                        / function(infostring, content)
-                           local attrs = parse_attributes(infostring)
+                           local attrs = infostring ~= "" and parse_attributes(infostring) or {}
                            local div = parse_blocks(content)
                            return writer.div(div, attrs)
                          end
@@ -1271,7 +1333,7 @@ function M.new(writer, options)
                      / writer.bulletlist
 
   local function ordered_list(s,tight,start)
-    local startnum, numstyle, numdelim = util.order2numberstyle(start)
+    local startnum, numstyle, numdelim = util.order_to_numberstyle(start)
     return writer.orderedlist(s,tight,
                               options.startnum and startnum,
                               options.fancy_lists and numstyle or "Decimal",
@@ -1460,8 +1522,8 @@ function M.new(writer, options)
                             + V("UlOrStarLine")
                             + V("Strong")
                             + V("Emph")
-                            + V("Strikethrough")
                             + V("Span")
+                            + V("Strikeout")
                             + V("Subscript")
                             + V("Superscript")
                             + V("InlineNote")
@@ -1485,8 +1547,8 @@ function M.new(writer, options)
       UlOrStarLine          = larsers.UlOrStarLine,
       Strong                = larsers.Strong,
       Emph                  = larsers.Emph,
-      Strikethrough         = larsers.Strikethrough,
       Span                  = larsers.Span,
+      Strikeout             = larsers.Strikeout,
       Subscript             = larsers.Subscript,
       Superscript           = larsers.Superscript,
       InlineNote            = larsers.InlineNote,
@@ -1529,13 +1591,28 @@ function M.new(writer, options)
     syntax.Smart = parsers.fail
   end
 
-  if not options.pandoc_extensions then
-    syntax.Strikethrough = parsers.fail
-    syntax.Span = parsers.fail
-    syntax.FencedDiv = parsers.fail
-    syntax.RawInLine = parsers.fail
-    syntax.Subscript = parsers.fail
+  if not options.superscript then
     syntax.Superscript = parsers.fail
+  end
+
+  if not options.subscript then
+    syntax.Subscript = parsers.fail
+  end
+
+  if not options.strikeout then
+    syntax.Strikeout = parsers.fail
+  end
+
+  if not options.raw_attribute then
+    syntax.RawInLine = parsers.fail
+  end
+
+  if not options.bracketed_spans then
+    syntax.Span = parsers.fail
+  end
+
+  if not options.fenced_divs then
+    syntax.FencedDiv = parsers.fail
   end
 
   if not options.task_list then
@@ -1583,7 +1660,7 @@ function M.new(writer, options)
         inp = rest
       end
       local result = { writer.start_document(), parse_blocks(inp), writer.stop_document() }
-      return writer.merge(result), writer.get_metadata()
+      return writer.rope_to_output(result), writer.get_metadata()
     end
 
   return parse_markdown

@@ -74,7 +74,7 @@ function M.new(options)
   end
 
   -- Turn list of output into final result.
-  function W.merge(result)
+  function W.rope_to_output(result)
     return util.rope_to_string(result)
   end
 
@@ -222,8 +222,8 @@ function M.new(options)
     return s
   end
 
-  --- Strikethrough text
-  function W.strikethrough(s)
+  --- Strikeout text
+  function W.strikeout(s)
     return s
   end
 
