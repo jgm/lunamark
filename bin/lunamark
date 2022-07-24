@@ -487,7 +487,14 @@ given in parentheses:
   (-) require_blank_before_fenced_code_block
   (-) fancy_lists          Pandoc style fancy lists
   (-) task_list            GitHub-Flavored Markdown task list
-  (-) pandoc_extensions    Several other Pandoc style features
+  (-) strikeout            Strike-through with double tildes
+  (-) subscript            Subscripted text between tildes
+  (-) superscript          Superscripted text between circumflexes
+  (-) bracketed_spans      Spans with attributes
+  (-) fenced_divs          Divs with attributes
+  (-) raw_attribute        Raw pass-through on code elements
+  (-) fenced_code_attributes Fenced code block attributes
+  (-) link_attributes      Link attributes
 The keyword 'all' may also be used, to set all extensions simultaneously.
 Setting the environment variable LUNAMARK_EXTENSIONS can change the
 defaults.
@@ -546,7 +553,14 @@ local extensions = {  -- defaults
   hash_enumerators = false,
   fancy_lists = false,
   task_list = false,
-  pandoc_extensions = false,
+  strikeout = false,
+  subscript = false,
+  superscript = false,
+  bracketed_spans = false,
+  fenced_divs = false,
+  raw_attribute = false,
+  fenced_code_attributes = false,
+  link_attributes = false,
 }
 
 if optarg["0"] then
