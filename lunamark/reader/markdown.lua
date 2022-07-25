@@ -1066,7 +1066,7 @@ function M.new(writer, options)
                         * parsers.optionalspace * parsers.newline)
   end
 
-  if not options.fenced_code_blocks or options.blank_before_fenced_code_blocks then
+  if not options.fenced_code_blocks or options.require_blank_before_fenced_code_blocks then
     larsers.fencestart = parsers.fail
   else
     larsers.fencestart = parsers.fencehead(parsers.backtick)
