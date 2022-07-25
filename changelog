@@ -1,3 +1,23 @@
+lunamark 0.6.0 (not yet released)
+
+  * Added fancy lists, task list and bunch of pandoc extensions (Omikhleia).
+
+  * Gracefully ignore unknown HTML character entities (Vít Novotný).
+
+  * Complete support for HTML character entities (Vít Novotný).
+
+  * Remove unreachable branch of parsers.line (Vít Novotný).
+
+  * Cast start number of ordered list item to integer in Lua 5.3 (Vít Novotný).
+
+  * Fixed internal punctuation in citations (Vít Novotný).
+
+  * Fixed blockquote parsing (Vít Novotný).
+
+  * Moved parsers into a hash table (Vít Novotný).
+
+  * Added support for Pandoc-style inline footnotes (Vít Novotný).
+
 lunamark 0.5.0 (released 11 Oct 2016)
 
   * Unordered list items now may begin with a bulletchar (Vít Novotný).
