@@ -70,7 +70,7 @@ function M.new(options)
     return {"<li>", s, "</li>"}
   end
 
-  function Html.bulletlist(items,tight)
+  function Html.bulletlist(items)
     return {"<ul>", containersep, intersperse(map(items, listitem), containersep), containersep, "</ul>"}
   end
 
@@ -81,7 +81,7 @@ function M.new(options)
     UpperAlpha = "A",
     LowerAlpha = "a",
   }
-  function Html.orderedlist(items,tight,startnum,numstyle,numdelim)
+  function Html.orderedlist(items,_,startnum,numstyle,numdelim)
     local start = ""
     if startnum and startnum ~= 1 then
       start = " start=\"" .. startnum .. "\""
@@ -102,7 +102,7 @@ function M.new(options)
     return {'<li class="tasklist-item '..status..'"><span>'..icon..' </span>', s[2], "</li>"}
   end
 
-  function Html.tasklist(items,tight)
+  function Html.tasklist(items)
     return {"<ul>", containersep, intersperse(map(items, tasklistitem), containersep), containersep, "</ul>"}
   end
 
@@ -170,11 +170,11 @@ function M.new(options)
     end
   end
 
-  function Html.rawinline(s,format,attr)
+  function Html.rawinline(s,format)
     return format == "html" and s or {}
   end
 
-  function Html.rawblock(s,format,attr)
+  function Html.rawblock(s,format)
     return format == "html" and s or {}
   end
 

@@ -203,7 +203,7 @@ parsers.bullet     = ( parsers.bulletchar * #parsers.spacing
 
 parsers.openticks   = Cg(parsers.backtick^1, "ticks")
 
-local function captures_equal_length(s,i,a,b)
+local function captures_equal_length(_,i,a,b)
   return #a == #b and i
 end
 
@@ -223,7 +223,7 @@ parsers.inticks     = parsers.openticks * parsers.space^-1
 -- Parsers used for fenced code blocks
 -----------------------------------------------------------------------------
 
-local function captures_geq_length(s,i,a,b)
+local function captures_geq_length(_,i,a,b)
   return #a >= #b and i
 end
 
@@ -854,7 +854,7 @@ function M.new(writer, options)
                     end)
 
   local parse_markdown
-  
+
   ------------------------------------------------------------------------------
   -- Basic parsers (local)
   ------------------------------------------------------------------------------
@@ -1028,12 +1028,12 @@ function M.new(writer, options)
   larsers.Str      = larsers.normalchar^1 / writer.string
 
   larsers.Ellipsis = P("...") / writer.ellipsis
-  
+
   larsers.Dash     = P("---") * -parsers.dash / writer.mdash
                    + P("--") * -parsers.dash / writer.ndash
                    + P("-") * #parsers.digit * B(parsers.digit*1, 2)
                    / writer.ndash
-  
+
   larsers.DoubleQuoted = parsers.dquote * Ct((parsers.Inline - parsers.dquote)^1)
                        * parsers.dquote / writer.doublequoted
 
@@ -1046,12 +1046,12 @@ function M.new(writer, options)
 
   larsers.Symbol       = (larsers.specialchar - parsers.tightblocksep)
                        / writer.string
-  
+
   larsers.RawInLine    = parsers.inticks * parsers.rawattributes
                        / writer.rawinline
 
   larsers.Code         = parsers.inticks / writer.code
-  
+
   if options.require_blank_before_blockquote then
     larsers.bqstart = parsers.fail
   else
@@ -1108,7 +1108,7 @@ function M.new(writer, options)
                    + parsers.between(parsers.Inline, parsers.doubleunderscores,
                                      parsers.doubleunderscores)
                    ) / writer.strong
-  
+
   larsers.Emph   = ( parsers.between(parsers.Inline, parsers.asterisk,
                                    parsers.asterisk)
                    + parsers.between(parsers.Inline, parsers.underscore,
@@ -1138,7 +1138,7 @@ function M.new(writer, options)
                         / function(url)
                             return writer.link(writer.string(url),url)
                           end
-  
+
   larsers.AutoLinkEmail = parsers.less
                         * C((parsers.alphanumeric + S("-._+"))^1
                         * P("@") * parsers.urlchar^1) * parsers.more
@@ -1210,11 +1210,11 @@ function M.new(writer, options)
   -- avoid parsing long strings of * or _ as emph/strong
   larsers.UlOrStarLine  = parsers.asterisk^4 + parsers.underscore^4
                         / writer.string
-  
+
   larsers.EscapedChar   = S("\\") * C(parsers.escapable) / writer.string
-  
+
   larsers.InlineHtml    = C(parsers.inlinehtml) / writer.inline_html
-  
+
   larsers.HtmlEntity    = parsers.hexentity / entities.hex_entity  / writer.string
                         + parsers.decentity / entities.dec_entity  / writer.string
                         + parsers.tagentity / entities.char_entity / writer.string
@@ -1379,7 +1379,7 @@ function M.new(writer, options)
                         * parsers.skipblanklines
                       ) / writer.tasklist
 
-  local function definition_list_item(term, defs, tight)
+  local function definition_list_item(term, defs)
     return { term = parse_inlines(term), definitions = defs }
   end
 

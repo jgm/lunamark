@@ -33,11 +33,11 @@ function M.new(options)
     return {"\\type{",ConTeXt.string(s),"}"}
   end
 
-  function ConTeXt.link(lab,src,tit)
+  function ConTeXt.link(lab,src)
     return {"\\goto{",lab,"}[url(",ConTeXt.string(src),"]"}
   end
 
-  function ConTeXt.image(lab,src,tit)
+  function ConTeXt.image(_,src)
     return {"\\externalfigure[",ConTeXt.string(src),"]"}
   end
 

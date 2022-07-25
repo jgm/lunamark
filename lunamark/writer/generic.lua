@@ -153,14 +153,14 @@ function M.new(options)
 
   --- A link with link text `label`, uri `uri`,
   -- and title `title`.
-  function W.link(label, uri, title)
+  function W.link(label)
     return label
   end
 
   --- An image link with alt text `label`,
   -- source `src`, and title `title`,
   -- additional attributes `attr`
-  function W.image(label, src, title, attr)
+  function W.image(label)
     return label
   end
 
@@ -172,7 +172,7 @@ function M.new(options)
   --- A bullet list with contents `items` (an array).  If
   -- `tight` is true, returns a "tight" list (with
   -- minimal space between items).
-  function W.bulletlist(items,tight)
+  function W.bulletlist(items)
     return util.intersperse(items,W.interblocksep)
   end
 
@@ -186,7 +186,7 @@ function M.new(options)
   -- `numdelim`, depending on options, may be one of "Default", "OneParen",
   -- "Period".
   -- (Those symbolic names are loosely taken from Pandoc.)
-  function W.orderedlist(items,tight,startnum,numstyle,numdelim)
+  function W.orderedlist(items)
     return util.intersperse(items,W.interblocksep)
   end
 
@@ -203,12 +203,12 @@ function M.new(options)
   end
 
   --- Inline HTML.
-  function W.inline_html(s)
+  function W.inline_html()
     return ""
   end
 
   --- Display HTML (HTML block).
-  function W.display_html(s)
+  function W.display_html()
     return ""
   end
 
@@ -240,34 +240,34 @@ function M.new(options)
   --- Fenced code block, with infostring `i`.
   -- and optional attributes `attr` (may be nil,
   -- when valued, `attr.class` is the same as the infostring)
-  function W.fenced_code(s, i, attr)
+  function W.fenced_code(s)
     return s
   end
 
   --- Header level `level`, with text `s`.
-  function W.header(s, level)
+  function W.header(s)
     return s
   end
 
   -- (Inline) Span with attributes `attr`
-  function W.span(s, attr)
+  function W.span(s)
     return s
   end
 
   -- (Block) Div with attributes `attr`
-  function W.div(s, attr)
+  function W.div(s)
     return s
   end
 
   --- Inline raw code, with format and
   -- optional attributes
-  function W.rawinline(s, format, attr)
+  function W.rawinline()
     return {} -- ignore by default
   end
 
   --- Raw block code, with format and
   -- optional attributes
-  function W.rawblock(s, format, attr)
+  function W.rawblock()
     return {} -- ignore by default
   end
 
@@ -332,7 +332,7 @@ function M.new(options)
   -- each of the form `{ term = t, definitions = defs, tight = tight }`,
   -- where `t` is a string and `defs` is an array of strings.
   -- `tight` is a boolean, true if it is a tight list.
-  function W.definitionlist(items, tight)
+  function W.definitionlist(items)
     local buffer = {}
     for _,item in ipairs(items) do
       buffer[#buffer + 1] = item.t

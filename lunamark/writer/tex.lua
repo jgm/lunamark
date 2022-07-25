@@ -81,11 +81,11 @@ function M.new(options)
   TeX.string = escaper
   TeX.citation = escaper_citation
 
-  function TeX.inline_html(s)
+  function TeX.inline_html()
     return ""
   end
 
-  function TeX.display_html(s)
+  function TeX.display_html()
     return ""
   end
 
