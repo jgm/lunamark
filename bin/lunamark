@@ -252,6 +252,101 @@ environment variable `LUNAMARK_EXTENSIONS` (see ENVIRONMENT below).
 :   Allow `#` instead of a digit for an ordered list enumerator
     (equivalent to `1`).
 
+`(-) task_list`
+:   GitHub-Flavored Markdown (GFM) task list extension to standard
+    bullet lists. Items starting with `[ ]`, `[x]` or `[X]` after the
+    bullet are processed as first-class structures by the Markdown reader
+    when this option is enabled, possibly allowing writers to handle
+    them more efficiently with a finer-grain logic.
+
+`(-) fancy_lists`
+:   Allow ordered list items to use a roman number or a letter
+    as anumerator, instead of a digit, and to use a closing parenthesis
+    as end delimiter, instead of a period.
+
+    Depending on the selected writer, the numbering scheme and delimeter
+    may be honored or just ignored.
+
+    If the `startnum` option is enabled, the starting value is converted
+    to decimal, when necessary, so that the list at least starts at the
+    appropriate value.
+
+    So in the minimal case, this option allows such lists to be processed,
+    albeit rendered as regular ordered lists.
+
+    Compared to the Pandoc option by the same name, the implementation
+    does not support currently list markers enclosed in parentheses.
+
+`(-) strikeout`
+:   Enable strike-through support for a text enclosed within double
+    tildes, as in `~~deleted~~`.
+
+`(-) subscript`
+:   Enable superscript support. Superscripts may be written by surrounding
+    the subscripted text by `~` characters, as in `2~10~`.
+
+    The text thus marked may not contain spaces or newlines.
+    If the subscripted text contains spaces, these spaces must be escaped
+    with backslashes.
+
+`(-) superscript`
+:   Enable superscript support. Superscripts may be written by surrounding
+    the superscripted text by `^` characters, as in `2^10^.
+
+    The text thus marked may not contain spaces or newlines.
+    If the superscripted text contains spaces, these spaces must be escaped
+    with backslashes.
+
+`(-) bracketed_spans`
+:   When enabled, a bracketed sequence of inlines (as one would use to
+    begin a link), is treated as a Span with attributes if it is
+    followed immediately by attributes, e.g. `[text]{.class key=value}`.
+
+`(-) fenced_divs`
+:   Allow special fenced syntax for native Div blocks. A Div starts with a
+    fence containing at least three consecutive colons plus some attributes.
+
+    The Div ends with another line containing a string of at least
+    three consecutive colons. The fenced Div should be separated by blank
+    lines from preceding and following blocks.
+
+    Current implementation restrictions and differences with the Pandoc
+    option by the same name: fenced Divs cannot be nested, the attributes
+    cannot be followed by another optional string of consecutive colons,
+    attributes have to be in curly braces (and cannot be a single unbraced
+    word).
+
+`(-) raw_attribute`
+:   When enabled, inline code and fenced code blocks with a special kind
+    of attribute will be parsed as raw content with the designated format,
+    e.g. `{=format}`. Writers may pass relevant raw content to the
+    target formatter.
+
+    To use a raw attribute with fenced code blocks, `fenced_code_blocks`
+    must be enabled.
+
+    As opposed to the Pandoc option going by the same name, raw
+    attributes can be continued with key=value pairs.
+
+    How these constructs are honored depends on the writer. In the
+    minimal case, they are ignored, as if they were stripped from
+    the input.
+
+`(-) fenced_code_attributes`
+:   Allow attaching attributes to fenced code blocks, if the latter.
+    are enabled.
+
+    Current implementation restrictions and differences with the Pandoc
+    option by the same name: attributes can only be set on fenced
+    code blocks.
+
+`(-) link_attributes`
+:   Allow attaching attributes to direct images.
+
+    Current implementation restrictions and differences with the Pandoc
+    option by the same name: attributes cannot be set on links
+    and indirect images (i.e. only direct images support them).
+
 # TEMPLATES
 
 By default, lunamark will produce a fragment.  If the
@@ -390,6 +485,16 @@ given in parentheses:
   (-) require_blank_before_blockquote
   (-) require_blank_before_header
   (-) require_blank_before_fenced_code_block
+  (-) fancy_lists          Pandoc style fancy lists
+  (-) task_list            GitHub-Flavored Markdown task list
+  (-) strikeout            Strike-through with double tildes
+  (-) subscript            Subscripted text between tildes
+  (-) superscript          Superscripted text between circumflexes
+  (-) bracketed_spans      Spans with attributes
+  (-) fenced_divs          Divs with attributes
+  (-) raw_attribute        Raw pass-through on code elements
+  (-) fenced_code_attributes Fenced code block attributes
+  (-) link_attributes      Link attributes
 The keyword 'all' may also be used, to set all extensions simultaneously.
 Setting the environment variable LUNAMARK_EXTENSIONS can change the
 defaults.
@@ -446,6 +551,16 @@ local extensions = {  -- defaults
   require_blank_before_header = false,
   require_blank_before_fenced_code_block = false,
   hash_enumerators = false,
+  fancy_lists = false,
+  task_list = false,
+  strikeout = false,
+  subscript = false,
+  superscript = false,
+  bracketed_spans = false,
+  fenced_divs = false,
+  raw_attribute = false,
+  fenced_code_attributes = false,
+  link_attributes = false,
 }
 
 if optarg["0"] then

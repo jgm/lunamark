@@ -1,0 +1,15 @@
+lunamark -Xtask_list
+<<<
+Task list
+
+ - [ ] unchecked
+ - [x] checked
+ - [X] checked
+
+>>>
+<p>Task list</p>
+<ul>
+<li class="tasklist-item unchecked"><span>☐</span> unchecked</li>
+<li class="tasklist-item checked"><span>☑</span> checked</li>
+<li class="tasklist-item checked"><span>☑</span> checked</li>
+</ul>

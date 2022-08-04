@@ -1,0 +1,12 @@
+lunamark -Xfenced_divs
+<<<
+:::
+Some Div
+:::
+
+::: {.myclass lang=fr}
+Some better Div
+:::
+>>>
+<div>Some Div</div>
+<div class="myclass" lang="fr">Some better Div</div>

@@ -1,0 +1,53 @@
+lunamark -Xfancy_lists
+<<<
+Fancy list (roman, lower)
+
+ i. item
+ i. item
+
+Fancy list (roman, upper)
+
+ I. item
+ I. item
+
+Fancy list (alpha, lower)
+
+ a. item
+ a. item
+
+Fancy list (alpha, upper)
+
+ A. item
+ A. item
+
+Fancy list (paren)
+
+ 1) item
+ 1) item
+
+>>>
+<p>Fancy list (roman, lower)</p>
+<ol type="i">
+<li>item</li>
+<li>item</li>
+</ol>
+<p>Fancy list (roman, upper)</p>
+<ol type="I">
+<li>item</li>
+<li>item</li>
+</ol>
+<p>Fancy list (alpha, lower)</p>
+<ol type="a">
+<li>item</li>
+<li>item</li>
+</ol>
+<p>Fancy list (alpha, upper)</p>
+<ol type="A">
+<li>item</li>
+<li>item</li>
+</ol>
+<p>Fancy list (paren)</p>
+<ol class="custom-marker-oneparen">
+<li>item</li>
+<li>item</li>
+</ol>

@@ -1,0 +1,20 @@
+lunamark -Xbracketed_spans
+<<<
+[text]{.myclass}.
+
+[text]{lang=fr}.
+
+[text]{#hash}.
+
+[text]{}.
+
+[text]{ #hash .my-class lang="fr" }.
+
+[text]{.underline}
+>>>
+<p><span class="myclass">text</span>.</p>
+<p><span lang="fr">text</span>.</p>
+<p><span id="hash">text</span>.</p>
+<p><span>text</span>.</p>
+<p><span id="hash" class="my-class" lang="fr">text</span>.</p>
+<p><u class="underline">text</u></u></p>

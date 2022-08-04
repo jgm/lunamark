@@ -1,0 +1,14 @@
+lunamark -Xfenced_code_blocks,fenced_code_attributes
+<<<
+```fancy1
+Code
+```
+
+```{.fancy2}
+Code
+```
+>>>
+<pre><code class="language-fancy1">Code
+</code></pre>
+<pre><code class="language-fancy2">Code
+</code></pre>

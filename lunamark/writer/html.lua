@@ -51,13 +51,15 @@ function M.new(options)
     return {"<a href=\"", Html.string(src), "\"", titattr, ">", lab, "</a>"}
   end
 
-  function Html.image(lab,src,tit)
+  function Html.image(lab,src,tit,attr)
     local titattr
     if type(tit) == "string" and #tit > 0
        then titattr = " title=\"" .. Html.string(tit) .. "\""
        else titattr = ""
-       end
-    return {"<img src=\"", Html.string(src), "\" alt=\"", lab, "\"", titattr, " />"}
+    end
+    local w = attr and attr.width and ' width="'..attr.width..'"'
+    local h = attr and attr.height and ' height="'..attr.height..'"'
+    return {"<img src=\"", Html.string(src), "\" alt=\"", lab, "\"", titattr, w, h, " />"}
   end
 
   function Html.paragraph(s)
@@ -68,16 +70,40 @@ function M.new(options)
     return {"<li>", s, "</li>"}
   end
 
-  function Html.bulletlist(items,tight)
+  function Html.bulletlist(items)
     return {"<ul>", containersep, intersperse(map(items, listitem), containersep), containersep, "</ul>"}
   end
 
-  function Html.orderedlist(items,tight,startnum)
+  local listStyle = {
+    -- Decimal = "1", -- That's the default
+    UpperRoman = "I",
+    LowerRoman = "i",
+    UpperAlpha = "A",
+    LowerAlpha = "a",
+  }
+  function Html.orderedlist(items,_,startnum,numstyle,numdelim)
     local start = ""
     if startnum and startnum ~= 1 then
       start = " start=\"" .. startnum .. "\""
     end
-    return {"<ol", start, ">", containersep, intersperse(map(items, listitem), containersep), containersep, "</ol>"}
+    local oltype = numstyle and listStyle[numstyle]
+    local oltypeattr = oltype and (' type="'..oltype..'"') or ""
+    local olmark = numdelim == "OneParen" and ' class="custom-marker-oneparen"' or ""
+    return {
+        "<ol", start, oltypeattr, olmark, ">",
+        containersep, intersperse(map(items, listitem), containersep), containersep,
+        "</ol>"
+    }
+  end
+
+  local function tasklistitem(s)
+    local status = (s[1] == "[X]") and "checked" or "unchecked"
+    local icon = (status == "checked") and "☑" or "☐"
+    return {'<li class="tasklist-item '..status..'"><span>'..icon..' </span>', s[2], "</li>"}
+  end
+
+  function Html.tasklist(items)
+    return {"<ul>", containersep, intersperse(map(items, tasklistitem), containersep), containersep, "</ul>"}
   end
 
   function Html.inline_html(s)
@@ -96,6 +122,37 @@ function M.new(options)
     return {"<strong>", s, "</strong>"}
   end
 
+  function Html.strikeout(s)
+    return {"<strike>", s, "</strike>"}
+  end
+
+  function Html.subscript(s)
+    return {"<sub>", s, "</sub>"}
+  end
+
+  function Html.superscript(s)
+    return {"<sup>", s, "</sup>"}
+  end
+
+  function Html.span(s, attr)
+    local class = attr.class and attr.class ~="" and ' class="'..attr.class..'"' or ""
+    local id = attr.id and ' id="'..attr.id..'"' or ""
+    local lang = attr.lang and ' lang="'..attr.lang..'"' or ""
+    local tag = (class and string.match(' ' ..attr.class .. ' ',' underline ')) and "u" or "span"
+    local opentag = "<"..tag..id..class..lang..'>'
+    local closetag = "</"..tag..">"
+    return {opentag, s, closetag}
+  end
+
+  function Html.div(s, attr)
+    local class = attr.class and attr.class ~="" and ' class="'..attr.class..'"' or ""
+    local id = attr.id and ' id="'..attr.id..'"' or ""
+    local lang = attr.lang and ' lang="'..attr.lang..'"' or ""
+    local opentag = '<div'..id..class..lang..'>'
+    local closetag = "</div>"
+    return {opentag, s, closetag}
+  end
+
   function Html.blockquote(s)
     return {"<blockquote>", containersep, s, containersep, "</blockquote>"}
   end
@@ -111,6 +168,14 @@ function M.new(options)
     else
       return Html.verbatim(s)
     end
+  end
+
+  function Html.rawinline(s,format)
+    return format == "html" and s or {}
+  end
+
+  function Html.rawblock(s,format)
+    return format == "html" and s or {}
   end
 
   function Html.header(s,level)

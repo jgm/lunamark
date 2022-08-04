@@ -6,9 +6,9 @@ local lpeg = require("lpeg")
 local entities = require("lunamark.entities")
 local lower, upper, gsub, format, length =
   string.lower, string.upper, string.gsub, string.format, string.len
-local P, R, S, V, C, Cg, Cb, Cmt, Cc, Ct, B, Cs =
+local P, R, S, V, C, Cg, Cb, Cmt, Cc, Ct, B, Cs, Cf =
   lpeg.P, lpeg.R, lpeg.S, lpeg.V, lpeg.C, lpeg.Cg, lpeg.Cb,
-  lpeg.Cmt, lpeg.Cc, lpeg.Ct, lpeg.B, lpeg.Cs
+  lpeg.Cmt, lpeg.Cc, lpeg.Ct, lpeg.B, lpeg.Cs, lpeg.Cf
 local lpegmatch = lpeg.match
 local expand_tabs_in_line = util.expand_tabs_in_line
 local utf8_lower do
@@ -102,6 +102,7 @@ parsers.internal_punctuation   = S(":;,.?")
 
 parsers.doubleasterisks        = P("**")
 parsers.doubleunderscores      = P("__")
+parsers.doubletildes           = P("~~")
 parsers.fourspaces             = P("    ")
 
 parsers.any                    = P(1)
@@ -147,6 +148,38 @@ parsers.indented_blocks = function(bl)
          *  parsers.blankline^1 )
 end
 
+-- Attributes list as in Pandoc {#id .class .class-other key=value key2="value 2"}
+parsers.identifier  = parsers.letter
+                      * (parsers.alphanumeric + S("_-"))^0
+parsers.attrvalue   = (parsers.dquote * C((parsers.alphanumeric + S("._- "))^1) * parsers.dquote)
+                      + C((parsers.alphanumeric + S("._-"))^1)
+
+parsers.attrpair    = Cg(C((parsers.identifier)^1)
+                      * parsers.optionalspace * parsers.equal * parsers.optionalspace
+                      * parsers.attrvalue)
+                      * parsers.optionalspace^-1
+parsers.attrlist    = Cf(Ct("") * parsers.attrpair^0, rawset)
+
+parsers.class       = parsers.period * C((parsers.identifier)^1)
+parsers.classes     = (parsers.class * parsers.optionalspace)^0
+
+parsers.hashid      = parsers.hash * C((parsers.identifier)^1)
+
+parsers.attributes  = P("{") * parsers.optionalspace
+                      * Cg(parsers.hashid^-1) * parsers.optionalspace
+                      * Ct(parsers.classes) * Cg(parsers.attrlist)
+                      * parsers.optionalspace * P("}")
+                      / function (hashid, classes, attr)
+                          attr.id = hashid ~= "" and hashid or nil
+                          attr.class = table.concat(classes or {}, " ")
+                            return attr
+                          end
+-- Raw attributes similar to Pandoc (=format key=value key2="value 2")
+parsers.raw              = parsers.equal * C((parsers.identifier)^1) * parsers.optionalspace
+parsers.rawattributes    = P("{") * parsers.optionalspace
+                          * parsers.raw * Cg(parsers.attrlist)
+                          * parsers.optionalspace * P("}")
+
 -----------------------------------------------------------------------------
 -- Parsers used for markdown lists
 -----------------------------------------------------------------------------
@@ -170,7 +203,7 @@ parsers.bullet     = ( parsers.bulletchar * #parsers.spacing
 
 parsers.openticks   = Cg(parsers.backtick^1, "ticks")
 
-local function captures_equal_length(s,i,a,b)
+local function captures_equal_length(_,i,a,b)
   return #a == #b and i
 end
 
@@ -190,7 +223,7 @@ parsers.inticks     = parsers.openticks * parsers.space^-1
 -- Parsers used for fenced code blocks
 -----------------------------------------------------------------------------
 
-local function captures_geq_length(s,i,a,b)
+local function captures_geq_length(_,i,a,b)
   return #a >= #b and i
 end
 
@@ -518,6 +551,11 @@ parsers.BacktickFencedCodeBlock
                      * Cs(parsers.fencedline(parsers.backtick)^0)
                      * parsers.fencetail(parsers.backtick)
 
+parsers.ColonFencedDivBlock
+                     = parsers.fencehead(parsers.colon)
+                     * Cs(parsers.fencedline(parsers.colon)^0)
+                     * parsers.fencetail(parsers.colon)
+
 parsers.lineof = function(c)
     return (parsers.leader * (P(c) * parsers.optionalspace)^3
            * parsers.newline * parsers.blankline^1)
@@ -600,6 +638,10 @@ end
 --     `notes`
 --     :   Enable footnotes as in pandoc.
 --
+--     `inline_notes`
+--     :  Inline footnotes. An inline footnote is like a markdown bracketed
+--        reference, but preceded with a circumflex (`^`).
+--
 --     `definition_lists`
 --     :   Enable definition lists as in pandoc.
 --
@@ -640,6 +682,102 @@ end
 --     `hash_enumerators`
 --     :   Allow `#` instead of a digit for an ordered list enumerator
 --         (equivalent to `1`).
+--
+--     `task_list`
+--     :   GitHub-Flavored Markdown (GFM) task list extension to standard
+--         bullet lists. Items starting with `[ ]`, `[x]` or `[X]` after the
+--         bullet are processed as first-class structures by the Markdown reader
+--         when this option is enabled, possibly allowing writers to handle
+--         them more efficiently with a finer-grain logic.
+--
+--     `fancy_lists`
+--     :   Allow ordered list items to use a roman number or a letter
+--         as anumerator, instead of a digit, and to use a closing parenthesis
+--         as end delimiter, instead of a period.
+--
+--         Depending on the selected writer, the numbering scheme and delimeter
+--         may be honored or just ignored.
+--
+--         If the `startnum` option is enabled, the starting value is converted
+--         to decimal, when necessary, so that the list at least starts at the
+--         appropriate value.
+--
+--         So in the minimal case, this option allows such lists to be processed,
+--         albeit rendered as regular ordered lists.
+--
+--         Compared to the Pandoc option by the same name, the implementation
+--         does not support currently list markers enclosed in parentheses.
+--
+--     `strikeout`
+--     :   Enable strike-through support for a text enclosed within double
+--         tildes, as in `~~deleted~~`.
+--
+--     `superscript`
+--     :   Enable superscript support. Superscripts may be written by surrounding
+--         the superscripted text by `^` characters, as in `2^10^.
+--
+--         The text thus marked may not contain spaces or newlines.
+--         If the superscripted text contains spaces, these spaces must be escaped
+--         with backslashes.
+--
+--     `subscript`
+--     :   Enable superscript support. Superscripts may be written by surrounding
+--         the subscripted text by `~` characters, as in `2~10~`.
+--
+--         The text thus marked may not contain spaces or newlines.
+--         If the supbscripted text contains spaces, these spaces must be escaped
+--         with backslashes.
+--
+--     `bracketed_spans`
+--     :   When enabled, a bracketed sequence of inlines (as one would use to
+--         begin a link), is treated as a Span with attributes if it is
+--         followed immediately by attributes, e.g. `[text]{.class key=value}`.
+--
+--     `fenced_divs`
+--     :   Allow special fenced syntax for native Div blocks. A Div starts with a
+--         fence containing at least three consecutive colons plus some attributes.
+--
+--         The Div ends with another line containing a string of at least
+--         three consecutive colons. The fenced Div should be separated by blank
+--         lines from preceding and following blocks.
+--
+--         Current implementation restrictions and differences with the Pandoc
+--         option by the same name: fenced Divs cannot be nested, the attributes
+--         cannot be followed by another optional string of consecutive colons,
+--         attributes have to be in curly braces (and cannot be a single unbraced
+--         word.
+--
+--     `raw_attribute`
+--     :   When enabled, inline code and fenced code blocks with a special kind
+--         of attribute will be parsed as raw content with the designated format,
+--         e.g. `{=format}`. Writers may pass relevant raw content to the
+--         target formatter.
+--
+--         To use a raw attribute with fenced code blocks, `fenced_code_blocks`
+--         must be enabled.
+--
+--         As opposed to the Pandoc option going by the same name, raw
+--         attributes can be continued with key=value pairs.
+--
+--         How these constructs are honored depends on the writer. In the
+--         minimal case, they are ignored, as if they were stripped from
+--         the input.
+--
+--     `fenced_code_attributes`
+--     :   Allow attaching attributes to fenced code blocks, if the latter.
+--         are enabled.
+--
+--         Current implementation restrictions and differences with the Pandoc
+--         option by the same name: attributes can only be set on fenced
+--         code blocks.
+--
+--     `link_attributes`
+--     :   Allow attaching attributes to direct images.
+--
+--         Current implementation restrictions and differences with the Pandoc
+--         option by the same name: attributes cannot be set on links
+--         and indirect images (i.e. only direct images support them).
+--
 --
 -- *   Returns a converter function that converts a markdown string
 --     using `writer`, returning the parsed document as first result,
@@ -708,16 +846,23 @@ function M.new(writer, options)
                       return larsers.inlines_nbsp
                     end)
 
+  local parse_attributes
+    = create_parser("parse_attributes",
+                    function()
+                      -- N.B. This one uses a global parser
+                      return parsers.attributes
+                    end)
+
   local parse_markdown
-  
+
   ------------------------------------------------------------------------------
   -- Basic parsers (local)
   ------------------------------------------------------------------------------
 
   if options.smart then
-    larsers.specialchar       = S("*_`&[]<!\\'\"-.@^")
+    larsers.specialchar       = S("*_~`&[]<!\\'\"-.@^")
   else
-    larsers.specialchar       = S("*_`&[]<!\\-@^")
+    larsers.specialchar       = S("*_~`&[]<!\\-@^")
   end
 
   larsers.normalchar          = parsers.any - (larsers.specialchar
@@ -734,18 +879,24 @@ function M.new(writer, options)
     larsers.dig = parsers.digit
   end
 
-  larsers.enumerator = C(larsers.dig^3 * parsers.period) * #parsers.spacing
-                     + C(larsers.dig^2 * parsers.period) * #parsers.spacing
+  larsers.numdelim = parsers.period
+  if options.fancy_lists then
+    larsers.dig = larsers.dig + parsers.letter
+    larsers.numdelim = larsers.numdelim + parsers.rparent
+  end
+
+  larsers.enumerator = C(larsers.dig^3 * larsers.numdelim) * #parsers.spacing
+                     + C(larsers.dig^2 * larsers.numdelim) * #parsers.spacing
                                        * (parsers.tab + parsers.space^1)
-                     + C(larsers.dig * parsers.period) * #parsers.spacing
+                     + C(larsers.dig * larsers.numdelim) * #parsers.spacing
                                      * (parsers.tab + parsers.space^-2)
-                     + parsers.space * C(larsers.dig^2 * parsers.period)
+                     + parsers.space * C(larsers.dig^2 * larsers.numdelim)
                                      * #parsers.spacing
-                     + parsers.space * C(larsers.dig * parsers.period)
+                     + parsers.space * C(larsers.dig * larsers.numdelim)
                                      * #parsers.spacing
                                      * (parsers.tab + parsers.space^-1)
                      + parsers.space * parsers.space * C(larsers.dig^1
-                                     * parsers.period) * #parsers.spacing
+                                     * larsers.numdelim) * #parsers.spacing
 
   ------------------------------------------------------------------------------
   -- Parsers used for citations (local)
@@ -877,12 +1028,12 @@ function M.new(writer, options)
   larsers.Str      = larsers.normalchar^1 / writer.string
 
   larsers.Ellipsis = P("...") / writer.ellipsis
-  
+
   larsers.Dash     = P("---") * -parsers.dash / writer.mdash
                    + P("--") * -parsers.dash / writer.ndash
                    + P("-") * #parsers.digit * B(parsers.digit*1, 2)
                    / writer.ndash
-  
+
   larsers.DoubleQuoted = parsers.dquote * Ct((parsers.Inline - parsers.dquote)^1)
                        * parsers.dquote / writer.doublequoted
 
@@ -895,9 +1046,12 @@ function M.new(writer, options)
 
   larsers.Symbol       = (larsers.specialchar - parsers.tightblocksep)
                        / writer.string
-  
+
+  larsers.RawInLine    = parsers.inticks * parsers.rawattributes
+                       / writer.rawinline
+
   larsers.Code         = parsers.inticks / writer.code
-  
+
   if options.require_blank_before_blockquote then
     larsers.bqstart = parsers.fail
   else
@@ -912,7 +1066,7 @@ function M.new(writer, options)
                         * parsers.optionalspace * parsers.newline)
   end
 
-  if not options.fenced_code_blocks or options.blank_before_fenced_code_blocks then
+  if not options.fenced_code_blocks or options.require_blank_before_fenced_code_blocks then
     larsers.fencestart = parsers.fail
   else
     larsers.fencestart = parsers.fencehead(parsers.backtick)
@@ -954,12 +1108,29 @@ function M.new(writer, options)
                    + parsers.between(parsers.Inline, parsers.doubleunderscores,
                                      parsers.doubleunderscores)
                    ) / writer.strong
-  
+
   larsers.Emph   = ( parsers.between(parsers.Inline, parsers.asterisk,
                                    parsers.asterisk)
                    + parsers.between(parsers.Inline, parsers.underscore,
                                    parsers.underscore)
                    ) / writer.emphasis
+
+  larsers.Strikeout
+                 = ( parsers.between(parsers.Inline, parsers.doubletildes,
+                                   parsers.doubletildes)
+                   ) / writer.strikeout
+
+  larsers.Span   = ( parsers.between(parsers.Inline, parsers.lbracket,
+                                   parsers.rbracket) ) * ( parsers.attributes )
+                   / writer.span
+
+  larsers.subsuperscripttext  = ( larsers.Str + P("\\ ") / writer.space )^1
+
+  larsers.Subscript   = ( parsers.between(larsers.subsuperscripttext, parsers.tilde, parsers.tilde) )
+                        / writer.subscript
+
+  larsers.Superscript = ( parsers.between(larsers.subsuperscripttext, parsers.circumflex, parsers.circumflex) )
+                         / writer.superscript
 
   larsers.AutoLinkUrl   = parsers.less
                         * C(parsers.alphanumeric^1 * P("://") * parsers.urlchar^1)
@@ -967,7 +1138,7 @@ function M.new(writer, options)
                         / function(url)
                             return writer.link(writer.string(url),url)
                           end
-  
+
   larsers.AutoLinkEmail = parsers.less
                         * C((parsers.alphanumeric + S("-._+"))^1
                         * P("@") * parsers.urlchar^1) * parsers.more
@@ -989,14 +1160,27 @@ function M.new(writer, options)
   -- parse a link or image (direct or indirect)
   larsers.Link          = larsers.DirectLink + larsers.IndirectLink
 
-  larsers.DirectImage   = parsers.exclamation
-                        * (parsers.tag / parse_inlines)
-                        * parsers.spnl
-                        * parsers.lparent
-                        * (parsers.url + Cc(""))  -- link can be empty [foo]()
-                        * parsers.optionaltitle
-                        * parsers.rparent
-                        / writer.image
+  if options.link_attributes then
+    -- Support additional attributes
+    larsers.DirectImage   = parsers.exclamation
+                          * (parsers.tag / parse_inlines)
+                          * parsers.spnl
+                          * parsers.lparent
+                          * (parsers.url + Cc(""))  -- link can be empty [foo]()
+                          * parsers.optionaltitle
+                          * parsers.rparent
+                          * (parsers.attributes + Ct(""))
+                          / writer.image
+  else
+    larsers.DirectImage   = parsers.exclamation
+                          * (parsers.tag / parse_inlines)
+                          * parsers.spnl
+                          * parsers.lparent
+                          * (parsers.url + Cc(""))  -- link can be empty [foo]()
+                          * parsers.optionaltitle
+                          * parsers.rparent
+                          / writer.image
+  end
 
   larsers.IndirectImage = parsers.exclamation * parsers.tag
                         * (C(parsers.spnl) * parsers.tag)^-1 / indirect_image
@@ -1026,11 +1210,11 @@ function M.new(writer, options)
   -- avoid parsing long strings of * or _ as emph/strong
   larsers.UlOrStarLine  = parsers.asterisk^4 + parsers.underscore^4
                         / writer.string
-  
+
   larsers.EscapedChar   = S("\\") * C(parsers.escapable) / writer.string
-  
+
   larsers.InlineHtml    = C(parsers.inlinehtml) / writer.inline_html
-  
+
   larsers.HtmlEntity    = parsers.hexentity / entities.hex_entity  / writer.string
                         + parsers.decentity / entities.dec_entity  / writer.string
                         + parsers.tagentity / entities.char_entity / writer.string
@@ -1050,8 +1234,28 @@ function M.new(writer, options)
                        = (parsers.TildeFencedCodeBlock
                          + parsers.BacktickFencedCodeBlock)
                        / function(infostring, code)
+                           if options.raw_attribute then
+                             local raw, attr = lpeg.match(parsers.rawattributes, infostring)
+                             if raw then
+                              return writer.rawblock(code, raw, attr)
+                             end
+                           end
+                           if options.fenced_code_attributes then
+                             local attr = lpeg.match(parsers.attributes, infostring)
+                             if attr then
+                              return writer.fenced_code(expandtabs(code),
+                                  attr.class, attr)
+                             end
+                           end
                            return writer.fenced_code(expandtabs(code),
                                                      writer.string(infostring))
+                         end
+
+  larsers.FencedDiv    = (parsers.ColonFencedDivBlock)
+                       / function(infostring, content)
+                           local attrs = infostring ~= "" and parse_attributes(infostring) or {}
+                           local div = parse_blocks(content)
+                           return writer.div(div, attrs)
                          end
 
   -- strip off leading > and indents, and run through blocks
@@ -1084,7 +1288,17 @@ function M.new(writer, options)
   -- Lists (local)
   ------------------------------------------------------------------------------
 
-  larsers.starter = parsers.bullet + larsers.enumerator
+  larsers.taskbullet  = ( parsers.bullet * parsers.optionalspace
+                        * C(parsers.lbracket * (S("xX ")) * parsers.rbracket) )
+                      / function (_, checked) -- first arg is the bullet
+                          return checked:upper() -- Just normalize it in uppercase
+                        end
+
+  if options.task_list then
+    larsers.starter = larsers.taskbullet + parsers.bullet + larsers.enumerator
+  else
+    larsers.starter = parsers.bullet + larsers.enumerator
+  end
 
   -- we use \001 as a separator between a tight list item and a
   -- nested list under it.
@@ -1122,16 +1336,12 @@ function M.new(writer, options)
                        * parsers.skipblanklines )
                      / writer.bulletlist
 
-  local function ordered_list(s,tight,startnum)
-    if options.startnum then
-      startnum = tonumber(startnum) or 1  -- fallback for '#'
-      if startnum ~= nil then
-        startnum = math.floor(startnum)
-      end
-    else
-      startnum = nil
-    end
-    return writer.orderedlist(s,tight,startnum)
+  local function ordered_list(s,tight,start)
+    local startnum, numstyle, numdelim = util.order_to_numberstyle(start)
+    return writer.orderedlist(s,tight,
+                              options.startnum and startnum,
+                              options.fancy_lists and numstyle or "Decimal",
+                              options.fancy_lists and numdelim or "Default")
   end
 
   larsers.OrderedList = Cg(larsers.enumerator, "listtype") *
@@ -1143,7 +1353,33 @@ function M.new(writer, options)
                       * Cc(false) * parsers.skipblanklines
                       ) * Cb("listtype") / ordered_list
 
-  local function definition_list_item(term, defs, tight)
+  local function gather_ticklist_item(checked, blocks)
+    return { checked, parse_blocks(blocks) }
+  end
+
+  -- Note: there could have been some code factorization with bullet lists,
+  -- but this is becoming tricky so let's not risk breaking what works.
+  larsers.TightTaskListItem = function(starter)
+    return -larsers.HorizontalRule
+           * Cs(starter) * Cs(larsers.ListBlock * larsers.NestedList^-1)
+             / gather_ticklist_item
+           * -(parsers.blanklines * parsers.indent)
+  end
+  larsers.LooseTaskListItem = function(starter)
+      return -larsers.HorizontalRule
+            * Cs(starter) * Cs(larsers.ListBlock * Cc("\n")
+              * (larsers.NestedList + larsers.ListContinuationBlock^0)
+              * (parsers.blanklines / "\n\n")
+              ) / gather_ticklist_item
+  end
+
+  larsers.TaskList = ( Ct(larsers.TightTaskListItem(larsers.taskbullet)^1) * Cc(true)
+                        * parsers.skipblanklines * -larsers.taskbullet
+                        + Ct(larsers.LooseTaskListItem(larsers.taskbullet)^1) * Cc(false)
+                        * parsers.skipblanklines
+                      ) / writer.tasklist
+
+  local function definition_list_item(term, defs)
     return { term = parse_inlines(term), definitions = defs }
   end
 
@@ -1259,7 +1495,9 @@ function M.new(writer, options)
       Block                 = V("Blockquote")
                             + V("Verbatim")
                             + V("FencedCodeBlock")
+                            + V("FencedDiv")
                             + V("HorizontalRule")
+                            + V("TaskList") -- Must have precedence over BulletList
                             + V("BulletList")
                             + V("OrderedList")
                             + V("Header")
@@ -1271,7 +1509,9 @@ function M.new(writer, options)
       Blockquote            = larsers.Blockquote,
       Verbatim              = larsers.Verbatim,
       FencedCodeBlock       = larsers.FencedCodeBlock,
+      FencedDiv             = larsers.FencedDiv,
       HorizontalRule        = larsers.HorizontalRule,
+      TaskList              = larsers.TaskList,
       BulletList            = larsers.BulletList,
       OrderedList           = larsers.OrderedList,
       Header                = larsers.AtxHeader + larsers.SetextHeader,
@@ -1286,11 +1526,16 @@ function M.new(writer, options)
                             + V("UlOrStarLine")
                             + V("Strong")
                             + V("Emph")
+                            + V("Span")
+                            + V("Strikeout")
+                            + V("Subscript")
+                            + V("Superscript")
                             + V("InlineNote")
                             + V("NoteRef")
                             + V("Citations")
                             + V("Link")
                             + V("Image")
+                            + V("RawInLine") -- Must have precedence over Code
                             + V("Code")
                             + V("AutoLinkUrl")
                             + V("AutoLinkEmail")
@@ -1306,12 +1551,17 @@ function M.new(writer, options)
       UlOrStarLine          = larsers.UlOrStarLine,
       Strong                = larsers.Strong,
       Emph                  = larsers.Emph,
+      Span                  = larsers.Span,
+      Strikeout             = larsers.Strikeout,
+      Subscript             = larsers.Subscript,
+      Superscript           = larsers.Superscript,
       InlineNote            = larsers.InlineNote,
       NoteRef               = larsers.NoteRef,
       Citations             = larsers.Citations,
       Link                  = larsers.Link,
       Image                 = larsers.Image,
       Code                  = larsers.Code,
+      RawInLine             = larsers.RawInLine,
       AutoLinkUrl           = larsers.AutoLinkUrl,
       AutoLinkEmail         = larsers.AutoLinkEmail,
       InlineHtml            = larsers.InlineHtml,
@@ -1343,6 +1593,34 @@ function M.new(writer, options)
 
   if not options.smart then
     syntax.Smart = parsers.fail
+  end
+
+  if not options.superscript then
+    syntax.Superscript = parsers.fail
+  end
+
+  if not options.subscript then
+    syntax.Subscript = parsers.fail
+  end
+
+  if not options.strikeout then
+    syntax.Strikeout = parsers.fail
+  end
+
+  if not options.raw_attribute then
+    syntax.RawInLine = parsers.fail
+  end
+
+  if not options.bracketed_spans then
+    syntax.Span = parsers.fail
+  end
+
+  if not options.fenced_divs then
+    syntax.FencedDiv = parsers.fail
+  end
+
+  if not options.task_list then
+    syntax.TaskList = parsers.fail
   end
 
   if options.alter_syntax and type(options.alter_syntax) == "function" then
@@ -1386,7 +1664,7 @@ function M.new(writer, options)
         inp = rest
       end
       local result = { writer.start_document(), parse_blocks(inp), writer.stop_document() }
-      return rope_to_string(result), writer.get_metadata()
+      return writer.rope_to_output(result), writer.get_metadata()
     end
 
   return parse_markdown

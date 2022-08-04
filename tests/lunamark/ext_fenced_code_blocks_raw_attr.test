@@ -1,0 +1,7 @@
+lunamark -Xfenced_code_blocks,raw_attribute
+<<<
+```{=html}
+<mark>me</mark>
+```
+>>>
+<mark>me</mark>
