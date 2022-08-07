@@ -186,7 +186,7 @@ function M.new(options)
   -- `numdelim`, depending on options, may be one of "Default", "OneParen",
   -- "Period".
   -- (Those symbolic names are loosely taken from Pandoc.)
-  function W.orderedlist(items)
+  function W.orderedlist(items, _)
     return util.intersperse(items,W.interblocksep)
   end
 
@@ -339,6 +339,16 @@ function M.new(options)
       buffer[#buffer + 1] = util.intersperse(item.definitions, W.interblocksep)
     end
     return util.intersperse(buffer,W.interblocksep)
+  end
+
+  --- A table.
+  -- The two arguments are rows, caption:
+  -- `rows[1]` contains the headers,
+  -- `rows[2]` contains the aligments (r l c d = right, left, centered, default)
+  -- and the other rows follow...
+  -- `caption` is the optional caption,
+  function W.table(_, _)
+    return ""
   end
 
   --- A cosmo template to be used in producing a standalone document.

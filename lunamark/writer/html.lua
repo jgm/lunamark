@@ -238,6 +238,49 @@ function M.new(options)
     return {"<dl>", containersep, intersperse(buffer, containersep), containersep, "</dl>"}
   end
 
+  local function tableCellAlign (align)
+    if align == 'l' then
+      return ' style="text-align: left;"'
+    elseif align == 'r' then
+      return ' style="text-align: right;"'
+    elseif align == 'c' then
+      return ' style="text-align: center;"'
+    end
+    return ''
+  end
+
+  function Html.table(rows, caption)
+    -- Mimic Pandoc output for such tables (in terms of carriage returns, class, styles, etc.)
+    local t = {}
+    local aligns = rows[2]
+
+    if caption then
+      t[#t+1] = { "<caption>", caption, "</caption>\n" }
+    end
+
+    local theadrow = { '<tr class="header">\n' }
+    for j, column in ipairs(rows[1]) do
+      local col = { "<th"..tableCellAlign(aligns[j])..">", column, "</th>\n" }
+      theadrow[#theadrow+1] = col
+    end
+    theadrow[#theadrow+1] = "</tr>\n"
+    t[#t+1] = { "<thead>\n", theadrow, "</thead>\n" }
+
+    t[#t+1] = "<tbody>\n"
+    for i = 3, #rows do
+      local tbodyrows = { '<tr class="', (i % 2 == 0) and "even" or "odd",'">\n' }
+      for j, column in ipairs(rows[i]) do
+        local col = { "<td"..tableCellAlign(aligns[j])..">", column, "</td>\n" }
+        tbodyrows[#tbodyrows+1] = col
+      end
+      tbodyrows[#tbodyrows+1]= "</tr>\n"
+      t[#t+1] = tbodyrows
+    end
+    t[#t+1] = "</tbody>\n"
+
+    return { "<table>\n", t, "</table>\n" }
+  end
+
   Html.template = [[
 <html>
 <head>
