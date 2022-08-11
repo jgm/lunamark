@@ -347,6 +347,14 @@ environment variable `LUNAMARK_EXTENSIONS` (see ENVIRONMENT below).
     option by the same name: attributes cannot be set on links
     and indirect images (i.e. only direct images support them).
 
+`(-) pipe_tables`
+:   Support "Pipe Table", as with Pandoc's option by the same name,
+    following the syntax introduced in PHP Markdown Extra.
+
+`(-) table_captions`
+:   Enable the Pandoc `table_captions` syntax extension for
+    tables.
+
 # TEMPLATES
 
 By default, lunamark will produce a fragment.  If the
@@ -495,6 +503,8 @@ given in parentheses:
   (-) raw_attribute        Raw pass-through on code elements
   (-) fenced_code_attributes Fenced code block attributes
   (-) link_attributes      Link attributes
+  (-) pipe_tables          PHP Markdown Extra pipe table support
+  (-) table_captions       Table caption syntax extension
 The keyword 'all' may also be used, to set all extensions simultaneously.
 Setting the environment variable LUNAMARK_EXTENSIONS can change the
 defaults.
@@ -561,6 +571,8 @@ local extensions = {  -- defaults
   raw_attribute = false,
   fenced_code_attributes = false,
   link_attributes = false,
+  pipe_tables = false,
+  table_captions = false,
 }
 
 if optarg["0"] then

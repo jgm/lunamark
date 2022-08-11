@@ -1,0 +1,38 @@
+lunamark -Xpipe_tables,table_captions
+<<<
+Pipe table
+
+| Right | Left | Default | Center |
+|------:|:-----|---------|:------:|
+|  12   |  12  |    12   |    12  |
+|  123  |  123 |   123   |   123  |
+
+  : Demonstration of a pipe table.
+>>>
+<p>Pipe table</p>
+
+<table>
+<caption>Demonstration of a pipe table.</caption>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Right</th>
+<th style="text-align: left;">Left</th>
+<th>Default</th>
+<th style="text-align: center;">Center</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">12</td>
+<td style="text-align: left;">12</td>
+<td>12</td>
+<td style="text-align: center;">12</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">123</td>
+<td style="text-align: left;">123</td>
+<td>123</td>
+<td style="text-align: center;">123</td>
+</tr>
+</tbody>
+</table>
