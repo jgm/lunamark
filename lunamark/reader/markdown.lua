@@ -161,7 +161,7 @@ parsers.attrpair    = Cg(C((parsers.identifier)^1)
                       * parsers.optionalspace^-1
 parsers.attrlist    = Cf(Ct("") * parsers.attrpair^0, rawset)
 
-parsers.class       = parsers.period * C((parsers.identifier)^1)
+parsers.class       = (P("-") * Cc("unnumbered")) + (parsers.period * C((parsers.identifier)^1))
 parsers.classes     = (parsers.class * parsers.optionalspace)^0
 
 parsers.hashid      = parsers.hash * C((parsers.identifier)^1)
@@ -602,7 +602,7 @@ parsers.HeadingStart = #parsers.hash * C(parsers.hash^-6)
 parsers.HeadingLevel = parsers.equal^1 * Cc(1) + parsers.dash^1 * Cc(2)
 
 local function strip_atx_end(s)
-  return s:gsub("[#%s]*\n$","")
+  return s:gsub("[#%s]*[\n]*$","")
 end
 
 
@@ -786,6 +786,10 @@ end
 --     `table_captions`
 --     :   Enable the Pandoc `table_captions` syntax extension for
 --         tables.
+--
+--     `header_attributes`
+--     :   Headings can be assigned attributes at the end of the line containing
+--         the heading text.
 --
 -- *   Returns a converter function that converts a markdown string
 --     using `writer`, returning the parsed document as first result,
@@ -1470,19 +1474,46 @@ function M.new(writer, options)
   -- Headers (local)
   ------------------------------------------------------------------------------
 
-  -- parse atx header
-  larsers.AtxHeader = Cg(parsers.HeadingStart,"level")
-                    * parsers.optionalspace
-                    * (C(parsers.line) / strip_atx_end / parse_inlines)
-                    * Cb("level")
-                    / writer.header
+  if options.header_attributes then
+    larsers.atxHeadLine     = ((parsers.linechar - (parsers.attributes * parsers.newline))^0
+                                / strip_atx_end / parse_inlines
+                              * Cg(parsers.attributes + Ct(""), "attrs"))
+                              * parsers.newline
+    larsers.setextHeadLine  = ((parsers.linechar - (parsers.attributes * parsers.newline))^0 / parse_inlines
+                              * Cg(parsers.attributes + Ct(""), "attrs"))
+                              * parsers.newline
+    -- parse atx header
+    larsers.AtxHeader = Cg(parsers.HeadingStart,"level")
+                        * parsers.optionalspace
+                        * larsers.atxHeadLine
+                        * Cb("level")
+                        * Cb("attrs")
+                        / writer.header
 
-  -- parse setext header
-  larsers.SetextHeader = #(parsers.line * S("=-"))
-                       * Ct(parsers.line / parse_inlines)
-                       * parsers.HeadingLevel
-                       * parsers.optionalspace * parsers.newline
-                       / writer.header
+    -- parse setext header
+    larsers.SetextHeader = #(parsers.line * S("=-"))
+                          * (larsers.setextHeadLine)
+                          * parsers.HeadingLevel
+                          * parsers.optionalspace * parsers.newline
+                          * Cb("attrs")
+                          / writer.header
+  else
+    -- parse atx header
+    larsers.AtxHeader = Cg(parsers.HeadingStart,"level")
+                        * parsers.optionalspace
+                        * (C(parsers.line) / strip_atx_end / parse_inlines)
+                        * Cb("level")
+                        * Ct("")
+                        / writer.header
+
+    -- parse setext header
+    larsers.SetextHeader = #(parsers.line * S("=-"))
+                        * Ct(parsers.line / parse_inlines)
+                        * parsers.HeadingLevel
+                        * parsers.optionalspace * parsers.newline
+                        * Ct("")
+                        / writer.header
+  end
 
   ------------------------------------------------------------------------------
   -- PipeTable

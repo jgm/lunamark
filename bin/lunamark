@@ -355,6 +355,10 @@ environment variable `LUNAMARK_EXTENSIONS` (see ENVIRONMENT below).
 :   Enable the Pandoc `table_captions` syntax extension for
     tables.
 
+`(-) header_attributes`
+:   Headings can be assigned attributes at the end of the line containing
+    the heading text.
+
 # TEMPLATES
 
 By default, lunamark will produce a fragment.  If the
@@ -505,6 +509,7 @@ given in parentheses:
   (-) link_attributes      Link attributes
   (-) pipe_tables          PHP Markdown Extra pipe table support
   (-) table_captions       Table caption syntax extension
+  (-) header_attributes    Header attributes
 The keyword 'all' may also be used, to set all extensions simultaneously.
 Setting the environment variable LUNAMARK_EXTENSIONS can change the
 defaults.
@@ -573,6 +578,7 @@ local extensions = {  -- defaults
   link_attributes = false,
   pipe_tables = false,
   table_captions = false,
+  header_attributes = false,
 }
 
 if optarg["0"] then
