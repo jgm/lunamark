@@ -1,0 +1,12 @@
+lunamark -Xheader_attributes
+<<<
+# Header1 {-}
+
+## Sous-section { #header-2 .myclass lang=fr }
+
+Setext { #header-3 .otherclass lang=en }
+------
+>>>
+<h1 class="unnumbered">Header1</h1>
+<h2 id="header-2" class="myclass" lang="fr">Sous-section</h2>
+<h2 id="header-3" class="otherclass" lang="en">Setext</h2>

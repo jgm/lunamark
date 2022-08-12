@@ -178,7 +178,10 @@ function M.new(options)
     return format == "html" and s or {}
   end
 
-  function Html.header(s,level)
+  function Html.header(s,level,attr)
+    local class = attr.class and attr.class ~= "" and ' class="'..attr.class..'"' or ""
+    local id = attr.id and ' id="'..attr.id..'"' or ""
+    local lang = attr.lang and ' lang="'..attr.lang..'"' or ""
     local sep = ""
     if options.slides or options.containers then
       local lev = (options.slides and 1) or level
@@ -188,7 +191,7 @@ function M.new(options)
       end
       sep = stop .. Html.start_section(lev) .. Html.containersep
     end
-    return {sep, "<h", level, ">", s, "</h", level, ">"}
+    return {sep, "<h", level, id, class, lang, ">", s, "</h", level, ">"}
   end
 
   Html.hrule = "<hr />"

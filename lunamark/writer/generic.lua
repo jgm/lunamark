@@ -244,8 +244,8 @@ function M.new(options)
     return s
   end
 
-  --- Header level `level`, with text `s`.
-  function W.header(s)
+  --- Header with text `s`, level `level` and optional attributes `attr`
+  function W.header(s, _, _)
     return s
   end
 
