@@ -284,6 +284,17 @@ function M.new(options)
     return { "<table>\n", t, "</table>\n" }
   end
 
+  function Html.lineblock(lines)
+    local t = {}
+
+    for i = 1, #lines - 1 do
+      t[#t + 1] = { lines[i], "<br />\n"}
+    end
+    t[#t + 1] = { lines[#lines] }
+
+    return { '<div class="line-block">', t, "</div>" }
+  end
+
   Html.template = [[
 <html>
 <head>

@@ -359,6 +359,19 @@ environment variable `LUNAMARK_EXTENSIONS` (see ENVIRONMENT below).
 :   Headings can be assigned attributes at the end of the line containing
     the heading text.
 
+`(-) line_blocks`
+:   A line block is a sequence of lines beginning with a vertical bar
+    followed by a space. The division into lines will be preserved in the
+    output, as will any leading spaces; otherwise, the lines will be
+    formatted as Markdown.
+
+    Inline formatting (such as emphasis) is allowed
+    in the content, but not block-level formatting (such as block quotes or
+    lists).
+
+    The lines can be hard-wrapped if needed, but the continuation line must
+    begin with a space.
+
 # TEMPLATES
 
 By default, lunamark will produce a fragment.  If the
@@ -510,6 +523,7 @@ given in parentheses:
   (-) pipe_tables          PHP Markdown Extra pipe table support
   (-) table_captions       Table caption syntax extension
   (-) header_attributes    Header attributes
+  (-) line_blocks          Line blocks
 The keyword 'all' may also be used, to set all extensions simultaneously.
 Setting the environment variable LUNAMARK_EXTENSIONS can change the
 defaults.
@@ -579,6 +593,7 @@ local extensions = {  -- defaults
   pipe_tables = false,
   table_captions = false,
   header_attributes = false,
+  line_blocks = false,
 }
 
 if optarg["0"] then

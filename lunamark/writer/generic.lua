@@ -351,6 +351,18 @@ function M.new(options)
     return ""
   end
 
+  --- A line block.
+  -- For each line, the leading spaces in the first inline are changed
+  -- into nbsp (U+00A0) as with Pandoc.
+  function W.lineblock(lines)
+    local t = {}
+    for i = 1, #lines - 1 do
+      t[#t + 1] = { lines[i], "\n" }
+    end
+    t[#t + 1] = lines[#lines]
+    return t
+  end
+
   --- A cosmo template to be used in producing a standalone document.
   -- `$body` is replaced with the document body, `$title` with the
   -- title, and so on.

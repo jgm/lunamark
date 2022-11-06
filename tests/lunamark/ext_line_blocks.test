@@ -1,0 +1,31 @@
+lunamark -Xline_blocks
+<<<
+Line blocks
+
+| The _limerick_ packs laughs anatomical
+| In space that is quite economical.
+|    But the **good** ones I have seen
+|        So seldom are clean
+| And the clean ones so seldom are comical
+
+Line blocks with continuation
+
+| The Right Honorable Most Venerable and Righteous Samuel L.
+  Constable, Jr.
+| 200 Main St.
+| Berkeley,
+ CA 94718
+>>>
+<p>Line blocks</p>
+
+<div class="line-block">The <em>limerick</em> packs laughs anatomical<br />
+In space that is quite economical.<br />
+   But the <strong>good</strong> ones I have seen<br />
+       So seldom are clean<br />
+And the clean ones so seldom are comical</div>
+
+<p>Line blocks with continuation</p>
+
+<div class="line-block">The Right Honorable Most Venerable and Righteous Samuel L. Constable, Jr.<br />
+200 Main St.<br />
+Berkeley, CA 94718</div>
