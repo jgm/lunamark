@@ -1,5 +1,13 @@
 lunamark 0.6.0 (not yet released)
 
+  * Added escaped line breaks (Omikhleia).
+
+  * Added line blocks (Omikhleia).
+
+  * Added header attributes (Omikhleia).
+
+  * Added pipe tables and table captions (Omikhleia, Vít Novotný).
+
   * Added fancy lists, task list and bunch of pandoc extensions (Omikhleia).
 
   * Gracefully ignore unknown HTML character entities (Vít Novotný).
