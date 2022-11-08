@@ -804,6 +804,12 @@ end
 --         The lines can be hard-wrapped if needed, but the continuation line must
 --         begin with a space.
 --
+--     `escaped_line_breaks`
+--     :   When enabled, a backslash followed by a newline is also a hard line
+--         break. This is a nice alternative to Markdown's "invisible" way of
+--         indicating hard line breaks using two trailing spaces at the end of
+--         a line.
+--
 -- *   Returns a converter function that converts a markdown string
 --     using `writer`, returning the parsed document as first result,
 --     and a table containing any extracted metadata as the second
@@ -1107,7 +1113,13 @@ function M.new(writer, options)
                       + larsers.fencestart
                     ) * parsers.spacechar^0 / writer.space
 
-  larsers.Space     = parsers.spacechar^2 * larsers.Endline / writer.linebreak
+  larsers.linebreak = parsers.spacechar^2 * larsers.Endline
+  if options.escaped_line_breaks then
+    larsers.linebreak = larsers.linebreak
+                      + P("\\") * larsers.Endline
+  end
+
+  larsers.Space     = larsers.linebreak / writer.linebreak
                     + parsers.spacechar^1 * larsers.Endline^-1 * parsers.eof /""
                     + parsers.spacechar^1 * larsers.Endline^-1
                                           * parsers.optionalspace / writer.space
@@ -1123,7 +1135,7 @@ function M.new(writer, options)
                     ) * parsers.spacechar^0 / writer.nbsp
 
   larsers.NonbreakingSpace
-                    = parsers.spacechar^2 * larsers.Endline / writer.linebreak
+                    = larsers.linebreak / writer.linebreak
                     + parsers.spacechar^1 * larsers.Endline^-1 * parsers.eof /""
                     + parsers.spacechar^1 * larsers.Endline^-1
                                           * parsers.optionalspace / writer.nbsp
