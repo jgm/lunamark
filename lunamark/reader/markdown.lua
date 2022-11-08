@@ -791,6 +791,19 @@ end
 --     :   Headings can be assigned attributes at the end of the line containing
 --         the heading text.
 --
+--     `line_blocks`
+--     :   A line block is a sequence of lines beginning with a vertical bar
+--         followed by a space. The division into lines will be preserved in the
+--         output, as will any leading spaces; otherwise, the lines will be
+--         formatted as Markdown.
+--
+--         Inline formatting (such as emphasis) is allowed
+--         in the content, but not block-level formatting (such as block quotes or
+--         lists).
+--
+--         The lines can be hard-wrapped if needed, but the continuation line must
+--         begin with a space.
+--
 -- *   Returns a converter function that converts a markdown string
 --     using `writer`, returning the parsed document as first result,
 --     and a table containing any extracted metadata as the second
@@ -1296,6 +1309,19 @@ function M.new(writer, options)
   larsers.Plain        = parsers.nonindentspace * Ct(parsers.Inline^1)
                        / writer.plain
 
+  larsers.LineBlock   = Ct(
+                        (Cs(
+                          ( (parsers.pipe * parsers.space)/""
+                          * ((parsers.space)/entities.char_entity("nbsp"))^0
+                          * parsers.linechar^0 * (parsers.newline/""))
+                          * (-parsers.pipe
+                            * (parsers.space^1/" ")
+                            * parsers.linechar^1
+                            * (parsers.newline/"")
+                            )^0
+                          * (parsers.blankline/"")^0
+                        ) / parse_inlines)^1) / writer.lineblock
+
   ------------------------------------------------------------------------------
   -- Lists (local)
   ------------------------------------------------------------------------------
@@ -1651,6 +1677,7 @@ function M.new(writer, options)
                             + V("Header")
                             + V("DefinitionList")
                             + V("DisplayHtml")
+                            + V("LineBlock")
                             + V("Paragraph")
                             + V("Plain"),
 
@@ -1667,6 +1694,7 @@ function M.new(writer, options)
       DisplayHtml           = larsers.DisplayHtml,
       Paragraph             = larsers.Paragraph,
       PipeTable             = larsers.PipeTable,
+      LineBlock             = larsers.LineBlock,
       Plain                 = larsers.Plain,
 
       Inline                = V("Str")
@@ -1774,6 +1802,10 @@ function M.new(writer, options)
 
   if not options.pipe_tables then
     syntax.PipeTable = parsers.fail
+  end
+
+  if not options.line_blocks then
+    syntax.LineBlock = parsers.fail
   end
 
   if options.alter_syntax and type(options.alter_syntax) == "function" then
