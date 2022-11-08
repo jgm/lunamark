@@ -1,0 +1,6 @@
+lunamark -Xescaped_line_breaks
+<<<
+Escaped hard line\
+breaks
+>>>
+<p>Escaped hard line<br/>breaks</p>

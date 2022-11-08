@@ -372,6 +372,12 @@ environment variable `LUNAMARK_EXTENSIONS` (see ENVIRONMENT below).
     The lines can be hard-wrapped if needed, but the continuation line must
     begin with a space.
 
+`(-) escaped_line_breaks`
+:   When enabled, a backslash followed by a newline is also a hard line
+    break. This is a nice alternative to Markdown's "invisible" way of
+    indicating hard line breaks using two trailing spaces at the end of
+    a line.
+
 # TEMPLATES
 
 By default, lunamark will produce a fragment.  If the
@@ -524,6 +530,7 @@ given in parentheses:
   (-) table_captions       Table caption syntax extension
   (-) header_attributes    Header attributes
   (-) line_blocks          Line blocks
+  (-) escaped_line_breaks  Pandoc-style escaped hard line breaks
 The keyword 'all' may also be used, to set all extensions simultaneously.
 Setting the environment variable LUNAMARK_EXTENSIONS can change the
 defaults.
@@ -594,6 +601,7 @@ local extensions = {  -- defaults
   table_captions = false,
   header_attributes = false,
   line_blocks = false,
+  escaped_line_breaks = false,
 }
 
 if optarg["0"] then
