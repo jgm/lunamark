@@ -7,6 +7,18 @@ Some Div
 ::: {.myclass lang=fr}
 Some better Div
 :::
+
+::: {.level1}
+Fenced Divs can be nested
+
+:::: {.level2}
+This is a nested Div
+::::
+:::
 >>>
 <div>Some Div</div>
 <div class="myclass" lang="fr">Some better Div</div>
+<div class="level1">
+<p>Fenced Divs can be nested</p>
+<div class="level2">This is a nested Div</div>
+</div>

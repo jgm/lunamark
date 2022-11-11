@@ -221,7 +221,7 @@ parsers.inticks     = parsers.openticks * parsers.space^-1
                     * C(parsers.intickschar^1) * parsers.closeticks
 
 -----------------------------------------------------------------------------
--- Parsers used for fenced code blocks
+-- Parsers used for fenced code blocks and fenced divs
 -----------------------------------------------------------------------------
 
 local function captures_geq_length(_,i,a,b)
@@ -232,7 +232,9 @@ parsers.infostring  = (parsers.linechar - (parsers.backtick
                     + parsers.space^1 * parsers.newline))^0
 
 local fenceindent
-parsers.fencehead   = function(char)
+local captures_length_comparator
+parsers.fencehead   = function(char, length_comparator)
+  captures_length_comparator = length_comparator
   return              C(parsers.nonindentspace) / function(s)
                                                     fenceindent = #s
                                                   end
@@ -243,7 +245,7 @@ end
 
 parsers.fencetail   = function(char)
   return              parsers.nonindentspace
-                    * Cmt(C(char^3) * Cb("fencelength"), captures_geq_length)
+                    * Cmt(C(char^3) * Cb("fencelength"), captures_length_comparator)
                     * parsers.optionalspace * (parsers.newline + parsers.eof)
 end
 
@@ -542,18 +544,23 @@ parsers.urlchar = parsers.anyescaped - parsers.newline - parsers.more
 
 parsers.Block        = V("Block")
 
+-- For fenced divs, the closing fence must match the opening fence, since
+-- divs of increasing fence length can be nested.
+-- But for fenced code blocks, "the closing fence must be at least as long as
+-- the opening fence".
+
 parsers.TildeFencedCodeBlock
-                     = parsers.fencehead(parsers.tilde)
+                     = parsers.fencehead(parsers.tilde, captures_geq_length)
                      * Cs(parsers.fencedline(parsers.tilde)^0)
                      * parsers.fencetail(parsers.tilde)
 
 parsers.BacktickFencedCodeBlock
-                     = parsers.fencehead(parsers.backtick)
+                     = parsers.fencehead(parsers.backtick, captures_geq_length)
                      * Cs(parsers.fencedline(parsers.backtick)^0)
                      * parsers.fencetail(parsers.backtick)
 
 parsers.ColonFencedDivBlock
-                     = parsers.fencehead(parsers.colon)
+                     = parsers.fencehead(parsers.colon, captures_equal_length)
                      * Cs(parsers.fencedline(parsers.colon)^0)
                      * parsers.fencetail(parsers.colon)
 
