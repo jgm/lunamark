@@ -1,12 +1,51 @@
 lunamark -Xfenced_divs
 <<<
 :::
-Some Div
+This is not a div
 :::
 
 ::: {.myclass lang=fr}
-Some better Div
+Some better div
 :::
+
+:::: {.level1}
+Fenced divs can be nested
+
+::::: {.level2-more-colons}
+This is a nested div
+:::::
+
+::: {.level2-fewer-colons}
+This is also a nested div that contains
+
+several paragraphs of text
+:::
+
+:::: {.level2-same-number-of-colons}
+This is another nested div
+
+::::: {.level3}
+with another nested div inside
+:::::
+::::
+::::
+
+Here are some extra colons that will be shown as just text:
+
+::::
 >>>
-<div>Some Div</div>
-<div class="myclass" lang="fr">Some better Div</div>
+<p>::: This is not a div :::</p>
+<div class="myclass" lang="fr">Some better div</div>
+<div class="level1">
+<p>Fenced divs can be nested</p>
+<div class="level2-more-colons">This is a nested div</div>
+<div class="level2-fewer-colons">
+<p>This is also a nested div that contains</p>
+several paragraphs of text</div>
+<div class="level2-same-number-of-colons">
+<p>This is another nested div</p>
+<div class="level3">with another nested div inside</div>
+</div>
+</div>
+<p>Here are some extra colons that will be shown as just text:</p>
+<p>::::</p>
