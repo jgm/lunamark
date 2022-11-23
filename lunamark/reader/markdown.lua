@@ -1354,6 +1354,7 @@ function M.new(writer, options)
                        * ( parsers.blankline^1
                          + #parsers.hash
                          + #(parsers.leader * parsers.more * parsers.space^-1)
+                         + #larsers.fenceend
                          )
                        / writer.paragraph
 
