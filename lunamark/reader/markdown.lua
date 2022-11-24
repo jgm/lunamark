@@ -923,15 +923,13 @@ function M.new(writer, options)
 
   larsers.fenced_div_begin = parsers.colon^3
                            * parsers.optionalspace
-                           * parsers.attributes
+                           * Cg(parsers.attributes)
                            * parsers.optionalspace
                            * (parsers.newline + parsers.eof)
-                           / writer.div_begin
 
   larsers.fenced_div_end   = parsers.colon^3
                            * parsers.optionalspace
                            * (parsers.newline + parsers.eof)
-                           / writer.div_end
 
   ------------------------------------------------------------------------------
   -- Parsers used for citations (local)
@@ -1108,24 +1106,6 @@ function M.new(writer, options)
                        + parsers.fencehead(parsers.tilde)
   end
 
-  local div_level = 0
-
-  if not options.fenced_divs then
-    larsers.fenceend = parsers.fail
-  else
-    larsers.fenceend = larsers.fenced_div_end
-                     * Cmt(P(true), function(_, i)
-                         local result
-                         -- check whether we are at top level without decrementing div_level
-                         if div_level <= 0 then
-                           result = nil
-                         else
-                           result = i
-                         end
-                         return result
-                       end)
-  end
-
   larsers.Endline   = parsers.newline * -( -- newline, but not before...
                         parsers.blankline -- paragraph break
                       + parsers.tightblocksep  -- nested list
@@ -1133,7 +1113,6 @@ function M.new(writer, options)
                       + larsers.bqstart
                       + larsers.headerstart
                       + larsers.fencestart
-                      + larsers.fenceend
                     ) * parsers.spacechar^0 / writer.space
 
   larsers.linebreak = parsers.spacechar^2 * larsers.Endline
@@ -1155,7 +1134,6 @@ function M.new(writer, options)
                       + larsers.bqstart
                       + larsers.headerstart
                       + larsers.fencestart
-                      + larsers.fenceend
                     ) * parsers.spacechar^0 / writer.nbsp
 
   larsers.NonbreakingSpace
@@ -1312,27 +1290,14 @@ function M.new(writer, options)
                                                      writer.string(infostring))
                          end
 
-
-  larsers.FencedDivBegin = larsers.fenced_div_begin
-                         * Cmt(P(true), function(_, i)
-                             -- keep track how deep nested we are
-                             div_level = div_level + 1
-                             return i
-                           end)
-
-  larsers.FencedDivEnd   = larsers.fenced_div_end
-                         * Cmt(P(true), function(_, i)
-                             local result
-                             -- check whether we are at top level and decrement
-                             -- div_level otherwise
-                             if div_level <= 0 then
-                               result = nil
-                             else
-                               div_level = div_level - 1
-                               result = i
-                             end
-                             return result
-                           end)
+    larsers.FencedDiv = P{ (larsers.fenced_div_begin)
+                           * C(((parsers.any - (larsers.fenced_div_begin + larsers.fenced_div_end)) + V(1))^0)
+                           * larsers.fenced_div_end } / function (attr, div)
+                                                          -- The \n here are to force paragraphs in the ..div
+                                                          -- Not sure Pandoc would generate Para nodes, rather than
+                                                          -- Plain, though!
+                                                          return parse_blocks("\n"..div.."\n"), attr
+                                                        end / writer.div
 
   -- strip off leading > and indents, and run through blocks
   larsers.Blockquote  = Cs((((parsers.leader * parsers.more * parsers.space^-1)/""
@@ -1354,7 +1319,6 @@ function M.new(writer, options)
                        * ( parsers.blankline^1
                          + #parsers.hash
                          + #(parsers.leader * parsers.more * parsers.space^-1)
-                         + #larsers.fenceend
                          )
                        / writer.paragraph
 
@@ -1721,8 +1685,7 @@ function M.new(writer, options)
                             + V("PipeTable")
                             + V("Verbatim")
                             + V("FencedCodeBlock")
-                            + V("FencedDivBegin")
-                            + V("FencedDivEnd")
+                            + V("FencedDiv")
                             + V("HorizontalRule")
                             + V("TaskList") -- Must have precedence over BulletList
                             + V("BulletList")
@@ -1737,8 +1700,7 @@ function M.new(writer, options)
       Blockquote            = larsers.Blockquote,
       Verbatim              = larsers.Verbatim,
       FencedCodeBlock       = larsers.FencedCodeBlock,
-      FencedDivBegin        = larsers.FencedDivBegin,
-      FencedDivEnd          = larsers.FencedDivEnd,
+      FencedDiv             = larsers.FencedDiv,
       HorizontalRule        = larsers.HorizontalRule,
       TaskList              = larsers.TaskList,
       BulletList            = larsers.BulletList,
@@ -1847,8 +1809,7 @@ function M.new(writer, options)
   end
 
   if not options.fenced_divs then
-    syntax.FencedDivBegin = parsers.fail
-    syntax.FencedDivEnd = parsers.fail
+    syntax.FencedDiv = parsers.fail
   end
 
   if not options.task_list then

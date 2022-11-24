@@ -144,15 +144,13 @@ function M.new(options)
     return {opentag, s, closetag}
   end
 
-  function Html.div_begin(attr)
+  function Html.div(s, attr)
     local class = attr.class and attr.class ~="" and ' class="'..attr.class..'"' or ""
     local id = attr.id and ' id="'..attr.id..'"' or ""
     local lang = attr.lang and ' lang="'..attr.lang..'"' or ""
-    return '<div'..id..class..lang..'>'
-  end
-
-  function Html.div_end()
-    return "</div>"
+    local opentag = '<div'..id..class..lang..'>'
+    local closetag = "</div>"
+    return {opentag, s, closetag}
   end
 
   function Html.blockquote(s)
