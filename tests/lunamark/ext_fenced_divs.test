@@ -64,9 +64,11 @@ This is not a div
 This is not a div
 >>>
 <p>::: This is not a div :::</p>
+
 <div class="myclass" lang="fr">
 <p>Some better div</p>
 </div>
+
 <div class="level1">
 <p>Fenced divs can be nested</p>
 <div class="level2-more-colons">
@@ -83,6 +85,7 @@ This is not a div
 </div>
 </div>
 </div>
+
 <div id="level1">
 <p>This is the beginning of a div</p>
 <blockquote>
@@ -92,6 +95,7 @@ This is a div inside a blockquote
 </div>
 </blockquote>
 </div>
+
 <div id="some-identifier">
 <p>This is the beginning of a div</p>
 <blockquote>
@@ -99,10 +103,13 @@ This is a div inside a blockquote
 </blockquote>
 <p>This is the end of a div</p>
 </div>
+
 <p>Here are some extra colons that will be shown as just text:</p>
 <p>::::</p>
+
 <p>::: {.some-classname} This is not a div</p>
 <pre><code>
 :::
 </code></pre>
+
 <p>::: {.some-classname} This is not a div</p>
