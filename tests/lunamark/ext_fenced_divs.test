@@ -33,6 +33,9 @@ with another nested div inside
 Here are some extra colons that will be shown as just text:
 
 ::::
+
+::: {.some-classname}
+This is not a div
 >>>
 <p>::: This is not a div :::</p>
 <div class="myclass" lang="fr">
@@ -56,3 +59,4 @@ Here are some extra colons that will be shown as just text:
 </div>
 <p>Here are some extra colons that will be shown as just text:</p>
 <p>::::</p>
+<p>::: {.some-classname} This is not a div</p>
