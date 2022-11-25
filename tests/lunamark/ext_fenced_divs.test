@@ -30,6 +30,15 @@ with another nested div inside
 ::::
 ::::
 
+::: {#some-identifier}
+This is the beginning of a div
+
+> This is a blockquote that contains three colons:
+> :::
+
+This is the end of a div
+:::
+
 Here are some extra colons that will be shown as just text:
 
 ::::
@@ -56,6 +65,13 @@ This is not a div
 <p>with another nested div inside</p>
 </div>
 </div>
+</div>
+<div id="some-identifier">
+<p>This is the beginning of a div</p>
+<blockquote>
+<p>This is a blockquote that contains three colons: :::</p>
+</blockquote>
+<p>This is the end of a div</p>
 </div>
 <p>Here are some extra colons that will be shown as just text:</p>
 <p>::::</p>
