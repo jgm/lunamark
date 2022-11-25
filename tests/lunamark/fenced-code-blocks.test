@@ -151,22 +151,17 @@ Info strings for backtick code blocks cannot contain backticks:
 ``` aa ```
 foo
 
-Closing code fences cannot have info strings:
-
-```
-``` aaa
-```
-
 Info strings for tilde code blocks can contain backticks and tildes:
 
 ~~~ aa ``` ~~~
 foo
 ~~~
 
-Info strings for backtick code blocks cannot contain backticks:
+Closing code fences cannot have info strings:
 
-``` aa ```
-foo
+```
+``` aaa
+```
 >>>
 <p>Here is a simple example with backticks:</p>
 
@@ -295,17 +290,12 @@ end
 
 <p><code>aa</code> foo</p>
 
-<p>Closing code fences cannot have info strings:</p>
-
-<pre><code>``` aaa
-</code></pre>
-
 <p>Info strings for tilde code blocks can contain backticks and tildes:</p>
 
 <pre><code class="language-aa">foo
 </code></pre>
 
-<p>Info strings for backtick code blocks cannot contain backticks:</p>
+<p>Closing code fences cannot have info strings:</p>
 
-<p><code>aa</code>
-foo</p>
+<pre><code>``` aaa
+</code></pre>
