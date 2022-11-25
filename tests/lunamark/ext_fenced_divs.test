@@ -30,6 +30,17 @@ with another nested div inside
 ::::
 ::::
 
+::: {.level1}
+This is the beginning of a div
+
+> This is a blockquote
+>
+> ::: {.level2-inside-blockquote}
+> This is a div inside a blockquote
+> :::
+
+:::
+
 ::: {#some-identifier}
 This is the beginning of a div
 
@@ -71,6 +82,15 @@ This is not a div
 <p>with another nested div inside</p>
 </div>
 </div>
+</div>
+<div id="level1">
+<p>This is the beginning of a div</p>
+<blockquote>
+<p>This is a blockquote</p>
+<div id="level2-inside-blockquote">
+This is a div inside a blockquote
+</div>
+</blockquote>
 </div>
 <div id="some-identifier">
 <p>This is the beginning of a div</p>
