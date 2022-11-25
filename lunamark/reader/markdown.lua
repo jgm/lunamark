@@ -228,17 +228,26 @@ local function captures_geq_length(_,i,a,b)
   return #a >= #b and i
 end
 
-parsers.infostring  = (parsers.linechar - (parsers.backtick
-                    + parsers.space^1 * parsers.newline))^0
+parsers.tilde_infostring
+                    = C((parsers.linechar
+                       - ((parsers.spacechar + parsers.backtick + parsers.tilde)^1
+                         * parsers.newline))^0)
+                    * (parsers.spacechar + parsers.backtick + parsers.tilde)^0
+                    * (parsers.newline + parsers.eof)
+
+parsers.backtick_infostring
+                    = C((parsers.linechar - (parsers.backtick
+                       + parsers.spacechar^1 * parsers.newline))^0)
+                    * parsers.optionalspace
+                    * (parsers.newline + parsers.eof)
 
 local fenceindent
-parsers.fencehead   = function(char)
+parsers.fencehead   = function(char, infostring)
   return              C(parsers.nonindentspace) / function(s)
                                                     fenceindent = #s
                                                   end
                     * Cg(char^3, "fencelength")
-                    * parsers.optionalspace * C(parsers.infostring)
-                    * parsers.optionalspace * parsers.newline + parsers.eof
+                    * parsers.optionalspace * infostring
 end
 
 parsers.fencetail   = function(char)
@@ -543,12 +552,14 @@ parsers.urlchar = parsers.anyescaped - parsers.newline - parsers.more
 parsers.Block        = V("Block")
 
 parsers.TildeFencedCodeBlock
-                     = parsers.fencehead(parsers.tilde)
+                     = parsers.fencehead(parsers.tilde,
+                                         parsers.tilde_infostring)
                      * Cs(parsers.fencedline(parsers.tilde)^0)
                      * parsers.fencetail(parsers.tilde)
 
 parsers.BacktickFencedCodeBlock
-                     = parsers.fencehead(parsers.backtick)
+                     = parsers.fencehead(parsers.backtick,
+                                         parsers.backtick_infostring)
                      * Cs(parsers.fencedline(parsers.backtick)^0)
                      * parsers.fencetail(parsers.backtick)
 
@@ -1104,8 +1115,10 @@ function M.new(writer, options)
   if not options.fenced_code_blocks or options.require_blank_before_fenced_code_blocks then
     larsers.fencestart = parsers.fail
   else
-    larsers.fencestart = parsers.fencehead(parsers.backtick)
-                       + parsers.fencehead(parsers.tilde)
+    larsers.fencestart = parsers.fencehead(parsers.backtick,
+                                           parsers.backtick_infostring)
+                       + parsers.fencehead(parsers.tilde,
+                                           parsers.tilde_infostring)
   end
 
   local div_level = 0
