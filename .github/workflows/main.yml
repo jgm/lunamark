@@ -1,6 +1,8 @@
 name: Run unit tests
 on:
   push:
+    branches:
+      - master
   pull_request:
   workflow_dispatch:
 jobs:
@@ -22,19 +24,14 @@ jobs:
   test:
     name: Run unit tests
     runs-on: ubuntu-latest
-    container:
-      image: ubuntu:latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Install additional packages
+      - name: Build docker image
         run: |
           set -ex
-          apt -qy update
-          apt -qy install lua5.1 liblua5.1-dev luarocks tidy build-essential
-          luarocks install diff
-          luarocks install luafilesystem
-      - name: Install Lunamark
-        run: luarocks make
+          export DOCKER_BUILDKIT=1
+          docker build -t jgm/lunamark .
       - name: Run unit tests
-        run: make test
+        run: |
+          docker run --rm -v "$PWD":/mnt -w /mnt --entrypoint /bin/sh jgm/lunamark -c 'make test'
