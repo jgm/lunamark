@@ -2,8 +2,6 @@ ARG FROM=ubuntu:latest
 
 FROM $FROM
 
-ARG ROCKSPEC
-
 ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get -qy update \
@@ -17,7 +15,7 @@ RUN apt-get -qy update \
 
 COPY . /opt/lunamark
 WORKDIR /opt/lunamark
-RUN luarocks make $ROCKSPEC
+RUN make
 
 RUN rm -rf /opt/lunamark \
     apt-qet remove \
