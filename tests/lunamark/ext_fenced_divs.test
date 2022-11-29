@@ -1,4 +1,4 @@
-lunamark -Xfenced_divs -Xfenced_code_blocks
+lunamark -Xfenced_divs,fenced_code_blocks
 <<<
 :::
 This is not a div
