@@ -1305,10 +1305,12 @@ function M.new(writer, options)
 
     larsers.FencedDiv = P{ larsers.fenced_div_begin
                          * C((( parsers.any
-                              - (larsers.fenced_div_begin + larsers.fenced_div_end))
+                              - parsers.newline
+                              * (larsers.fenced_div_begin + larsers.fenced_div_end))
                              + V(1))^0)
+                         * parsers.newline
                          * larsers.fenced_div_end }
-                      / function (attr, div) return parse_blocks(div .. "\n"), attr end
+                      / function (attr, div) return parse_blocks(div .. "\n\n"), attr end
                       / writer.div
 
   -- strip off leading > and indents, and run through blocks
