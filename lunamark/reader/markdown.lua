@@ -1303,14 +1303,13 @@ function M.new(writer, options)
                                                      writer.string(infostring))
                          end
 
-    larsers.FencedDiv = P{ (larsers.fenced_div_begin)
-                           * C(((parsers.any - (larsers.fenced_div_begin + larsers.fenced_div_end)) + V(1))^0)
-                           * larsers.fenced_div_end } / function (attr, div)
-                                                          -- The \n here are to force paragraphs in the ..div
-                                                          -- Not sure Pandoc would generate Para nodes, rather than
-                                                          -- Plain, though!
-                                                          return parse_blocks("\n"..div.."\n"), attr
-                                                        end / writer.div
+    larsers.FencedDiv = P{ larsers.fenced_div_begin
+                         * C((( parsers.any
+                              - (larsers.fenced_div_begin + larsers.fenced_div_end))
+                             + V(1))^0)
+                         * larsers.fenced_div_end }
+                      / function (attr, div) return parse_blocks(div .. "\n"), attr end
+                      / writer.div
 
   -- strip off leading > and indents, and run through blocks
   larsers.Blockquote  = Cs((((parsers.leader * parsers.more * parsers.space^-1)/""
