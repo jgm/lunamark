@@ -108,8 +108,7 @@ This is not a div
 <p>::::</p>
 
 <p>::: {.some-classname} This is not a div</p>
-<pre><code>
-:::
+<pre><code>:::
 </code></pre>
 
 <p>::: {.some-classname} This is not a div</p>
