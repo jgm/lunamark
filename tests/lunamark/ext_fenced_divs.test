@@ -4,9 +4,9 @@ lunamark -Xfenced_divs,fenced_code_blocks
 This is not a div
 :::
 
-::: {.myclass lang=fr}
+ ::: {.myclass lang=fr}
 Some better div
-:::
+  :::
 
 :::: {.level1}
 Fenced divs can be nested

@@ -932,13 +932,15 @@ function M.new(writer, options)
   -- Parsers used for fenced divs (local)
   -----------------------------------------------------------------------------
 
-  larsers.fenced_div_begin = parsers.colon^3
+  larsers.fenced_div_begin = parsers.nonindentspace
+                           * parsers.colon^3
                            * parsers.optionalspace
                            * Cg(parsers.attributes)
                            * parsers.optionalspace
                            * (parsers.newline + parsers.eof)
 
-  larsers.fenced_div_end   = parsers.colon^3
+  larsers.fenced_div_end   = parsers.nonindentspace
+                           * parsers.colon^3
                            * parsers.optionalspace
                            * (parsers.newline + parsers.eof)
 
