@@ -86,12 +86,12 @@ This is not a div
 </div>
 </div>
 
-<div id="level1">
+<div class="level1">
 <p>This is the beginning of a div</p>
 <blockquote>
 <p>This is a blockquote</p>
-<div id="level2-inside-blockquote">
-This is a div inside a blockquote
+<div class="level2-inside-blockquote">
+<p>This is a div inside a blockquote</p>
 </div>
 </blockquote>
 </div>
