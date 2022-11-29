@@ -1303,15 +1303,15 @@ function M.new(writer, options)
                                                      writer.string(infostring))
                          end
 
-    larsers.FencedDiv = P{ larsers.fenced_div_begin
-                         * C((( parsers.any
-                              - parsers.newline
-                              * (larsers.fenced_div_begin + larsers.fenced_div_end))
-                             + V(1))^0)
-                         * parsers.newline
-                         * larsers.fenced_div_end }
-                      / function (attr, div) return parse_blocks(div .. "\n\n"), attr end
-                      / writer.div
+  larsers.FencedDiv = P{ larsers.fenced_div_begin
+                       * C((( parsers.any
+                            - parsers.newline
+                            * (larsers.fenced_div_begin + larsers.fenced_div_end))
+                           + V(1))^0)
+                       * parsers.newline
+                       * larsers.fenced_div_end }
+                    / function (attr, div) return parse_blocks(div .. "\n\n"), attr end
+                    / writer.div
 
   -- strip off leading > and indents, and run through blocks
   larsers.Blockquote  = Cs((((parsers.leader * parsers.more * parsers.space^-1)/""
