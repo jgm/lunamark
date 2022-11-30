@@ -30,6 +30,15 @@ with another nested div inside
 ::::
 ::::
 
+
+::: {.some-classname}
+::: {#some-id}
+::: {lang=some}
+Divs can be nested directly inside one another without surrounding text.
+:::
+:::
+:::
+
 ::: {.level1}
 This is the beginning of a div
 
@@ -82,6 +91,14 @@ This is not a div
 <p>This is another nested div</p>
 <div class="level3">
 <p>with another nested div inside</p>
+</div>
+</div>
+</div>
+
+<div class="some-classname">
+<div id="some-id">
+<div lang="some">
+<p>Divs can be nested directly inside one another without surrounding text.</p>
 </div>
 </div>
 </div>

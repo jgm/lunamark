@@ -1306,11 +1306,16 @@ function M.new(writer, options)
                          end
 
   larsers.FencedDiv = P{ larsers.fenced_div_begin
-                       * C((( parsers.any
-                            - parsers.newline
-                            * (larsers.fenced_div_begin + larsers.fenced_div_end))
-                           + V(1))^0)
-                       * parsers.newline
+                       * C((V(1)
+                           + parsers.newline
+                           + ( parsers.any
+                             - ( larsers.fenced_div_begin
+                               + larsers.fenced_div_end))
+                           * ( parsers.any
+                             - parsers.newline
+                             * ( larsers.fenced_div_begin
+                               + larsers.fenced_div_end))^0
+                           * parsers.newline)^0)
                        * larsers.fenced_div_end }
                     / function (attr, div) return parse_blocks(div .. "\n\n"), attr end
                     / writer.div
