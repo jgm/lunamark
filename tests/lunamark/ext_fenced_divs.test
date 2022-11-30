@@ -63,6 +63,11 @@ Here are some extra colons that will be shown as just text:
 
 ::::
 
+::: {.not-a-div}
+here is a code span `
+:::
+` that contains three colons
+
 ::: {.some-classname}
 This is a div with a fenced code inside
 
@@ -131,6 +136,8 @@ This is not a div
 
 <p>Here are some extra colons that will be shown as just text:</p>
 <p>::::</p>
+
+<p>::: {.not-a-div} here is a code span <code>:::</code> that contains three colons</p>
 
 <div class="some-classname">
 <p>This is a div with a fenced code inside</p>
