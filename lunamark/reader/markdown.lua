@@ -1121,6 +1121,20 @@ function M.new(writer, options)
                                            parsers.tilde_infostring)
   end
 
+  if options.fenced_divs then
+    local function check_div_level(s, i, current_level) -- luacheck: ignore s i
+      current_level = tonumber(current_level)
+      return current_level > 0
+    end
+
+    local is_inside_div = Cmt(Cb("div_level"), check_div_level)
+
+    larsers.fencestart = larsers.fencestart
+                       + is_inside_div  -- break out of a paragraph when we
+                                        -- are inside a div and see a closing tag
+                       * larsers.fenced_div_end
+  end
+
   larsers.Endline   = parsers.newline * -( -- newline, but not before...
                         parsers.blankline -- paragraph break
                       + parsers.tightblocksep  -- nested list
@@ -1305,19 +1319,27 @@ function M.new(writer, options)
                                                      writer.string(infostring))
                          end
 
-  larsers.FencedDiv = P{ larsers.fenced_div_begin
-                       * C((V(1)
-                           + parsers.newline
-                           + ( parsers.any
-                             - ( larsers.fenced_div_begin
-                               + larsers.fenced_div_end))
-                           * ( parsers.any
-                             - parsers.newline
-                             * ( larsers.fenced_div_begin
-                               + larsers.fenced_div_end))^0
-                           * parsers.newline)^0)
-                       * larsers.fenced_div_end }
-                    / function (attr, div) return parse_blocks(div .. "\n\n"), attr end
+  local function increment_div_level(increment)
+    local function update_div_level(s, i, current_level) -- luacheck: ignore s i
+      current_level = tonumber(current_level)
+      local next_level = tostring(current_level + increment)
+      return true, next_level
+    end
+
+    return Cg( Cmt(Cb("div_level"), update_div_level)
+             , "div_level")
+  end
+
+  larsers.FencedDiv = larsers.fenced_div_begin * increment_div_level(1)
+                    * parsers.blanklines
+                    * Ct( (V("Block") - larsers.fenced_div_end)^-1
+                        * (parsers.blanklines / function()
+                                              return writer.interblocksep
+                                            end
+                          * (V("Block") - larsers.fenced_div_end))^0)
+                    * parsers.blanklines
+                    * larsers.fenced_div_end * increment_div_level(-1)
+                    / function (attr, div) return div, attr end
                     / writer.div
 
   -- strip off leading > and indents, and run through blocks
@@ -1693,7 +1715,8 @@ function M.new(writer, options)
   local syntax =
     { "Blocks",
 
-      Blocks                = larsers.Blank^0 * parsers.Block^-1
+      Blocks                = Cg(Ct("") / "0", "div_level") -- initialize div_level to 0
+                            * larsers.Blank^0 * parsers.Block^-1
                             * (larsers.Blank^0 / function()
                                                    return writer.interblocksep
                                                  end

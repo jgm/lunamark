@@ -87,32 +87,23 @@ This is not a div
 >>>
 <p>::: This is not a div :::</p>
 
-<div class="myclass" lang="fr">
-<p>Some better div</p>
-</div>
+<div class="myclass" lang="fr">Some better div</div>
 
 <div class="level1">
 <p>Fenced divs can be nested</p>
-<div class="level2-more-colons">
-<p>This is a nested div</p>
-</div>
+<div class="level2-more-colons">This is a nested div</div>
 <div class="level2-fewer-colons">
 <p>This is also a nested div that contains</p>
-<p>several paragraphs of text</p>
-</div>
+several paragraphs of text</div>
 <div class="level2-same-number-of-colons">
 <p>This is another nested div</p>
-<div class="level3">
-<p>with another nested div inside</p>
-</div>
+<div class="level3">with another nested div inside</div>
 </div>
 </div>
 
 <div class="some-classname">
 <div id="some-id">
-<div lang="some">
-<p>Divs can be nested directly inside one another without surrounding text.</p>
-</div>
+<div lang="some">Divs can be nested directly inside one another without surrounding text.</div>
 </div>
 </div>
 
@@ -120,9 +111,7 @@ This is not a div
 <p>This is the beginning of a div</p>
 <blockquote>
 <p>This is a blockquote</p>
-<div class="level2-inside-blockquote">
-<p>This is a div inside a blockquote</p>
-</div>
+<div class="level2-inside-blockquote">This is a div inside a blockquote</div>
 </blockquote>
 </div>
 
@@ -131,8 +120,7 @@ This is not a div
 <blockquote>
 <p>This is a blockquote that contains three colons: :::</p>
 </blockquote>
-<p>This is the end of a div</p>
-</div>
+This is the end of a div</div>
 
 <p>Here are some extra colons that will be shown as just text:</p>
 <p>::::</p>
@@ -145,7 +133,7 @@ This is not a div
 </code></pre>
 </div>
 
-<p>::: {.some-classname} This is not a div</p>
+::: {.some-classname} This is not a div
 <pre><code>:::
 </code></pre>
 
