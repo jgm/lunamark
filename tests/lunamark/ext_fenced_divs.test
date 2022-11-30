@@ -64,6 +64,14 @@ Here are some extra colons that will be shown as just text:
 ::::
 
 ::: {.some-classname}
+This is a div with a fenced code inside
+
+```
+:::
+```
+:::
+
+::: {.some-classname}
 This is not a div
 ```
 :::
@@ -123,6 +131,12 @@ This is not a div
 
 <p>Here are some extra colons that will be shown as just text:</p>
 <p>::::</p>
+
+<div class="some-classname">
+<p>This is a div with a fenced code inside</p>
+<pre><code>:::
+</code></pre>
+</div>
 
 <p>::: {.some-classname} This is not a div</p>
 <pre><code>:::
