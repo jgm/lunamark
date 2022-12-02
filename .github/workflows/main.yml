@@ -1,4 +1,4 @@
-name: Run unit tests
+name: Run luacheck and unit tests
 on:
   push:
     branches:
