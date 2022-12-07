@@ -1331,13 +1331,13 @@ function M.new(writer, options)
   end
 
   larsers.FencedDiv = larsers.fenced_div_begin * increment_div_level(1)
-                    * parsers.blanklines
+                    * parsers.skipblanklines
                     * Ct( (V("Block") - larsers.fenced_div_end)^-1
                         * (parsers.blanklines / function()
                                               return writer.interblocksep
                                             end
                           * (V("Block") - larsers.fenced_div_end))^0)
-                    * parsers.blanklines
+                    * parsers.skipblanklines
                     * larsers.fenced_div_end * increment_div_level(-1)
                     / function (attr, div) return div, attr end
                     / writer.div
