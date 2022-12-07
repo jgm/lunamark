@@ -1709,13 +1709,19 @@ function M.new(writer, options)
                   / writer.table
 
   ------------------------------------------------------------------------------
+  -- Parser state initialization
+  ------------------------------------------------------------------------------
+
+  larsers.InitializeState = Cg(Ct("") / "0", "div_level") -- initialize named groups
+
+  ------------------------------------------------------------------------------
   -- Syntax specification
   ------------------------------------------------------------------------------
 
   local syntax =
     { "Blocks",
 
-      Blocks                = Cg(Ct("") / "0", "div_level") -- initialize div_level to 0
+      Blocks                = larsers.InitializeState
                             * larsers.Blank^0 * parsers.Block^-1
                             * (larsers.Blank^0 / function()
                                                    return writer.interblocksep
@@ -1876,7 +1882,10 @@ function M.new(writer, options)
 
   local inlines_t = util.table_copy(syntax)
   inlines_t[1] = "Inlines"
-  inlines_t.Inlines = parsers.Inline^0 * (parsers.spacing^0 * parsers.eof / "")
+  inlines_t.Inlines = larsers.InitializeState
+                    * parsers.Inline^0
+                    * (parsers.spacing^0
+                      * parsers.eof / "")
   larsers.inlines = Ct(inlines_t)
 
   local inlines_no_link_t = util.table_copy(inlines_t)
