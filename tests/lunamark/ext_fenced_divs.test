@@ -1,12 +1,12 @@
-lunamark -Xfenced_divs
+lunamark -Xfenced_divs,fenced_code_blocks
 <<<
 :::
 This is not a div
 :::
 
-::: {.myclass lang=fr}
+ ::: {.myclass lang=fr}
 Some better div
-:::
+  :::
 
 :::: {.level1}
 Fenced divs can be nested
@@ -30,29 +30,126 @@ with another nested div inside
 ::::
 ::::
 
+::: {.some-classname}
+::: {#some-id}
+::: {lang=some}
+Divs can be nested directly inside one another without surrounding text.
+:::
+:::
+:::
+
+::: {.level1}
+This is the beginning of a div
+
+> This is a blockquote
+>
+> ::: {.level2-inside-blockquote}
+> This is a div inside a blockquote
+> :::
+
+:::
+
+::: {#some-identifier}
+This is the beginning of a div
+
+> This is a blockquote that contains three colons:
+> :::
+
+This is the end of a div
+:::
+
 Here are some extra colons that will be shown as just text:
 
 ::::
+
+::: {.not-a-div}
+here is a code span `
+:::
+` that contains three colons
+
+::: {.some-classname}
+This is a div with a fenced code inside
+
+```
+:::
+```
+:::
+
+::: {.cit custom-style=raggedleft}
+I am a _fenced_ div
+:::
+
+::: {.cit custom-style=raggedleft}
+
+I am a _fenced_ div
+
+:::
+
+::: {.some-classname}
+This is not a div
+```
+:::
+```
+
+::: {.some-classname}
+This is not a div
 >>>
 <p>::: This is not a div :::</p>
-<div class="myclass" lang="fr">
-<p>Some better div</p>
-</div>
+
+<div class="myclass" lang="fr">Some better div</div>
+
 <div class="level1">
 <p>Fenced divs can be nested</p>
-<div class="level2-more-colons">
-<p>This is a nested div</p>
-</div>
+<div class="level2-more-colons">This is a nested div</div>
 <div class="level2-fewer-colons">
 <p>This is also a nested div that contains</p>
-<p>several paragraphs of text</p>
-</div>
+several paragraphs of text</div>
 <div class="level2-same-number-of-colons">
 <p>This is another nested div</p>
-<div class="level3">
-<p>with another nested div inside</p>
+<div class="level3">with another nested div inside</div>
 </div>
 </div>
+
+<div class="some-classname">
+<div id="some-id">
+<div lang="some">Divs can be nested directly inside one another without surrounding text.</div>
 </div>
+</div>
+
+<div class="level1">
+<p>This is the beginning of a div</p>
+<blockquote>
+<p>This is a blockquote</p>
+<div class="level2-inside-blockquote">This is a div inside a blockquote</div>
+</blockquote>
+</div>
+
+<div id="some-identifier">
+<p>This is the beginning of a div</p>
+<blockquote>
+<p>This is a blockquote that contains three colons: :::</p>
+</blockquote>
+This is the end of a div</div>
+
 <p>Here are some extra colons that will be shown as just text:</p>
 <p>::::</p>
+
+<p>::: {.not-a-div} here is a code span <code>:::</code> that contains three colons</p>
+
+<div class="some-classname">
+<p>This is a div with a fenced code inside</p>
+<pre><code>:::
+</code></pre>
+</div>
+
+<div class="cit">I am a <em>fenced</em> div</div>
+
+<div class="cit">
+<p>I am a <em>fenced</em> div</p>
+</div>
+
+::: {.some-classname} This is not a div
+<pre><code>:::
+</code></pre>
+
+<p>::: {.some-classname} This is not a div</p>

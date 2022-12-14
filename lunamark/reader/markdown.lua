@@ -932,17 +932,17 @@ function M.new(writer, options)
   -- Parsers used for fenced divs (local)
   -----------------------------------------------------------------------------
 
-  larsers.fenced_div_begin = parsers.colon^3
+  larsers.fenced_div_begin = parsers.nonindentspace
+                           * parsers.colon^3
                            * parsers.optionalspace
-                           * parsers.attributes
+                           * Cg(parsers.attributes)
                            * parsers.optionalspace
                            * (parsers.newline + parsers.eof)
-                           / writer.div_begin
 
-  larsers.fenced_div_end   = parsers.colon^3
+  larsers.fenced_div_end   = parsers.nonindentspace
+                           * parsers.colon^3
                            * parsers.optionalspace
                            * (parsers.newline + parsers.eof)
-                           / writer.div_end
 
   ------------------------------------------------------------------------------
   -- Parsers used for citations (local)
@@ -1121,22 +1121,18 @@ function M.new(writer, options)
                                            parsers.tilde_infostring)
   end
 
-  local div_level = 0
+  if options.fenced_divs then
+    local function check_div_level(s, i, current_level) -- luacheck: ignore s i
+      current_level = tonumber(current_level)
+      return current_level > 0
+    end
 
-  if not options.fenced_divs then
-    larsers.fenceend = parsers.fail
-  else
-    larsers.fenceend = larsers.fenced_div_end
-                     * Cmt(P(true), function(_, i)
-                         local result
-                         -- check whether we are at top level without decrementing div_level
-                         if div_level <= 0 then
-                           result = nil
-                         else
-                           result = i
-                         end
-                         return result
-                       end)
+    local is_inside_div = Cmt(Cb("div_level"), check_div_level)
+
+    larsers.fencestart = larsers.fencestart
+                       + is_inside_div  -- break out of a paragraph when we
+                                        -- are inside a div and see a closing tag
+                       * larsers.fenced_div_end
   end
 
   larsers.Endline   = parsers.newline * -( -- newline, but not before...
@@ -1146,7 +1142,6 @@ function M.new(writer, options)
                       + larsers.bqstart
                       + larsers.headerstart
                       + larsers.fencestart
-                      + larsers.fenceend
                     ) * parsers.spacechar^0 / writer.space
 
   larsers.linebreak = parsers.spacechar^2 * larsers.Endline
@@ -1168,7 +1163,6 @@ function M.new(writer, options)
                       + larsers.bqstart
                       + larsers.headerstart
                       + larsers.fencestart
-                      + larsers.fenceend
                     ) * parsers.spacechar^0 / writer.nbsp
 
   larsers.NonbreakingSpace
@@ -1325,27 +1319,28 @@ function M.new(writer, options)
                                                      writer.string(infostring))
                          end
 
+  local function increment_div_level(increment)
+    local function update_div_level(s, i, current_level) -- luacheck: ignore s i
+      current_level = tonumber(current_level)
+      local next_level = tostring(current_level + increment)
+      return true, next_level
+    end
 
-  larsers.FencedDivBegin = larsers.fenced_div_begin
-                         * Cmt(P(true), function(_, i)
-                             -- keep track how deep nested we are
-                             div_level = div_level + 1
-                             return i
-                           end)
+    return Cg( Cmt(Cb("div_level"), update_div_level)
+             , "div_level")
+  end
 
-  larsers.FencedDivEnd   = larsers.fenced_div_end
-                         * Cmt(P(true), function(_, i)
-                             local result
-                             -- check whether we are at top level and decrement
-                             -- div_level otherwise
-                             if div_level <= 0 then
-                               result = nil
-                             else
-                               div_level = div_level - 1
-                               result = i
-                             end
-                             return result
-                           end)
+  larsers.FencedDiv = larsers.fenced_div_begin * increment_div_level(1)
+                    * parsers.skipblanklines
+                    * Ct( (V("Block") - larsers.fenced_div_end)^-1
+                        * (parsers.blanklines / function()
+                                              return writer.interblocksep
+                                            end
+                          * (V("Block") - larsers.fenced_div_end))^0)
+                    * parsers.skipblanklines
+                    * larsers.fenced_div_end * increment_div_level(-1)
+                    / function (attr, div) return div, attr end
+                    / writer.div
 
   -- strip off leading > and indents, and run through blocks
   larsers.Blockquote  = Cs((((parsers.leader * parsers.more * parsers.space^-1)/""
@@ -1367,7 +1362,6 @@ function M.new(writer, options)
                        * ( parsers.blankline^1
                          + #parsers.hash
                          + #(parsers.leader * parsers.more * parsers.space^-1)
-                         + #larsers.fenceend
                          )
                        / writer.paragraph
 
@@ -1715,13 +1709,20 @@ function M.new(writer, options)
                   / writer.table
 
   ------------------------------------------------------------------------------
+  -- Parser state initialization
+  ------------------------------------------------------------------------------
+
+  larsers.InitializeState = Cg(Ct("") / "0", "div_level") -- initialize named groups
+
+  ------------------------------------------------------------------------------
   -- Syntax specification
   ------------------------------------------------------------------------------
 
   local syntax =
     { "Blocks",
 
-      Blocks                = larsers.Blank^0 * parsers.Block^-1
+      Blocks                = larsers.InitializeState
+                            * larsers.Blank^0 * parsers.Block^-1
                             * (larsers.Blank^0 / function()
                                                    return writer.interblocksep
                                                  end
@@ -1734,8 +1735,7 @@ function M.new(writer, options)
                             + V("PipeTable")
                             + V("Verbatim")
                             + V("FencedCodeBlock")
-                            + V("FencedDivBegin")
-                            + V("FencedDivEnd")
+                            + V("FencedDiv")
                             + V("HorizontalRule")
                             + V("TaskList") -- Must have precedence over BulletList
                             + V("BulletList")
@@ -1750,8 +1750,7 @@ function M.new(writer, options)
       Blockquote            = larsers.Blockquote,
       Verbatim              = larsers.Verbatim,
       FencedCodeBlock       = larsers.FencedCodeBlock,
-      FencedDivBegin        = larsers.FencedDivBegin,
-      FencedDivEnd          = larsers.FencedDivEnd,
+      FencedDiv             = larsers.FencedDiv,
       HorizontalRule        = larsers.HorizontalRule,
       TaskList              = larsers.TaskList,
       BulletList            = larsers.BulletList,
@@ -1860,8 +1859,7 @@ function M.new(writer, options)
   end
 
   if not options.fenced_divs then
-    syntax.FencedDivBegin = parsers.fail
-    syntax.FencedDivEnd = parsers.fail
+    syntax.FencedDiv = parsers.fail
   end
 
   if not options.task_list then
@@ -1884,7 +1882,10 @@ function M.new(writer, options)
 
   local inlines_t = util.table_copy(syntax)
   inlines_t[1] = "Inlines"
-  inlines_t.Inlines = parsers.Inline^0 * (parsers.spacing^0 * parsers.eof / "")
+  inlines_t.Inlines = larsers.InitializeState
+                    * parsers.Inline^0
+                    * (parsers.spacing^0
+                      * parsers.eof / "")
   larsers.inlines = Ct(inlines_t)
 
   local inlines_no_link_t = util.table_copy(inlines_t)

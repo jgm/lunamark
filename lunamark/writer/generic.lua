@@ -255,12 +255,8 @@ function M.new(options)
   end
 
   -- (Block) Div with attributes `attr`
-  function W.div_begin(_)
-    return {}
-  end
-
-  function W.div_end()
-    return {}
+  function W.div(s)
+    return s
   end
 
   --- Inline raw code, with format and
