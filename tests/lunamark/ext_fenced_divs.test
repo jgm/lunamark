@@ -30,7 +30,6 @@ with another nested div inside
 ::::
 ::::
 
-
 ::: {.some-classname}
 ::: {#some-id}
 ::: {lang=some}
@@ -74,6 +73,16 @@ This is a div with a fenced code inside
 ```
 :::
 ```
+:::
+
+::: {.cit custom-style=raggedleft}
+I am a _fenced_ div
+:::
+
+::: {.cit custom-style=raggedleft}
+
+I am a _fenced_ div
+
 :::
 
 ::: {.some-classname}
@@ -131,6 +140,12 @@ This is the end of a div</div>
 <p>This is a div with a fenced code inside</p>
 <pre><code>:::
 </code></pre>
+</div>
+
+<div class="cit">I am a <em>fenced</em> div</div>
+
+<div class="cit">
+<p>I am a <em>fenced</em> div</p>
 </div>
 
 ::: {.some-classname} This is not a div
