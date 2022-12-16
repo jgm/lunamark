@@ -30,6 +30,14 @@ with another nested div inside
 ::::
 ::::
 
+::: Warning ::::::
+This is a warning.
+
+::: Danger
+This is a warning within a warning.
+:::
+::::::::::::::::::
+
 ::: {.some-classname}
 ::: {#some-id}
 ::: {lang=some}
@@ -108,6 +116,11 @@ several paragraphs of text</div>
 <p>This is another nested div</p>
 <div class="level3">with another nested div inside</div>
 </div>
+</div>
+
+<div class="Warning">
+<p>This is a warning.</p>
+<div class="Danger">This is a warning within a warning.</div>
 </div>
 
 <div class="some-classname">
