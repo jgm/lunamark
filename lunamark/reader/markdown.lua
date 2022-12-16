@@ -173,8 +173,8 @@ parsers.attributes  = P("{") * parsers.optionalspace
                       / function (hashid, classes, attr)
                           attr.id = hashid ~= "" and hashid or nil
                           attr.class = table.concat(classes or {}, " ")
-                            return attr
-                          end
+                          return attr
+                        end
 -- Raw attributes similar to Pandoc (=format key=value key2="value 2")
 parsers.raw              = parsers.equal * C((parsers.identifier)^1) * parsers.optionalspace
 parsers.rawattributes    = P("{") * parsers.optionalspace
@@ -262,6 +262,29 @@ parsers.fencedline  = function(char)
                         return s:gsub("^" .. string.rep(" ?", fenceindent), "")
                        end
 end
+
+------------------------------------------------------------------------------
+-- Parsers used for fenced divs
+------------------------------------------------------------------------------
+
+parsers.fenced_div_infostring
+                         = C((parsers.linechar
+                            - ( parsers.spacechar^1
+                              * parsers.colon^1))^1)
+
+parsers.fenced_div_begin = parsers.nonindentspace
+                         * parsers.colon^3
+                         * parsers.optionalspace
+                         * parsers.fenced_div_infostring
+                         * ( parsers.spacechar^1
+                           * parsers.colon^1)^0
+                         * parsers.optionalspace
+                         * (parsers.newline + parsers.eof)
+
+parsers.fenced_div_end   = parsers.nonindentspace
+                         * parsers.colon^3
+                         * parsers.optionalspace
+                         * (parsers.newline + parsers.eof)
 
 -----------------------------------------------------------------------------
 -- Parsers used for markdown tags and links
@@ -928,22 +951,6 @@ function M.new(writer, options)
                      + parsers.space * parsers.space * C(larsers.dig^1
                                      * larsers.numdelim) * #parsers.spacing
 
-  -----------------------------------------------------------------------------
-  -- Parsers used for fenced divs (local)
-  -----------------------------------------------------------------------------
-
-  larsers.fenced_div_begin = parsers.nonindentspace
-                           * parsers.colon^3
-                           * parsers.optionalspace
-                           * Cg(parsers.attributes)
-                           * parsers.optionalspace
-                           * (parsers.newline + parsers.eof)
-
-  larsers.fenced_div_end   = parsers.nonindentspace
-                           * parsers.colon^3
-                           * parsers.optionalspace
-                           * (parsers.newline + parsers.eof)
-
   ------------------------------------------------------------------------------
   -- Parsers used for citations (local)
   ------------------------------------------------------------------------------
@@ -1132,7 +1139,7 @@ function M.new(writer, options)
     larsers.fencestart = larsers.fencestart
                        + is_inside_div  -- break out of a paragraph when we
                                         -- are inside a div and see a closing tag
-                       * larsers.fenced_div_end
+                       * parsers.fenced_div_end
   end
 
   larsers.Endline   = parsers.newline * -( -- newline, but not before...
@@ -1330,16 +1337,22 @@ function M.new(writer, options)
              , "div_level")
   end
 
-  larsers.FencedDiv = larsers.fenced_div_begin * increment_div_level(1)
+  larsers.FencedDiv = parsers.fenced_div_begin * increment_div_level(1)
                     * parsers.skipblanklines
-                    * Ct( (V("Block") - larsers.fenced_div_end)^-1
+                    * Ct( (V("Block") - parsers.fenced_div_end)^-1
                         * (parsers.blanklines / function()
                                               return writer.interblocksep
                                             end
-                          * (V("Block") - larsers.fenced_div_end))^0)
+                          * (V("Block") - parsers.fenced_div_end))^0)
                     * parsers.skipblanklines
-                    * larsers.fenced_div_end * increment_div_level(-1)
-                    / function (attr, div) return div, attr end
+                    * parsers.fenced_div_end * increment_div_level(-1)
+                    / function (infostring, div)
+                        local attr = lpeg.match(Cg(parsers.attributes), infostring)
+                        if attr == nil then
+                          attr = {class=infostring}
+                        end
+                        return div, attr
+                      end
                     / writer.div
 
   -- strip off leading > and indents, and run through blocks
