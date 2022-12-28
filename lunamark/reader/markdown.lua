@@ -1136,10 +1136,14 @@ function M.new(writer, options)
 
     local is_inside_div = Cmt(Cb("div_level"), check_div_level)
 
+    larsers.fenced_div_out = is_inside_div  -- break out of a paragraph when we
+                                            -- are inside a div and see a closing tag
+                           * parsers.fenced_div_end
+
     larsers.fencestart = larsers.fencestart
-                       + is_inside_div  -- break out of a paragraph when we
-                                        -- are inside a div and see a closing tag
-                       * parsers.fenced_div_end
+                       + larsers.fenced_div_out
+  else
+    larsers.fenced_div_out = parsers.fail
   end
 
   larsers.Endline   = parsers.newline * -( -- newline, but not before...
@@ -1359,7 +1363,7 @@ function M.new(writer, options)
   larsers.Blockquote  = Cs((((parsers.leader * parsers.more * parsers.space^-1)/""
                              * parsers.linechar^0 * parsers.newline)^1
                             * (-(parsers.leader * parsers.more
-                                + parsers.blankline) * parsers.linechar^1
+                                + parsers.blankline + larsers.fenced_div_out) * parsers.linechar^1
                               * parsers.newline)^0 * parsers.blankline^0
                            )^1) / parse_blocks / writer.blockquote
 
