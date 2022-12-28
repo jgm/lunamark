@@ -66,6 +66,11 @@ This is the beginning of a div
 This is the end of a div
 :::
 
+::: {#another-identifier}
+> This is a blockquote immediately in a
+> div
+:::
+
 Here are some extra colons that will be shown as just text:
 
 ::::
@@ -143,6 +148,10 @@ several paragraphs of text</div>
 <p>This is a blockquote that contains three colons: :::</p>
 </blockquote>
 This is the end of a div</div>
+
+<div id="another-identifier">
+<blockquote>This is a blockquote immediately in a div</blockquote>
+</div>
 
 <p>Here are some extra colons that will be shown as just text:</p>
 <p>::::</p>
