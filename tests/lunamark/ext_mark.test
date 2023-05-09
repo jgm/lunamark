@@ -1,0 +1,5 @@
+lunamark -Xmark
+<<<
+Some ==highlighted text==.
+>>>
+<p>Some <span class="mark">highlighted text</span>.</p>
