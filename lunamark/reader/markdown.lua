@@ -1363,7 +1363,8 @@ function M.new(writer, options)
   larsers.Blockquote  = Cs((((parsers.leader * parsers.more * parsers.space^-1)/""
                              * parsers.linechar^0 * parsers.newline)^1
                             * (-(parsers.leader * parsers.more
-                                + parsers.blankline + larsers.fenced_div_out) * parsers.linechar^1
+                                + parsers.blankline
+                                + larsers.fenced_div_out) * parsers.linechar^1
                               * parsers.newline)^0 * parsers.blankline^0
                            )^1) / parse_blocks / writer.blockquote
 
