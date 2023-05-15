@@ -83,6 +83,11 @@ This is a div with a fenced code inside
 ```
 :::
 
+::: {#another-identifier}
+> This is a blockquote immediately in a
+> div
+:::
+
 ::: {.cit custom-style=raggedleft}
 I am a _fenced_ div
 :::
@@ -153,6 +158,10 @@ This is the end of a div</div>
 <p>This is a div with a fenced code inside</p>
 <pre><code>:::
 </code></pre>
+</div>
+
+<div id="another-identifier">
+<blockquote>This is a blockquote immediately in a div</blockquote>
 </div>
 
 <div class="cit">I am a <em>fenced</em> div</div>
