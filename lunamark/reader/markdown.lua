@@ -1344,11 +1344,9 @@ function M.new(writer, options)
   larsers.FencedDiv = parsers.fenced_div_begin * increment_div_level(1)
                     * parsers.skipblanklines
                     * Ct( (V("Block") - parsers.fenced_div_end)^-1
-                        * (parsers.blanklines / function()
-                                              return writer.interblocksep
-                                            end
+                        * ( V("Blank")^0 / writer.interblocksep
                           * (V("Block") - parsers.fenced_div_end))^0)
-                    * parsers.skipblanklines
+                    * V("Blank")^0
                     * parsers.fenced_div_end * increment_div_level(-1)
                     / function (infostring, div)
                         local attr = lpeg.match(Cg(parsers.attributes), infostring)
