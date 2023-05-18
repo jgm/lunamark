@@ -94,7 +94,9 @@ I am a _fenced_ div
 
 ::: {.cit custom-style=raggedleft}
 
-I am a _fenced_ div
+I am a _fenced_ div with [a reference][1]
+
+ [1]: https://foo.bar/
 
 :::
 
@@ -167,7 +169,7 @@ This is the end of a div</div>
 <div class="cit">I am a <em>fenced</em> div</div>
 
 <div class="cit">
-<p>I am a <em>fenced</em> div</p>
+<p>I am a <em>fenced</em> div with <a href="https://foo.bar/">a reference</a></p>
 </div>
 
 ::: {.some-classname} This is not a div
