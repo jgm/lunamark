@@ -164,7 +164,7 @@ parsers.attrvalue   = (parsers.dquote
                       * parsers.squote)
                     + C((parsers.anyescaped - parsers.dquote - parsers.space - P("}"))^1)
 
-parsers.attrpair    = Cg(C((parsers.attrid)^1)
+parsers.attrpair    = Cg(C(parsers.attrid)
                       * parsers.optionalspace * parsers.equal * parsers.optionalspace
                       * parsers.attrvalue)
                       * parsers.optionalspace^-1
