@@ -1,4 +1,4 @@
-lunamark -Xfenced_divs,fenced_code_blocks
+lunamark -Xfenced_divs,fenced_code_blocks,notes
 <<<
 :::
 This is not a div
@@ -100,6 +100,14 @@ I am a _fenced_ div with [a reference][1]
 
 :::
 
+::: {.cit custom-style=raggedleft}
+
+I am a _fenced_ div with a note[^1]
+
+ [^1]: This is a note.
+
+:::
+
 ::: {.some-classname}
 This is not a div
 ```
@@ -172,8 +180,20 @@ This is the end of a div</div>
 <p>I am a <em>fenced</em> div with <a href="https://foo.bar/">a reference</a></p>
 </div>
 
+<div class="cit">
+<p>I am a <em>fenced</em> div with a note<sup><a href="#fn1" class="footnoteRef" id="fnref1">1</a></sup></p>
+</div>
+
 ::: {.some-classname} This is not a div
 <pre><code>:::
 </code></pre>
 
 <p>::: {.some-classname} This is not a div</p>
+
+<hr>
+
+<ol class="notes">
+<li id="fn1">
+<p>This is a note. <a href="#fnref1" class="footnoteBackLink">↩</a></p>
+</li>
+</ol>
