@@ -1203,12 +1203,11 @@ function M.new(writer, options)
                                    parsers.doubletildes)
                    ) / writer.strikeout
 
-  larsers.Mark
-                 = ( parsers.between(parsers.Inline, parsers.doubleequals,
-                                   parsers.doubleequals)
-                   ) / function (inlines)
-                        return writer.span(inlines, { class="mark" })
-                       end
+  larsers.Mark = parsers.between(parsers.Inline, parsers.doubleequals,
+                                 parsers.doubleequals)
+               / function (inlines)
+                   return writer.span(inlines, { class="mark" })
+                 end
 
   larsers.Span   = ( parsers.between(parsers.Inline, parsers.lbracket,
                                    parsers.rbracket) ) * ( parsers.attributes )
