@@ -281,6 +281,10 @@ environment variable `LUNAMARK_EXTENSIONS` (see ENVIRONMENT below).
 :   Enable strike-through support for a text enclosed within double
     tildes, as in `~~deleted~~`.
 
+`(-) mark`
+:   Enable highlighting support for a text enclosed within double
+    equals, as in `==marked==`.
+
 `(-) subscript`
 :   Enable superscript support. Superscripts may be written by surrounding
     the subscripted text by `~` characters, as in `2~10~`.
@@ -519,6 +523,7 @@ given in parentheses:
   (-) fancy_lists          Pandoc style fancy lists
   (-) task_list            GitHub-Flavored Markdown task list
   (-) strikeout            Strike-through with double tildes
+  (-) mark                 Highlight with double equals
   (-) subscript            Subscripted text between tildes
   (-) superscript          Superscripted text between circumflexes
   (-) bracketed_spans      Spans with attributes
@@ -590,6 +595,7 @@ local extensions = {  -- defaults
   fancy_lists = false,
   task_list = false,
   strikeout = false,
+  mark = false,
   subscript = false,
   superscript = false,
   bracketed_spans = false,

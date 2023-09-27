@@ -102,6 +102,7 @@ parsers.citation_chars         = parsers.alphanumeric
 parsers.internal_punctuation   = S(":;,.?")
 
 parsers.doubleasterisks        = P("**")
+parsers.doubleequals           = P("==")
 parsers.doubleunderscores      = P("__")
 parsers.doubletildes           = P("~~")
 parsers.fourspaces             = P("    ")
@@ -752,6 +753,10 @@ end
 --     :   Enable strike-through support for a text enclosed within double
 --         tildes, as in `~~deleted~~`.
 --
+--     `mark`
+--     :   Enable highlighting support for a text enclosed within double
+--         equals, as in `==marked==`.
+--
 --     `superscript`
 --     :   Enable superscript support. Superscripts may be written by surrounding
 --         the superscripted text by `^` characters, as in `2^10^.
@@ -922,11 +927,14 @@ function M.new(writer, options)
   -- Basic parsers (local)
   ------------------------------------------------------------------------------
 
+  local specials = "*_~`&[]<!\\-@^"
   if options.smart then
-    larsers.specialchar       = S("*_~`&[]<!\\'\"-.@^")
-  else
-    larsers.specialchar       = S("*_~`&[]<!\\-@^")
+    specials = specials .. "'.\""
   end
+  if options.mark then
+    specials = specials .. "="
+  end
+  larsers.specialchar         = S(specials)
 
   larsers.normalchar          = parsers.any - (larsers.specialchar
                                                 + parsers.spacing
@@ -1208,6 +1216,12 @@ function M.new(writer, options)
                  = ( parsers.between(parsers.Inline, parsers.doubletildes,
                                    parsers.doubletildes)
                    ) / writer.strikeout
+
+  larsers.Mark = parsers.between(parsers.Inline, parsers.doubleequals,
+                                 parsers.doubleequals)
+               / function (inlines)
+                   return writer.span(inlines, { class="mark" })
+                 end
 
   larsers.Span   = ( parsers.between(parsers.Inline, parsers.lbracket,
                                    parsers.rbracket) ) * ( parsers.attributes )
@@ -1799,6 +1813,7 @@ function M.new(writer, options)
                             + V("Emph")
                             + V("Span")
                             + V("Strikeout")
+                            + V("Mark")
                             + V("Subscript")
                             + V("Superscript")
                             + V("InlineNote")
@@ -1824,6 +1839,7 @@ function M.new(writer, options)
       Emph                  = larsers.Emph,
       Span                  = larsers.Span,
       Strikeout             = larsers.Strikeout,
+      Mark                  = larsers.Mark,
       Subscript             = larsers.Subscript,
       Superscript           = larsers.Superscript,
       InlineNote            = larsers.InlineNote,
@@ -1876,6 +1892,10 @@ function M.new(writer, options)
 
   if not options.strikeout then
     syntax.Strikeout = parsers.fail
+  end
+
+  if not options.mark then
+    syntax.Mark = parsers.fail
   end
 
   if not options.raw_attribute then

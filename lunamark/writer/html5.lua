@@ -16,6 +16,8 @@ function M.new(options)
   options = options or {}
   local Html5 = html.new(options)
 
+  local htmlSpan = Html5.span -- inherited, for overriding
+
   Html5.container = "section"
 
   Html5.template = [[
@@ -34,6 +36,14 @@ $body
   function Html5.strikeout(s)
     -- HTML5 obsoletes <strike> and recommends <del>
     return {"<del>", s, "</del>"}
+  end
+
+  function Html5.span(s, attr)
+    -- HTML5 has semantic <mark>
+    if attr.class == "mark" then
+      return {"<mark>", s, "</mark>"}
+    end
+    return htmlSpan(s, attr)
   end
 
   return Html5
