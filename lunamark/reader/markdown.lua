@@ -462,7 +462,8 @@ parsers.block_keyword =
     parsers.keyword_exact("noscript") + parsers.keyword_exact("table") +
     parsers.keyword_exact("tbody") + parsers.keyword_exact("tfoot") +
     parsers.keyword_exact("thead") + parsers.keyword_exact("th") +
-    parsers.keyword_exact("td") + parsers.keyword_exact("tr")
+    parsers.keyword_exact("td") + parsers.keyword_exact("tr") +
+    parsers.keyword_exact("style")
 
 -- There is no reason to support bad html, so we expect quoted attributes
 parsers.htmlattributevalue
