@@ -1,5 +1,7 @@
 lunamark 0.6.0 (not yet released)
 
+  * <style> tag is a block element (Omikhleia).
+
   * Added support for marked text (Omikhleia).
 
   * Added escaped line breaks (Omikhleia).
