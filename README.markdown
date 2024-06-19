@@ -8,7 +8,7 @@ written using a PEG grammar and can also be modified by the user.
 
 The library is as portable as lua and has very good performance.
 It is roughly as fast as the author's own C library
-[peg-markdown](http://github.com/jgm/peg-markdown),
+[peg-markdown](https://github.com/jgm/peg-markdown),
 two orders of magnitude faster than `Markdown.pl`,
 and three orders of magnitude faster than `markdown.lua`.
 
@@ -23,11 +23,11 @@ and three orders of magnitude faster than `markdown.lua`.
 
 [Source code repository]: https://github.com/jgm/lunamark
 [Issue tracker]: https://github.com/jgm/lunamark/issues
-[Website]: http://jgm.github.io/lunamark
-[API documentation]: http://jgm.github.io/lunamark/doc/
-[lunamark(1)]: http://jgm.github.io/lunamark/lunamark.1.html
-[lunadoc(1)]: http://jgm.github.io/lunamark/lunadoc.1.html
-[dzslides]: http://paulrouget.com/dzslides/ 
+[Website]: https://jgm.github.io/lunamark
+[API documentation]: https://jgm.github.io/lunamark/doc/
+[lunamark(1)]: https://jgm.github.io/lunamark/lunamark.1.html
+[lunadoc(1)]: https://jgm.github.io/lunamark/lunadoc.1.html
+[dzslides]: https://paulrouget.com/dzslides/
 
 # Extensions
 
