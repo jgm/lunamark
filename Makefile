@@ -15,7 +15,7 @@ TESTOPTS ?= --tidy
 all: build
 
 build: $(ROCKSPEC)
-	luarocks make $(ROCKSPEC)
+	luarocks --local make $(ROCKSPEC)
 
 .PHONY: build test testall check rock bench docs clean run-code-examples install website standalone
 
