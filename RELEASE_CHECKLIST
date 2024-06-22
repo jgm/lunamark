@@ -1,0 +1,8 @@
+- update changelog
+- update VERSION in Makefile
+- make
+- check over rockspec-VERSION.rockspec
+- commit
+- tag release with VERSION-REVISION
+- git push && git push --tags
+- luarocks upload rockspec-VERSION-REVISION.rockspec
