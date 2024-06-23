@@ -25,6 +25,11 @@ rock: $(ROCKSPEC)
 check:
 	luacheck bin/lunamark lunamark/*.lua lunamark/*/*.lua
 
+testdeps:
+	luarocks --local install lfs
+	luarocks --local install diff
+	luarocks --local install alt_getopt
+
 test:
 	LUAPATH="?.lua;lunamark/?.lua;lunamark/?/?.lua;$$LUAPATH"
 	LUNAMARK_EXTENSIONS="" bin/shtest ${TESTOPTS} -d tests/Markdown_1.0.3 -p ${PROG} ${OPTS}
@@ -76,7 +81,7 @@ run-code-examples: lunamark.lua
 	grep -e '^--     ' $< | sed -e 's/^--     //' | lua
 
 install: ${luas}
-	luarocks make
+	luarocks --local make
 
 website: docs ${web}/index.html
 	rm -r ${web}/doc ${web}/*.1.html

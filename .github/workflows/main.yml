@@ -34,4 +34,4 @@ jobs:
           docker build -t jgm/lunamark .
       - name: Run unit tests
         run: |
-          docker run --rm -v "$PWD":/mnt -w /mnt --entrypoint /bin/sh jgm/lunamark -c 'make test'
+          docker run --rm -v "$PWD":/mnt -w /mnt --entrypoint /bin/sh jgm/lunamark -c 'make testdeps && make test'
