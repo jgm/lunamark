@@ -39,6 +39,19 @@ testall: test
 	LUAPATH="?.lua;lunamark/?.lua;lunamark/?/?.lua;$$LUAPATH"
 	LUNAMARK_EXTENSIONS="" bin/shtest ${TESTOPTS} -d tests/PHP_Markdown -p ${PROG} ${OPTS}
 
+.PHONY: build-docker
+build-docker:
+	docker build -t jgm/lunamark .
+
+.PHONY: test-docker
+test-docker:
+	docker run \
+	    --rm \
+	    --volume="$(PWD)":/mnt \
+	    --workdir=/mnt \
+	    --entrypoint=/bin/sh \
+	    jgm/lunamark -c 'make testdeps && eval $$(luarocks path) && make test'
+
 $(ROCKSPEC): rockspec.in
 	sed -e "s/_VERSION/$(VERSION)/g; s/_REVISION/$(REVISION)/g" $< > $@
 

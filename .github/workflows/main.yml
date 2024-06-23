@@ -28,10 +28,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Build docker image
-        run: |
-          set -ex
-          export DOCKER_BUILDKIT=1
-          docker build -t jgm/lunamark .
+        run: make build-docker
       - name: Run unit tests
-        run: |
-          docker run --rm -v "$PWD":/mnt -w /mnt --entrypoint /bin/sh jgm/lunamark -c 'make testdeps && make test'
+        run: make test-docker
