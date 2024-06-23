@@ -26,9 +26,9 @@ check:
 	luacheck bin/lunamark lunamark/*.lua lunamark/*/*.lua
 
 testdeps:
-	luarocks --local install lfs
+	luarocks --local install luafilesystem
 	luarocks --local install diff
-	luarocks --local install alt_getopt
+	luarocks --local install alt-getopt
 
 test:
 	LUAPATH="?.lua;lunamark/?.lua;lunamark/?/?.lua;$$LUAPATH"
