@@ -31,7 +31,6 @@ testdeps:
 	luarocks --local install alt-getopt
 
 test:
-	LUAPATH="?.lua;lunamark/?.lua;lunamark/?/?.lua;$$LUAPATH"
 	LUNAMARK_EXTENSIONS="" bin/shtest ${TESTOPTS} -d tests/Markdown_1.0.3 -p ${PROG} ${OPTS}
 	LUNAMARK_EXTENSIONS="" bin/shtest ${TESTOPTS} -d tests/lunamark -p ${PROG} ${OPTS}
 
