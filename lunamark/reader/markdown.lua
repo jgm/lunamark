@@ -1172,7 +1172,7 @@ function M.new(writer, options)
                       + larsers.bqstart
                       + larsers.headerstart
                       + larsers.fencestart
-                    ) * parsers.spacechar^0 / writer.space
+                    ) * parsers.spacechar^0 / (writer.softbreak or writer.space)
 
   larsers.linebreak = parsers.spacechar^2 * larsers.Endline
   if options.escaped_line_breaks then

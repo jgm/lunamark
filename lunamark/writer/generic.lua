@@ -43,6 +43,9 @@ setmetatable(W, meta)
 -- :   `minimize` (no space between blocks)
 -- :   `compact` (no extra blank lines between blocks)
 -- :   `default` (blank line between blocks)
+--
+-- `wrap_preserve`
+-- :   whether the line wrapping of the source text should be preserved
 function M.new(options)
 
 --- The table contains the following fields:
@@ -80,6 +83,8 @@ function M.new(options)
 
   --- A space (string).
   W.space = " "
+
+  W.softbreak = options.wrap_preserve and "\n" or " "
 
   --- Setup tasks at beginning of document.
   function W.start_document()

@@ -26,6 +26,9 @@ local flatten, intersperse, map = util.flatten, util.intersperse, util.map
 -- :   `minimize` removes semantically insignificant white space.
 -- :   `compact` removes unneeded blank lines.
 -- :   `default` puts blank lines between block elements.
+--
+-- `wrap_preserve`
+-- :   whether the line wrapping of the source text should be preserved
 function M.new(options)
   options = options or {}
   local Html = xml.new(options)
