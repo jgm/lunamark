@@ -1,0 +1,5 @@
+lunamark
+<<<
+![A pretty normal markdown image](tests/assets/img/pdia-1.jpg)
+>>>
+<p><img src="tests/assets/img/pdia-1.jpg" alt="A pretty normal markdown image" /></p>
